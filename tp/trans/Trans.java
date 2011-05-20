@@ -5,12 +5,13 @@ import java.util.ArrayList;
 public class Trans extends Thread{
 	private static Trans ref;
 	private static Route route;
-	private static int address;
+	private int address;
 	
 	private ArrayList<Segment> rcvBuff;
 	
-	private Trans(){
+	private Trans(int address){
 		route = new Route(this);
+		this.address = address;
 		route.start();
 	}
 	
@@ -21,9 +22,13 @@ public class Trans extends Thread{
 		}
 	}
 	
+	public int getAddress(){
+		return address;
+	}
+	
 	public static Trans getTrans(){
 		if(ref==null){
-			ref = new Trans();
+			ref = new Trans(0);
 		}
 		return ref;
 	}

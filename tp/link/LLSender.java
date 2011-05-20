@@ -7,12 +7,14 @@ import lpt.Lpt;
  * There is a tight relationship with the class Frame.
  * LLSender has a data-buffer which will be filled with Frames.
  * The buffer consists of 10 integers: 2 integers (both 31) for flagging, the other 8 integers are the contents of the retreived Frame.
+
  * There is another array with size 10, which is a boolean-array and keeps track of whether integer i has been sent.
  *
  * The purpose of this class is to send the retreived Frame over the LPT-cable in chuncks of 1 integer each.
  * The first entry in the data-buffer is the flag-pattern (11111), so is the last entry.
  * Furthermore LLSender keeps track of the last sent integer over the cable.
  * If the integer to be sent exactly matches the previously sent integer, the class will send 00000 over the cable, before sending the new integer.
+
  *
  * Synchronization is handled as follows:
  * The receiver will put a new value on the cable if he is ready to receive a new integer.
@@ -23,31 +25,33 @@ import lpt.Lpt;
  */
 public class LLSender {
 
-    private HLSender hlSend;
     private Lpt cable;
-    private Frame[] frames;
+   // private Frame[] frames;
     private int[] frameData;
     private boolean[] sentData;
     private int changeNr;
     private int frameCount = 0;
     private int lastNr = -1;
     private HLSender hls;
+    private long time;
 
     /**
      * Creates a new low-level linklayer sender component and sets up the buffers.
      */
     public LLSender(HLSender hls) {
         this.hls = hls;
-        frames = new Frame[8];
+       // frames = new Frame[8];
         frameData = new int[11];
         sentData = new boolean[11];
         cable = new Lpt();
-        fillRand();
+        time = System.currentTimeMillis();
+       /* fillRand();
         if (pushFirstFrame(frames[0])) {
-            for (int i = 0; i < 2000; i++) {
+            for (int i = 1; i < 2000; i++) {
+                fillRand();
                 pushFrame(frames[0]);
             }
-        }
+        }*/
     }
 
     /**
@@ -69,19 +73,20 @@ public class LLSender {
      * @return
      */
     public Frame[] getFrames() {
-        // return hlSend.pop();
         return null;
     }
 
-    private int getNextRead() {
+    private void getNextRead() {
         int nr;
         while (true) {
             nr = cable.readLPT();
             if (nr != changeNr) {
                 microSleep();
                 changeNr = cable.readLPT();
+                break;
             }
         }
+        System.out.println("LLS: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
     }
 
     /**
@@ -90,29 +95,47 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f) {
-        getNextRead();
-        for (int i = 0; i < sentData.length; i++) {
+        for (int i = 0; i < f.getBytes().length; i++) {
             if (!sentData[i]) {
-                if (lastNr != frameData[i]) {
-                    sendData(i);
-                    System.out.println(frameData[i] + " = verzonden data");
+                getNextRead();
+                if (lastNr != f.getBytes()[i]) {
+                	if (f.getBytes()[i] == 0) {	//temp
+                		sendOther(i);			//temp
+                	}							//temp
+                	else {						//temp
+                		sendData(i, f);			//temp
+                    }							//temp
+                    //sendData(i,f);			//by removing temp, uncomment!
+                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
                 } else {
                     cable.writeLPT(0);
+                    System.out.println("LLS: lol "+0 + " = verzonden data");
                     getNextRead();
-                    sendData(i);
-                    System.out.println(0 + " = verzonden data");
+                    if (f.getBytes()[i] == 0) {	//temp
+                		sendOther(i);			//temp
+                	}							//temp
+                	else {						//temp
+                		sendData(i, f);			//temp
+                    }							//temp
+                    //sendData(i,f);			//by removing temp, uncomment!
+                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
                 }
-                if (i == sentData.length - 1) {
+                if (i == f.getBytes().length - 1) {
                     frameCount++;
                     if (frameCount % 10 == 0) {
-                        System.out.println("frame ended: verzonden frames: " + frameCount);
+                        System.out.println("LLS: "+"frame ended: verzonden frames: " + frameCount);
+                        System.out.println("LLS: "+(double)(System.currentTimeMillis() - time)/frameCount);
                     }
-                    fillRand();
+                    getNextRead();
+                    cable.writeLPT(31);
+                    System.out.println("LLS: " +31 + " = verzonden data");
+                    for (int j = 0; j < sentData.length; j++) {
+                    	sentData[j] = false; 
+                    }
+                  //  fillRand();
                 }
-                break;
             }
         }
-
     }
 
     /**
@@ -132,21 +155,28 @@ public class LLSender {
     public boolean pushFirstFrame(Frame f) {
         boolean succes;
         int initNr = cable.readLPT();
+        changeNr = initNr;
+        System.out.println("LLS: "+(((((byte) initNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
         if ((((((byte) initNr) >> 3) & 0x1f) ^ 0x10) == 31) {
             cable.writeLPT(31);
-            getNextRead();
+            System.out.println("LLS: "+"31 geschreven");
+            getNextRead();  //this should be 0
             cable.writeLPT(0);
+            System.out.println("LLS: "+"0 geschreven");
             succes = false;
         } else {
             cable.writeLPT(31);
+            System.out.println("LLS: "+"31 geschreven");
             getNextRead();
             if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
                 cable.writeLPT(0);
+                System.out.println("LLS: "+"0 geschreven");
                 succes = false;
             } else {
-                sentData[0] = true;
-                sendData(1);
-                pushFrame(frames[0]);
+                //sentData[0] = true;
+                sendData(0, f);
+                System.out.println("LLS: "+(((((byte) f.getBytes()[0]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
+                pushFrame(f);
                 succes = true;
             }
         }
@@ -171,7 +201,7 @@ public class LLSender {
      * frame without checking what the response is (normal sending) and
      * return with true AFTER you get a response for last 5 bits.
      *
-     * for 'normal sending see the ' pushFrame' implementation **/
+     * for 'normal sending see the 'pushFrame' implementation **/
     }
 
     private void microSleep() {
@@ -179,9 +209,16 @@ public class LLSender {
         i++;
     }
 
-    private void sendData(int i) {
-        cable.writeLPT(frameData[i]);
-        lastNr = frameData[i];
+    private void sendData(int i, Frame f) {
+        cable.writeLPT(f.getBytes()[i]);
+        lastNr = f.getBytes()[i];
+        sentData[i] = true;
+    // System.out.println((((((byte) frameData[i]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
+    }
+    
+    private void sendOther(int i) {
+    	cable.writeLPT(30);
+        lastNr = 30;
         sentData[i] = true;
     }
-}
+} 

@@ -31,7 +31,11 @@ public class Route extends Thread {
 	}
 	
 	public void rcvSegment(Segment s){
-		//add to routing  | trans.rcvSegment(s)
+		if(s.getAddress()==trans.getAddress()){
+			trans.rcvSeg(s);
+		}else{
+			routableSegs.add(s);
+		}
 	}
 	
 	public void initRoutingTable(){
@@ -50,7 +54,9 @@ public class Route extends Thread {
 					//TODO: INIT RCV, INIT SENDER
 				}else{
 					String IPAdd = scan.next();
-					l = new Tunnel(IPAdd, Integer.parseInt(scan.next()));
+					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()));
+					l = t;
+					t.start();
 				}
 				routingTable.put(addr, l);
 			}
@@ -58,9 +64,7 @@ public class Route extends Thread {
 			System.out.println("Could not open routing file");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		routingTable = new HashMap<Integer, Link>();
 	}
 }

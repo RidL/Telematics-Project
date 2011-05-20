@@ -1,25 +1,42 @@
 package tp.link;
 
-public class Frame {
-	private byte[] data;
-	private byte head;
-	private int len;
+import tp.util.ByteBuilder;
 
+public class Frame {
+	private byte[] bytes;
+	private int len;
+	private int index;
+	public static final int PAYLOAD_SIZE = 40;
 	/**
-	 * Creates a new instanc of a Frame object.
+	 * Creates a new instance of a Frame object.
 	 * @param data the data of this frame
 	 * @param ack the ACK header information of this Frame
 	 * @param fin the FIN header information of this Frame
 	 */
 	public Frame(byte[] data, boolean ack, boolean fin){
-		this.data = escape(data);
-		head = 0;
+		byte[] tmp = escape(data);
+		bytes = new byte[8];
 		if(ack){
-			head = -128;
+			bytes[0] = -128;
 		}
 		if(fin){
-			head = (byte)(head&-64);
+			bytes[0] += 64;
 		}
+		for(int i=1; i<=tmp.length; i++){
+            System.out.println(bytes[i]);
+            System.out.println(tmp[i-1]);
+			bytes[i] = tmp[i-1];
+		}
+		index = -1;
+	}
+	
+	public Frame(byte[] data, byte head){
+		//this(data, ((byte)(head&-128)==-128), ((byte)(head&64))==64);
+        bytes = new byte[8];
+        bytes[0] = head;
+        for(int i=1; i<=data.length; i++){
+            bytes[i] = data[i-1];
+        }
 	}
 	
 	/**
@@ -33,12 +50,52 @@ public class Frame {
 	 */
 	public static byte[] escape(byte[] b){
 		byte[] eBuff = new byte[7];
+		int addIndex = 0;
+		ByteBuilder build = new ByteBuilder();
+		
 		for(int byt = 0; byt<b.length; byt++){
 			for(int bit=0; bit<8; bit++){
+				ByteBuilder.ByteReturn retval;
+				int curr = 0;
 				
+				if((byte)(b[byt]<<bit)<0){
+					curr = 1;
+				}
+				retval = build.add(curr);
+				
+				if(retval == ByteBuilder.ByteReturn.FULL || retval == ByteBuilder.ByteReturn.CARRY){
+					eBuff[addIndex] = build.pop();
+					addIndex++;
+				}
+				if(retval == ByteBuilder.ByteReturn.FLAG || retval == ByteBuilder.ByteReturn.CARRY){
+					if(curr==1){
+						retval = build.add(0);
+					}else{
+						retval = build.add(1);
+					}
+					if(retval == ByteBuilder.ByteReturn.FULL || retval == ByteBuilder.ByteReturn.CARRY){
+						eBuff[addIndex] = build.pop();
+						addIndex++;
+					}
+				}
 			}
 		}
-		return null;
+		if(!build.isPopped()){
+			eBuff[addIndex] = build.pop();
+		}
+		return eBuff;
+	}
+	
+	public byte[] getBytes(){
+		return bytes;
+	}
+	
+	public boolean isFin(){
+		return (byte)(bytes[0]&64)==64;
+	}
+	
+	public boolean isACK(){
+		return (byte)(bytes[0]&-128)==-128;
 	}
 	
 	/**
@@ -50,7 +107,35 @@ public class Frame {
 	 * @return the unescaped array
 	 */
 	public static byte[] unescape(byte[] b){
-		return null;
+		byte[] uBuff = new byte[5];
+		int addIndex = 0;
+		int carry = 0;
+		ByteBuilder build = new ByteBuilder();
+		
+		for(int byt=0; byt<b.length; byt++){
+			for(int bit=carry; bit<8; bit++){
+				ByteBuilder.ByteReturn retval;
+				int curr = 0;
+				
+				if((byte)(b[byt]<<bit)<0){
+					curr = 1;
+				}
+				
+				carry = 0;
+				retval = build.add(curr);
+				if(retval==ByteBuilder.ByteReturn.FLAG || retval==ByteBuilder.ByteReturn.CARRY){
+					build.flagSeen(curr);
+					if(bit==7)
+						carry = 1;
+					bit++;
+				}
+				if(retval==ByteBuilder.ByteReturn.FULL || retval==ByteBuilder.ByteReturn.CARRY){
+					uBuff[addIndex] = build.pop();
+					addIndex++;
+				}
+			}
+		}
+		return uBuff;
 	}
 	
 	/**
@@ -111,25 +196,64 @@ public class Frame {
 	}
 	
 	/**
-	 * Gives the next five bits of this frame
+	 * First gives the head then gives the next five bits of this frame's pay-load
 	 * @return the next five bits of this frame
 	 */
-	public int getNext(){
-		return 1;
+	public int next(){
+		if(index>=56){
+			return -1;
+		}
+		ByteBuilder build = new ByteBuilder();
+		build.add(0);
+		build.add(0);
+		build.add(0);
+		int byt = index/8;
+		int bit = index %8;
+		int ret = 0;
+		
+		if(index == -1){
+			ret = bytes[0]>>3;
+			index = 8;
+		}else{
+			for(int i=0; i<5; i++,bit++){
+				if(bit==8){
+					byt++;
+					bit = -1; //bit++ still happens, HACKAGE YO
+					continue;
+				}
+				//System.out.print("byte:" + byt + " bit:" + bit);
+				if((byte)(bytes[byt]<<bit)<0){
+					//System.out.println(" -- adding 1");
+					build.add(1);
+				}else{
+					//System.out.println(" -- adding 0");
+					build.add(0);
+				}
+			}
+			index += 5;
+			ret = build.pop();
+		}
+		
+		return ret&0x1F;
 	}
 	
 	public static void main(String[] args){
-		byte[] buff = new byte[8];
+		byte[] buff = new byte[5];
 		buff[0] = -1;
-		buff[1] = 0;
+		buff[1] = -1;
 		buff[2] = -1;
 		buff[3] = -1;
 		buff[4] = -1;
-		buff[5] = -128;
-		buff[6] = -64;
-		buff[7] = -1;
-		System.out.println(toBinaryString(buff));
-		bitConcat(buff, (byte)-64, 12);
-		System.out.println(toBinaryString(buff));
+//		System.out.println(toBinaryString(buff));
+//		byte[] esc = escape(buff);
+//		System.out.println(toBinaryString(esc));
+//		System.out.println(toBinaryString(unescape(esc)));
+		Frame f = new Frame(buff, true, true);
+		System.out.println(toBinaryString(f.getBytes()));
+		int n = f.next();
+		while(n!=-1){
+			System.out.println((toBinaryString((byte)n)));
+			n = f.next();
+		}
 	}
 }
