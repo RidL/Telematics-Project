@@ -232,7 +232,7 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	System.out.println("Zoutje voor: "+frame_buffer[i].getBytes()[1]);
+        	System.out.println("PUSH THAT FRAME BIATCH");
             lls.pushFrame(frame_buffer[i]);
             i++;
         }
