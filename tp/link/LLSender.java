@@ -165,7 +165,7 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
-    	}while(n!=-1||n!=0);
+    	}while(n!=-1&&n!=0);
     	getNextRead();
     	cable.writeLPT(31); //just send, don't read next see ^^
     	System.out.println("LLS: OUT: 31");
