@@ -4,9 +4,10 @@ import tp.util.ByteBuilder;
 
 public class Frame {
 	private byte[] bytes;
-	private int len;
 	private int index;
 	public static final int PAYLOAD_SIZE = 40;
+	public static final int ONES = -1;
+	public static final int ZEROS = 7;
 	/**
 	 * Creates a new instance of a Frame object.
 	 * @param data the data of this frame

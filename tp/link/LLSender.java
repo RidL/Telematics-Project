@@ -137,17 +137,13 @@ public class LLSender {
 //                }
 //            }
 //        }
+    	
     	System.out.println(Frame.toBinaryString(f.getBytes()));
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
     		cable.writeLPT(31);
     		System.out.println("LLS: OUT: 31");
-    	}else{
-    		cable.writeLPT(n);
-    		System.out.println("LLS: OUT: " + n + "");
-    		n = f.next();
-    		lastNr = n; 
     	}
     		
     	do{
@@ -223,17 +219,19 @@ public class LLSender {
     	cable.writeLPT(31);
     	System.out.println("LLS: OUT: 31");
      	
-    	if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+    	if (changeNr == Frame.ONES) { //shift(changeNr) == 31
     		System.out.println("LLS: COLLISION DETECTED");
          	getNextRead();  //this should be 0
          	cable.writeLPT(0);
          	System.out.println("LLS: OUT: 0");
          }else{
         	 getNextRead();
-        	 if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+        	 if (changeNr == -1) { //shift(changeNr) == 31
         		 cable.writeLPT(0);
         		 System.out.println("LLS: "+"0 geschreven");
         	 } else {
+        		 lastNr = f.next();
+        		 cable.writeLPT(lastNr);
         		 pushFrame(f,false);
         		 succes = true;
           	 }
@@ -263,7 +261,8 @@ public class LLSender {
     }
 
     private void microSleep() {
-        int i = (int) Math.random() * 9;
+        @SuppressWarnings("unused")
+		int i = (int) Math.random() * 9;
         i++;
     }
 

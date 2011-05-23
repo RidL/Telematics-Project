@@ -1,7 +1,5 @@
 package tp.util;
 
-import tp.link.*;
-
 public class ByteBuilder {
 	public enum ByteReturn{
 		FULL, FLAG, CARRY, CONT

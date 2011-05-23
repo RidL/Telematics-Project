@@ -3,7 +3,8 @@ package tp.link;
 import lpt.Lpt;
 
 public class LLReceiver {
-
+	private static final int INITIAL_VALUE = 10;
+	
     private Lpt lpt;
     private HLReceiver hlr;
     private boolean alt;
@@ -15,7 +16,6 @@ public class LLReceiver {
     private byte[] data;
     private int offset;
     private byte header;
-    private static final int INITIAL_VALUE = 10;
 
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
@@ -43,19 +43,19 @@ public class LLReceiver {
         while(!frameReceived){
         	if(lpt.readLPT() != tmp){
         		for (int z = 0; z < 2; z++) {
-                    int y = 3;
+                    @SuppressWarnings("unused")
+					int y = 3;
                     y++;
                 }
-        	tmp = lpt.readLPT();
-        	int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-        	System.out.println("LLR: INC: "+i);
-        	if(i == 31 && !validFrame && readThisFrame()){
-        		validFrame = true;
-        	}
-        	if(validFrame){
-        		sendResponse();
-        		bitInterpret(i);
-        	}
+	        	tmp = lpt.readLPT();
+	        	System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+	        	if(tmp == Frame.ONES && !validFrame && readThisFrame()){
+	        		validFrame = true;
+	        	}
+	        	if(validFrame){
+	        		sendResponse();
+	        		bitInterpret(tmp);
+	        	}
         	}
         }
         System.out.println("LLR:<!--Frame received--!>");
@@ -78,15 +78,15 @@ public class LLReceiver {
 	}
 
 	private void bitInterpret(int i) {
-		if (i==31 && readingFrame){
-			if(offset <= 50){
+		if (i==-1 && readingFrame){
+			if(offset < 51){
                 System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
 				f = new Frame(data, header);
 			}
 			frameReceived=true;
 			offset = 0;
 			readingFrame = false;
-		}else if(i!= 0 && i!=31 && offset <=50){
+		}else if(i!=Frame.ZEROS && i!=Frame.ONES && offset <=50){ //shift(i)!=0 && shift(i)!=31
 			if(!readingFrame){
 				header = (byte)i;
 				readingFrame = true;
