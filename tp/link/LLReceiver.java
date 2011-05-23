@@ -59,6 +59,7 @@ public class LLReceiver {
         	}
         }
         System.out.println("LLR:<!--Frame received--!>");
+        System.out.println("LLR: "+Frame.toBinaryString(f.getBytes()));
         return f;
        
     }
