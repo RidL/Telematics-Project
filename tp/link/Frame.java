@@ -22,6 +22,7 @@ public class Frame {
 		if(fin){
 			bytes[0] += 64;
 		}
+		bytes[0] += 8;
 		for(int i=1; i<=tmp.length; i++){
             System.out.println(bytes[i]);
             System.out.println(tmp[i-1]);
