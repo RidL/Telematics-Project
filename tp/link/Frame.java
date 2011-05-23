@@ -13,8 +13,8 @@ public class Frame {
 	 * @param ack the ACK header information of this Frame
 	 * @param fin the FIN header information of this Frame
 	 */
-	public Frame(byte[] data, boolean ack, boolean fin){
-		byte[] tmp = escape(data);
+	public Frame(byte[] payload, boolean ack, boolean fin){
+		byte[] tmp = escape(payload);
 		bytes = new byte[8];
 		if(ack){
 			bytes[0] = -128;
@@ -34,8 +34,9 @@ public class Frame {
 		//this(data, ((byte)(head&-128)==-128), ((byte)(head&64))==64);
         bytes = new byte[8];
         bytes[0] = head;
+        byte[] tmp = unescape(data);
         for(int i=1; i<=data.length; i++){
-            bytes[i] = data[i-1];
+            bytes[i] = tmp[i-1];
         }
 	}
 	
@@ -107,7 +108,7 @@ public class Frame {
 	 * @return the unescaped array
 	 */
 	public static byte[] unescape(byte[] b){
-		byte[] uBuff = new byte[5];
+		byte[] uBuff = new byte[8];
 		int addIndex = 0;
 		int carry = 0;
 		ByteBuilder build = new ByteBuilder();
@@ -131,20 +132,12 @@ public class Frame {
 				}
 				if(retval==ByteBuilder.ByteReturn.FULL || retval==ByteBuilder.ByteReturn.CARRY){
 					uBuff[addIndex] = build.pop();
+					System.out.println("UNESCAPE ADDED: " + uBuff[addIndex]);
 					addIndex++;
 				}
 			}
 		}
 		return uBuff;
-	}
-	
-	/**
-	 * Converts a String to a byte[]
-	 * @param s the String to convert
-	 * @return a byte array representation of a String
-	 */
-	public static byte[] toByteArray(String s){
-		return null;
 	}
 	
 	/**
@@ -216,12 +209,13 @@ public class Frame {
 			index = 8;
 		}else{
 			for(int i=0; i<5; i++,bit++){
+				//System.out.print("byte:" + byt + " bit:" + bit);
 				if(bit==8){
 					byt++;
+					i--;
 					bit = -1; //bit++ still happens, HACKAGE YO
 					continue;
 				}
-				//System.out.print("byte:" + byt + " bit:" + bit);
 				if((byte)(bytes[byt]<<bit)<0){
 					//System.out.println(" -- adding 1");
 					build.add(1);
@@ -239,21 +233,36 @@ public class Frame {
 	
 	public static void main(String[] args){
 		byte[] buff = new byte[5];
-		buff[0] = -1;
-		buff[1] = -1;
-		buff[2] = -1;
-		buff[3] = -1;
-		buff[4] = -1;
+		buff[0] = 0;
+		buff[1] = 0;
+		buff[2] = 0;
+		buff[3] = 0;
+		buff[4] = 0;
 //		System.out.println(toBinaryString(buff));
 //		byte[] esc = escape(buff);
 //		System.out.println(toBinaryString(esc));
 //		System.out.println(toBinaryString(unescape(esc)));
+		byte[] tmp = new byte[7];
+		byte head;
 		Frame f = new Frame(buff, true, true);
 		System.out.println(toBinaryString(f.getBytes()));
+		
+		int it = 0;
 		int n = f.next();
+		System.out.println((toBinaryString((byte)n)));
+		head = (byte)(n<<3);
+		n = f.next();
 		while(n!=-1){
+			bitConcat(tmp, (byte)(n<<3), it);
+			it+=5;
+			if(it>=51){
+				break;
+			}
 			System.out.println((toBinaryString((byte)n)));
 			n = f.next();
 		}
+		Frame rcv = new Frame(tmp, head);
+		System.out.println((toBinaryString(tmp)));
+		System.out.println((toBinaryString(rcv.getBytes())));
 	}
 }
