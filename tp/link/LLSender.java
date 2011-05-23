@@ -80,6 +80,7 @@ public class LLSender {
         int nr;
         while (true) {
             nr = cable.readLPT();
+           // System.out.println("LLS: GNR: " +(((((byte) nr) >> 3) & 0x1f) ^ 0x10));
             if (nr != changeNr) {
                 microSleep();
                 changeNr = cable.readLPT();
@@ -140,7 +141,16 @@ public class LLSender {
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
+    		cable.writeLPT(0);
+    		System.out.println("LLS: OUT: 0");
+    		getNextRead();
     		cable.writeLPT(31);
+    		System.out.println("LLS: OUT: 31");
+    	}else{
+    		cable.writeLPT(n);
+    		System.out.println("LLS: OUT: " + n + "");
+    		n = f.next();
+    		lastNr = n; 
     	}
     		
     	do{
@@ -155,8 +165,10 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
-    	}while(n!=-1);
+    	}while(n!=-1||n!=0);
+    	getNextRead();
     	cable.writeLPT(31); //just send, don't read next see ^^
+    	System.out.println("LLS: OUT: 31");
     	System.out.println("LLS: ===frame sent===");
     }
 
@@ -206,9 +218,7 @@ public class LLSender {
        
  
         changeNr = cable.readLPT();
-        System.out.println("LLS: InitialValue: "+changeNr);
-    	System.out.println(Frame.toBinaryString(f.getBytes()));
-    	
+        System.out.println("LLS: InitialValue: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     	cable.writeLPT(31);
     	System.out.println("LLS: OUT: 31");
      	
