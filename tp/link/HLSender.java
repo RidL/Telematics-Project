@@ -140,7 +140,7 @@ public class HLSender extends Thread {
             int i;
             for(i = 0; i < newBytes.length && segPtr < bytes.length; i++) {
                 newBytes[i] = bytes[segPtr];
-                System.out.printf("bytePtr: %d & i: %d\n", segPtr, i);
+                System.out.printf("HLS: bytePtr: %d & i: %d\n", segPtr, i);
                 segPtr++;
             }
             if((segPtr)%5 != 0) {  // if stuffing must occur
@@ -232,13 +232,13 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	System.out.println("PUSH THAT FRAME BIATCH");
-            lls.pushFrame(frame_buffer[i]);
+        	System.out.println("HLS: PUSH THAT FRAME BIATCH");
+            lls.pushFrame(frame_buffer[i], true);
             i++;
         }
         while(i%WINDOW_SIZE != 0);
 
-        System.out.println("\n--Window pushed--\n");
+        System.out.println("HLS: \n--Window pushed--\n");
         expectAck = true;
         hlr.setExpectingAck();
 
@@ -305,7 +305,7 @@ public class HLSender extends Thread {
                     i++;
                     break;
                 }
-                lls.pushFrame(frame_buffer[sendPointer+i]);
+                lls.pushFrame(frame_buffer[sendPointer+i], true);
             }
         }
         if(!retrans) {
@@ -374,7 +374,7 @@ public class HLSender extends Thread {
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
         ackToSend = false;
-        lls.pushFrame(ackFrame);
+        lls.pushFrame(ackFrame, true);
     }
 
 

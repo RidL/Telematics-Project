@@ -94,7 +94,7 @@ public class LLSender {
      * first frame was send successfully and there trough the cable got claimed
      * for the entire TP package.
      */
-    public void pushFrame(Frame f) {
+    public void pushFrame(Frame f, boolean flag) {
 //        for (int i = 0; i < f.getBytes().length; i++) {
 //            if (!sentData[i]) {
 //                getNextRead();
@@ -138,8 +138,11 @@ public class LLSender {
 //        }
     	System.out.println(Frame.toBinaryString(f.getBytes()));
     	int n = f.next();
-    	getNextRead(); //read first, because we didn't read after last send
-    	cable.writeLPT(31);
+    	if(flag){
+    		getNextRead();//read first, because we didn't read after last send
+    		cable.writeLPT(31);
+    	}
+    		
     	do{
     		getNextRead();
     		if(lastNr!=n){
@@ -172,34 +175,58 @@ public class LLSender {
      * true if the first frame was succesfully send.
      */
     public boolean pushFirstFrame(Frame f) {
-        boolean succes;
-        int initNr = cable.readLPT();
-        changeNr = initNr;
-        System.out.println("LLS: "+(((((byte) initNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
-        if ((((((byte) initNr) >> 3) & 0x1f) ^ 0x10) == 31) {
-            cable.writeLPT(31);
-            System.out.println("LLS: "+"31 geschreven");
-            getNextRead();  //this should be 0
-            cable.writeLPT(0);
-            System.out.println("LLS: "+"0 geschreven");
-            succes = false;
-        } else {
-            cable.writeLPT(31);
-            System.out.println("LLS: "+"31 geschreven");
-            getNextRead();
-            if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
-                cable.writeLPT(0);
-                System.out.println("LLS: "+"0 geschreven");
-                succes = false;
-            } else {
-                //sentData[0] = true;
-                sendData(0, f);
-                System.out.println("LLS: "+(((((byte) f.getBytes()[0]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
-                pushFrame(f);
-                succes = true;
-            }
-        }
-        return succes;
+        boolean succes = false;
+//        int initNr = cable.readLPT();
+//        changeNr = initNr;
+//        System.out.println("LLS: "+(((((byte) initNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
+//        if ((((((byte) initNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+//            cable.writeLPT(31);
+//            System.out.println("LLS: "+"31 geschreven");
+//            getNextRead();  //this should be 0
+//            cable.writeLPT(0);
+//            System.out.println("LLS: "+"0 geschreven");
+//            succes = false;
+//        } else {
+//            cable.writeLPT(31);
+//            System.out.println("LLS: "+"31 geschreven");
+//            getNextRead();
+//            if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+//                cable.writeLPT(0);
+//                System.out.println("LLS: "+"0 geschreven");
+//                succes = false;
+//            } else {
+//                //sentData[0] = true;
+//                sendData(0, f);
+//                System.out.println("LLS: "+(((((byte) f.getBytes()[0]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
+//                pushFrame(f);
+//                succes = true;
+//            }
+//        }
+        
+       
+ 
+        changeNr = cable.readLPT();
+        System.out.println("LLS: InitialValue: "+changeNr);
+    	System.out.println(Frame.toBinaryString(f.getBytes()));
+    	
+    	cable.writeLPT(31);
+    	System.out.println("LLS: OUT: 31");
+     	
+    	if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+    		System.out.println("LLS: COLLISION DETECTED");
+         	getNextRead();  //this should be 0
+         	cable.writeLPT(0);
+         	System.out.println("LLS: OUT: 0");
+         }else{
+        	 getNextRead();
+        	 if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
+        		 cable.writeLPT(0);
+        		 System.out.println("LLS: "+"0 geschreven");
+        	 } else {
+        		 pushFrame(f,false);
+        		 succes = true;
+          	 }
+         }
 
     /** Implementation idea
      *
@@ -221,6 +248,7 @@ public class LLSender {
      * return with true AFTER you get a response for last 5 bits.
      *
      * for 'normal sending see the 'pushFrame' implementation **/
+        return succes;
     }
 
     private void microSleep() {

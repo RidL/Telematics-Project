@@ -31,13 +31,13 @@ public class LinkInitializer {
 
         hlr.start();
         hls.start();
-//        while (true) {
-//            if (hls.readyToPushSegment()) {
-//                if (hls.readyToPushSegment()) {
-//                    hls.pushSegment(bytes);
-//                }
-//            }
-//        }
+        while (true) {
+            if (hls.readyToPushSegment()) {
+                if (hls.readyToPushSegment()) {
+                    hls.pushSegment(bytes);
+                }
+            }
+        }
 
     }
 }
