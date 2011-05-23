@@ -141,9 +141,6 @@ public class LLSender {
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
-    		cable.writeLPT(0);
-    		System.out.println("LLS: OUT: 0");
-    		getNextRead();
     		cable.writeLPT(31);
     		System.out.println("LLS: OUT: 31");
     	}else{
@@ -167,8 +164,12 @@ public class LLSender {
     		n = f.next();
     	}while(n!=-1&&n!=0);
     	getNextRead();
-    	cable.writeLPT(31); //just send, don't read next see ^^
     	System.out.println("LLS: OUT: 31");
+    	cable.writeLPT(31);
+    	getNextRead();
+    	System.out.println("LLS: OUT: 0");
+		cable.writeLPT(0);
+ 
     	System.out.println("LLS: ===frame sent===");
     }
 
