@@ -48,7 +48,7 @@ public class LLReceiver {
                 }
         	tmp = lpt.readLPT();
         	int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-        	System.out.println("LLR:   ---->: "+i);
+        	System.out.println("LLR: INC: "+i);
         	if(i == 31 && !validFrame && readThisFrame()){
         		validFrame = true;
         	}
@@ -66,11 +66,11 @@ public class LLReceiver {
     private void sendResponse() {
     	   if (alt) {
                lpt.writeLPT(4);
-              System.out.println("LLR: <<: 4");
+              System.out.println("LLR: OUT: 4");
                alt = false;
            } else {
                lpt.writeLPT(10);
-              System.out.println("LLR: <<: 10");
+              System.out.println("LLR: OUT: 10");
                alt = true;
            }
 		
