@@ -46,7 +46,6 @@ public class HLReceiver extends Thread {
         while (true) {
 
             Frame tempFrame = llr.read();
-
             // !senderActive == receiving || cable_free
             if (!senderActive) {
                 interpretFrame(tempFrame);
@@ -67,6 +66,7 @@ public class HLReceiver extends Thread {
 
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
+        System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
         hls.ackReceived(ack);
         expectingAck = false;
         // ackReceived non-existent, ik gebruik expectingAck
@@ -88,7 +88,7 @@ public class HLReceiver extends Thread {
          * Vervolgens roept hij 'HLSender' aan met 'ackToSend(byte) waaarbij
          * hij de gemaakte byte meegeeft
          */
-        byte ack = -128;
+        byte ack = 0;
         boolean[] acks = new boolean[8];
         boolean newWindow = true;
         for(int i = 0; i < WINDOW_SIZE; i++) {
@@ -105,10 +105,7 @@ public class HLReceiver extends Thread {
             windowPtr += WINDOW_SIZE;
         }
         System.out.println("newWindow: " + newWindow);
-        System.out.println("ACK: " + ack);
-        System.out.println("toBits: " + Integer.toBinaryString((int)ack));
-        for(boolean b: acks)
-            System.out.println("ACKS: " + b);
+        System.out.println("ACK: " + Frame.toBinaryString(ack));
 
         hls.ackToSend((byte)-128);
     }

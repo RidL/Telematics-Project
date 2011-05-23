@@ -374,6 +374,7 @@ public class HLSender extends Thread {
         byte[] ackData = new byte[]{ack};
         Frame ackFrame = new Frame(ackData, ackToSend, false);
         ackToSend = false;
+        lls.pushFrame(ackFrame);
     }
 
 
