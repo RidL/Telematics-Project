@@ -86,7 +86,7 @@ public class LLSender {
                 break;
             }
         }
-        System.out.println("LLS: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
+        System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     }
 
     /**
@@ -95,47 +95,66 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f) {
-        for (int i = 0; i < f.getBytes().length; i++) {
-            if (!sentData[i]) {
-                getNextRead();
-                if (lastNr != f.getBytes()[i]) {
-                	if (f.getBytes()[i] == 0) {	//temp
-                		sendOther(i);			//temp
-                	}							//temp
-                	else {						//temp
-                		sendData(i, f);			//temp
-                    }							//temp
-                    //sendData(i,f);			//by removing temp, uncomment!
-                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
-                } else {
-                    cable.writeLPT(0);
-                    System.out.println("LLS: lol "+0 + " = verzonden data");
-                    getNextRead();
-                    if (f.getBytes()[i] == 0) {	//temp
-                		sendOther(i);			//temp
-                	}							//temp
-                	else {						//temp
-                		sendData(i, f);			//temp
-                    }							//temp
-                    //sendData(i,f);			//by removing temp, uncomment!
-                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
-                }
-                if (i == f.getBytes().length - 1) {
-                    frameCount++;
-                    if (frameCount % 10 == 0) {
-                        System.out.println("LLS: "+"frame ended: verzonden frames: " + frameCount);
-                        System.out.println("LLS: "+(double)(System.currentTimeMillis() - time)/frameCount);
-                    }
-                    getNextRead();
-                    cable.writeLPT(31);
-                    System.out.println("LLS: " +31 + " = verzonden data");
-                    for (int j = 0; j < sentData.length; j++) {
-                    	sentData[j] = false; 
-                    }
-                  //  fillRand();
-                }
-            }
-        }
+//        for (int i = 0; i < f.getBytes().length; i++) {
+//            if (!sentData[i]) {
+//                getNextRead();
+//                if (lastNr != f.getBytes()[i]) {
+//                	if (f.getBytes()[i] == 0) {	//temp
+//                		sendOther(i);			//temp
+//                	}							//temp
+//                	else {						//temp
+//                		sendData(i, f);			//temp
+//                    }							//temp
+//                    //sendData(i,f);			//by removing temp, uncomment!
+//                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
+//                } else {
+//                    cable.writeLPT(0);
+//                    System.out.println("LLS: lol "+0 + " = verzonden data");
+//                    getNextRead();
+//                    if (f.getBytes()[i] == 0) {	//temp
+//                		sendOther(i);			//temp
+//                	}							//temp
+//                	else {						//temp
+//                		sendData(i, f);			//temp
+//                    }							//temp
+//                    //sendData(i,f);			//by removing temp, uncomment!
+//                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
+//                }
+//                if (i == f.getBytes().length - 1) {
+//                    frameCount++;
+//                    if (frameCount % 10 == 0) {
+//                        System.out.println("LLS: "+"frame ended: verzonden frames: " + frameCount);
+//                        System.out.println("LLS: "+(double)(System.currentTimeMillis() - time)/frameCount);
+//                    }
+//                    getNextRead();
+//                    cable.writeLPT(31);
+//                    System.out.println("LLS: " +31 + " = verzonden data");
+//                    for (int j = 0; j < sentData.length; j++) {
+//                    	sentData[j] = false; 
+//                    }
+//                  //  fillRand();
+//                }
+//            }
+//        }
+    	System.out.println(Frame.toBinaryString(f.getBytes()));
+    	int n = f.next();
+    	getNextRead(); //read first, because we didn't read after last send
+    	cable.writeLPT(31);
+    	do{
+    		getNextRead();
+    		if(lastNr!=n){
+    			cable.writeLPT(n);
+    		}else{
+    			cable.writeLPT(0);
+    			getNextRead();
+    			cable.writeLPT(n);
+    		}
+    		System.out.println("LLS: OUT: " + n + "");
+    		lastNr = n;
+    		n = f.next();
+    	}while(n!=-1);
+    	cable.writeLPT(31); //just send, don't read next see ^^
+    	System.out.println("LLS: ===frame sent===");
     }
 
     /**
