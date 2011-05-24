@@ -49,8 +49,10 @@ public class LLReceiver {
                 }
                 tmp = lpt.readLPT();
                 System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
-                //   System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
+                //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
+                //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
+
                     System.out.println("LLR: set FrameValid!");
                     validFrame = true;
                 }
@@ -61,7 +63,7 @@ public class LLReceiver {
             }
         }
         System.out.println("LLR:<!--Frame received--!>");
-        System.out.println("LLR: " + Frame.toBinaryString(f.getBytes()));
+        System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
         return f;
 
     }
@@ -94,10 +96,7 @@ public class LLReceiver {
                 header = (byte) (i^0x80);
                 readingFrame = true;
             } else {
-                System.out.println(Frame.toBinaryString((byte)i));
-                System.out.println(Frame.toBinaryString(data));
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
-                System.out.println(Frame.toBinaryString(data));
                 offset = offset + 5;
             }
         }
