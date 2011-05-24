@@ -25,8 +25,6 @@ public class Frame {
 		}
 		bytes[0] += 8;
 		for(int i=1; i<=tmp.length; i++){
-            System.out.println(bytes[i]);
-            System.out.println(tmp[i-1]);
 			bytes[i] = tmp[i-1];
 		}
 		index = -1;

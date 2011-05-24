@@ -68,6 +68,7 @@ public class HLReceiver extends Thread {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
         System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
         hls.ackReceived(ack);
+        llr.setInvalidFrame();
         expectingAck = false;
         // ackReceived non-existent, ik gebruik expectingAck
         // frameReceived setten lijkt me niet nodig
@@ -104,8 +105,8 @@ public class HLReceiver extends Thread {
         if(newWindow) {
             windowPtr += WINDOW_SIZE;
         }
-        System.out.println("newWindow: " + newWindow);
-        System.out.println("ACK: " + Frame.toBinaryString(ack));
+        System.out.println("HLR: newWindow: " + newWindow);
+        System.out.println("HLR: ACK: " + Frame.toBinaryString(ack));
 
         hls.ackToSend((byte)-128);
     }
@@ -127,8 +128,6 @@ public class HLReceiver extends Thread {
      * Wij allebei niets doen, jij je bek houden
      */
     public void setReceivingMode(boolean b) {
-    	if(hls==null)
-    		System.out.println("its null");
         hls.setReceiverActive(b);
     }
 

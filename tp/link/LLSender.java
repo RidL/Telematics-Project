@@ -96,48 +96,7 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f, boolean flag) {
-//        for (int i = 0; i < f.getBytes().length; i++) {
-//            if (!sentData[i]) {
-//                getNextRead();
-//                if (lastNr != f.getBytes()[i]) {
-//                	if (f.getBytes()[i] == 0) {	//temp
-//                		sendOther(i);			//temp
-//                	}							//temp
-//                	else {						//temp
-//                		sendData(i, f);			//temp
-//                    }							//temp
-//                    //sendData(i,f);			//by removing temp, uncomment!
-//                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
-//                } else {
-//                    cable.writeLPT(0);
-//                    System.out.println("LLS: lol "+0 + " = verzonden data");
-//                    getNextRead();
-//                    if (f.getBytes()[i] == 0) {	//temp
-//                		sendOther(i);			//temp
-//                	}							//temp
-//                	else {						//temp
-//                		sendData(i, f);			//temp
-//                    }							//temp
-//                    //sendData(i,f);			//by removing temp, uncomment!
-//                    System.out.println("LLS: "+f.getBytes()[i] + " = verzonden data");
-//                }
-//                if (i == f.getBytes().length - 1) {
-//                    frameCount++;
-//                    if (frameCount % 10 == 0) {
-//                        System.out.println("LLS: "+"frame ended: verzonden frames: " + frameCount);
-//                        System.out.println("LLS: "+(double)(System.currentTimeMillis() - time)/frameCount);
-//                    }
-//                    getNextRead();
-//                    cable.writeLPT(31);
-//                    System.out.println("LLS: " +31 + " = verzonden data");
-//                    for (int j = 0; j < sentData.length; j++) {
-//                    	sentData[j] = false; 
-//                    }
-//                  //  fillRand();
-//                }
-//            }
-//        }
-    	
+
     	System.out.println(Frame.toBinaryString(f.getBytes()));
     	int n = f.next();
     	if(flag){
@@ -158,7 +117,7 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
-    	}while(n!=-1&&n!=0);
+    	}while(n!= Frame.ONES && n!=0);
     	getNextRead();
     	System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
@@ -185,35 +144,7 @@ public class LLSender {
      */
     public boolean pushFirstFrame(Frame f) {
         boolean succes = false;
-//        int initNr = cable.readLPT();
-//        changeNr = initNr;
-//        System.out.println("LLS: "+(((((byte) initNr) >> 3) & 0x1f) ^ 0x10) + " gelezen");
-//        if ((((((byte) initNr) >> 3) & 0x1f) ^ 0x10) == 31) {
-//            cable.writeLPT(31);
-//            System.out.println("LLS: "+"31 geschreven");
-//            getNextRead();  //this should be 0
-//            cable.writeLPT(0);
-//            System.out.println("LLS: "+"0 geschreven");
-//            succes = false;
-//        } else {
-//            cable.writeLPT(31);
-//            System.out.println("LLS: "+"31 geschreven");
-//            getNextRead();
-//            if ((((((byte) changeNr) >> 3) & 0x1f) ^ 0x10) == 31) {
-//                cable.writeLPT(0);
-//                System.out.println("LLS: "+"0 geschreven");
-//                succes = false;
-//            } else {
-//                //sentData[0] = true;
-//                sendData(0, f);
-//                System.out.println("LLS: "+(((((byte) f.getBytes()[0]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
-//                pushFrame(f);
-//                succes = true;
-//            }
-//        }
         
-       
- 
         changeNr = cable.readLPT();
         System.out.println("LLS: InitialValue: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     	cable.writeLPT(31);
@@ -226,7 +157,7 @@ public class LLSender {
          	System.out.println("LLS: OUT: 0");
          }else{
         	 getNextRead();
-        	 if (changeNr == -1) { //shift(changeNr) == 31
+        	 if (changeNr == Frame.ONES) { //shift(changeNr) == 31
         		 cable.writeLPT(0);
         		 System.out.println("LLS: "+"0 geschreven");
         	 } else {
@@ -266,16 +197,4 @@ public class LLSender {
         i++;
     }
 
-    private void sendData(int i, Frame f) {
-        cable.writeLPT(f.getBytes()[i]);
-        lastNr = f.getBytes()[i];
-        sentData[i] = true;
-    // System.out.println((((((byte) frameData[i]) >> 3) & 0x1f) ^ 0x10) + " geschreven");
-    }
-    
-    private void sendOther(int i) {
-    	cable.writeLPT(30);
-        lastNr = 30;
-        sentData[i] = true;
-    }
 } 
