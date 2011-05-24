@@ -198,7 +198,8 @@ public class HLSender extends Thread {
                 if((segPtr)%5 == 1)    // 4 bytes stuffing
                     newBytes[i+3] = 4;
             }
-            if(segPtr == bytes.length) {  // end of tl-packet
+            if(segPtr == bytes.length) {  // end of tl-seg
+            	System.out.println("HLS: FINFIN");
                 isFin = true;
             }
             Frame frame = new Frame(newBytes, false, isFin);
@@ -236,7 +237,7 @@ public class HLSender extends Thread {
         	 lls.pushFrame(frame_buffer[i], true);
             i++;
         }
-        while(i%WINDOW_SIZE != 0);
+        while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
 
         System.out.println("HLS: \n--Window pushed--\n");
         expectAck = true;
