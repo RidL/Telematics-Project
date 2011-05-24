@@ -1,6 +1,5 @@
 package tp.trans;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -20,14 +19,15 @@ public class SHA1Hash {
                 halfbyte = data[i] & 0x0F;
             } while (two_halfs++ < 1);
         }
-        return
-         buf.toString();
+        return buf.toString();
     }
 
-    public static byte[] SHA1(byte[] data)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest md;
-        md = MessageDigest.getInstance("SHA-1");
+    public static byte[] SHA1(byte[] data) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException ex) {
+        }
         byte[] sha1hash = new byte[40];
         md.update(data, 0, data.length);
         sha1hash = md.digest();
