@@ -7,7 +7,7 @@ public class Frame {
 	private int index;
 	public static final int PAYLOAD_SIZE = 40;
 	public static final int ONES = 127;
-	public static final int ZEROS = 7;
+	public static final int ZEROS = -121;
 	/**
 	 * Creates a new instance of a Frame object.
 	 * @param data the data of this frame
