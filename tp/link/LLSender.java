@@ -110,6 +110,7 @@ public class LLSender {
     			cable.writeLPT(n);
     		}else{
     			cable.writeLPT(0);
+    			System.out.println("LLS: OUT: 0");
     			getNextRead();
     			cable.writeLPT(n);
     		}
