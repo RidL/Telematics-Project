@@ -1,5 +1,7 @@
 package tp.trans;
 
+import java.security.NoSuchAlgorithmException;
+
 public class Segment {
 
     private byte[] bytes;
@@ -74,7 +76,11 @@ public class Segment {
         bytes[3] = 0;
         bytes[4] = (byte) (bytes[4] & 0x0f);
 
-        hash = SHA1Hash.SHA1(bytes);
+        try{
+            hash = SHA1Hash.SHA1(bytes);
+        }catch (NoSuchAlgorithmException nsae) {
+
+        }
 
         bytes[2] = hash[0];
         bytes[3] = hash[1];

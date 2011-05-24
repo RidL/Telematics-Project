@@ -22,12 +22,11 @@ public class SHA1Hash {
         return buf.toString();
     }
 
-    public static byte[] SHA1(byte[] data) {
+    public static byte[] SHA1(byte[] data) throws NoSuchAlgorithmException {
         MessageDigest md = null;
-        try {
+        
             md = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException ex) {
-        }
+        
         byte[] sha1hash = new byte[40];
         md.update(data, 0, data.length);
         sha1hash = md.digest();
