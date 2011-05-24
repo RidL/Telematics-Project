@@ -90,10 +90,14 @@ public class LLReceiver {
             readingFrame = false;
         } else if ((i != Frame.ZEROS) && (i != Frame.ONES) && offset <= 50) { //shift(i)!=0 && shift(i)!=31
             if (!readingFrame) {
-                header = (byte) i;
+                System.out.println("Setting Header");
+                header = (byte) (i^0x80);
                 readingFrame = true;
             } else {
-                Frame.bitConcat(data, (byte) i, offset);
+                System.out.println(Frame.toBinaryString((byte)i));
+                System.out.println(Frame.toBinaryString(data));
+                Frame.bitConcat(data, (byte) (i^0x80), offset);
+                System.out.println(Frame.toBinaryString(data));
                 offset = offset + 5;
             }
         }
