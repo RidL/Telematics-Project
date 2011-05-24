@@ -51,6 +51,7 @@ public class HLReceiver extends Thread {
                 interpretFrame(tempFrame);
             } else {
             	// if senderActive
+            	System.out.println("HLR: ACK PROCCESSING");
                 ackReceived(tempFrame);
             }
         }
@@ -68,6 +69,7 @@ public class HLReceiver extends Thread {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
         System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
         hls.ackReceived(ack);
+        System.out.println("HLR: SET HLS TO EXPACT ACK");
         llr.setInvalidFrame();
         expectingAck = false;
         // ackReceived non-existent, ik gebruik expectingAck

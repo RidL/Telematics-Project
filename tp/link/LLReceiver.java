@@ -96,10 +96,10 @@ public class LLReceiver {
                 header = (byte) (i^0x80);
                 readingFrame = true;
             } else {
-            	System.out.println("LLR: notShifted "+Frame.toBinaryString((byte)(i)));
-            	System.out.println("LLR: Shifted    "+(Frame.toBinaryString((byte)(i^0x80))));
+            	//System.out.println("LLR: notShifted "+Frame.toBinaryString((byte)(i)));
+            //	System.out.println("LLR: Shifted    "+(Frame.toBinaryString((byte)(i^0x80))));
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
-                System.out.println(Frame.toBinaryString(data));
+              //  System.out.println(Frame.toBinaryString(data));
                 offset = offset + 5;
             }
         }

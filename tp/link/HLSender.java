@@ -93,6 +93,7 @@ public class HLSender extends Thread {
                 if (ackReceived) {
                     retransmitWindow();
                 } else if (segmentInBuffer && !expectAck) {
+                	System.out.println("HLS: pushWindow");
                     pushWindow();
                 }
             } else {
@@ -285,8 +286,7 @@ public class HLSender extends Thread {
      */
     public void ackReceived(byte b) {
         ackReceived = true;
-        expectAck = false;
-        ack = b;
+        ack = b;  
     }
 
     /**
@@ -294,7 +294,12 @@ public class HLSender extends Thread {
      * retransmits the incorrectly received frames
      */
     public void retransmitWindow() {
+    	System.out.println("in rtrwindow");
         boolean retrans = false;
+        
+        ackReceived = false;
+        expectAck = false;  
+        
         int i;
         for(i = 0; i < WINDOW_SIZE; i++) {
             if((byte)(ack << i) < 0) {
@@ -317,8 +322,7 @@ public class HLSender extends Thread {
             else {
                 sendPointer += i;
             }
-        }
-        else {
+        } else {
             System.out.println("\nHLR:--Retransmitting--\n");
             expectAck = true;
             hlr.setSenderActive(false);
