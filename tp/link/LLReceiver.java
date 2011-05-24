@@ -104,7 +104,7 @@ public class LLReceiver {
 
     public void setInvalidFrame() {
         validFrame = false;
-        System.out.println("LLR: Frame got set invalid");
+        System.out.println("LLR: Ignoring data");
     }
 
     public boolean readThisFrame() {
