@@ -108,7 +108,7 @@ public class HLReceiver extends Thread {
         System.out.println("HLR: newWindow: " + newWindow);
         System.out.println("HLR: ACK: " + Frame.toBinaryString(ack));
 
-        hls.ackToSend((byte)-128);
+        hls.ackToSend((byte)ack);
     }
     /**
      * Ik doe niets als true
