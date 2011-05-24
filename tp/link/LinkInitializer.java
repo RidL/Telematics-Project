@@ -39,5 +39,13 @@ public class LinkInitializer {
 //            }
 //        }
 
+        while (true) {
+        	System.out.println("LI: "+hls.readyToPushSegment());
+            if (hls.readyToPushSegment()) {
+                if (hls.readyToPushSegment()) {
+                    hls.pushSegment(bytes);
+                }
+            }
+        }
     }
 }
