@@ -94,15 +94,16 @@ public class HLReceiver extends Thread {
         byte ack = 0;
         boolean[] acks = new boolean[8];
         boolean newWindow = true;
-        for(int i = 0; i < WINDOW_SIZE; i++) {
+        for(int i = 0; i<WINDOW_SIZE; i++) {
              if(frame_buffer[windowPtr+i] == null) {
                  ack+= Math.pow(2, (WINDOW_SIZE-1)-i);
                  acks[i] = false;
                  newWindow = false;
-             }
-             else {
+             } else {
                  acks[i] = true;
              }
+             if(frame_buffer[windowPtr+i].isFin())
+                 break;
         }
         if(newWindow) {
             windowPtr += WINDOW_SIZE;
