@@ -23,7 +23,7 @@ public class LinkInitializer {
             12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 6, 3, 16, 14, 7, 9, 26, 12, 13, 3, 30, 1, 5, 12, 7, 4, 6,
             9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 16, 14, 7, 9,
             26, 12, 13, 3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5, 12, 7};   // 103 bytes
-//        byte[] bytes2 = new byte[]{3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5,
+        //        byte[] bytes2 = new byte[]{3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5,
 //            12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 6, 3, 16, 14, 7, 9, 26, 12, 13, 3, 30, 1, 5, 12, 7, 4, 6,
 //            9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 16, 14, 7, 9,
 //            26, 12, 13, 3, 30, 1, 5, 12, 7, 4, 6};   // 89 bytes
@@ -31,13 +31,21 @@ public class LinkInitializer {
 
         hlr.start();
         hls.start();
-//        while (true) {
-//            if (hls.readyToPushSegment()) {
-//                if (hls.readyToPushSegment()) {
-//                    hls.pushSegment(bytes);
-//                }
-//            }
-//        }
 
+        while (true) {
+        	//System.out.println("LI: "+hls.readyToPushSegment());
+            if (hls.readyToPushSegment()) {
+                if (hls.readyToPushSegment()) {
+                    hls.pushSegment(bytes);
+                }
+            }
+            System.out.println("LI: DONE WITH SENDING");
+            try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
     }
 }

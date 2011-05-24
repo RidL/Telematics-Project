@@ -93,6 +93,7 @@ public class HLSender extends Thread {
                 if (ackReceived) {
                     retransmitWindow();
                 } else if (segmentInBuffer && !expectAck) {
+                	//System.out.println("HLS: pushWindow");
                     pushWindow();
                 }
             } else {
@@ -140,7 +141,7 @@ public class HLSender extends Thread {
             int i;
             for(i = 0; i < newBytes.length && segPtr < bytes.length; i++) {
                 newBytes[i] = bytes[segPtr];
-                System.out.printf("HLS: bytePtr: %d & i: %d\n", segPtr, i);
+                //System.out.printf("HLS: bytePtr: %d & i: %d\n", segPtr, i);
                 segPtr++;
             }
             if((segPtr)%5 != 0) {  // if stuffing must occur
@@ -197,7 +198,8 @@ public class HLSender extends Thread {
                 if((segPtr)%5 == 1)    // 4 bytes stuffing
                     newBytes[i+3] = 4;
             }
-            if(segPtr == bytes.length) {  // end of tl-packet
+            if(segPtr == bytes.length) {  // end of tl-seg
+            	//System.out.println("HLS: FINFIN");
                 isFin = true;
             }
             Frame frame = new Frame(newBytes, false, isFin);
@@ -232,11 +234,10 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	System.out.println("HLS: PUSH THAT FRAME BIATCH");
-            lls.pushFrame(frame_buffer[i], true);
+        	 lls.pushFrame(frame_buffer[i], true);
             i++;
         }
-        while(i%WINDOW_SIZE != 0);
+        while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
 
         System.out.println("HLS: \n--Window pushed--\n");
         expectAck = true;
@@ -286,8 +287,7 @@ public class HLSender extends Thread {
      */
     public void ackReceived(byte b) {
         ackReceived = true;
-        expectAck = false;
-        ack = b;
+        ack = b;  
     }
 
     /**
@@ -295,21 +295,29 @@ public class HLSender extends Thread {
      * retransmits the incorrectly received frames
      */
     public void retransmitWindow() {
+    	//System.out.println("in rtrwindow");
         boolean retrans = false;
+        
+        ackReceived = false;
+        expectAck = false;  
+        
         int i;
         for(i = 0; i < WINDOW_SIZE; i++) {
             if((byte)(ack << i) < 0) {
                 retrans = true;
-                //Frame temp = frame_buffer[sendPointer+i];
-                if(frame_buffer[(sendPointer+i)-1].isFin()) {
-                    i++;
-                    break;
-                }
                 lls.pushFrame(frame_buffer[sendPointer+i], true);
+            }
+            //Frame temp = frame_buffer[sendPointer+i];
+            System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
+            if(frame_buffer[(sendPointer+i)].isFin()) {
+            	System.out.println("HLS: DETECTED PREM FIN IN ACK");
+       
+                break;
             }
         }
         if(!retrans) {
-            if(frame_buffer[sendPointer+i-1].isFin()) {
+        	System.out.println("\nHLR: No retransmit, sendPointer updated \n");
+            if(frame_buffer[sendPointer+i].isFin()) {
                 sendPointer = 0;
                 framesInBuffer = 0;
                 segmentInBuffer = false;
@@ -317,8 +325,7 @@ public class HLSender extends Thread {
             else {
                 sendPointer += i;
             }
-        }
-        else {
+        } else {
             System.out.println("\nHLR:--Retransmitting--\n");
             expectAck = true;
             hlr.setSenderActive(false);
@@ -349,7 +356,11 @@ public class HLSender extends Thread {
          *
          */
     }
-
+    
+    public void pushFrame(Frame f){
+    	lls.pushFirstFrame(f);
+    }
+    
     /**
      * Informs this class that a certain ack needs to be send.
      *
@@ -372,6 +383,7 @@ public class HLSender extends Thread {
          * Maakt een ack frame met behulp van byte 'ack', verstuurd deze ack,
          * zet ackToSend op false en informeer HLReceiver.
          */
+    	//System.out.println("HLS:  Sending ack");
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
         ackToSend = false;

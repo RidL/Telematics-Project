@@ -62,6 +62,7 @@ public class HLReceiver extends Thread {
                 interpretFrame(tempFrame);
             } else {
             	// if senderActive
+            	System.out.println("HLR: ACK PROCCESSING");
                 ackReceived(tempFrame);
             }
         }
@@ -78,8 +79,9 @@ public class HLReceiver extends Thread {
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
         System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
-        llr.setInvalidFrame();
         hls.ackReceived(ack);
+        System.out.println("HLR: SET HLS TO EXPACT ACK");
+        llr.setInvalidFrame();
         expectingAck = false;
         // ackReceived non-existent, ik gebruik expectingAck
         // frameReceived setten lijkt me niet nodig
@@ -103,14 +105,19 @@ public class HLReceiver extends Thread {
         byte ack = 0;
         boolean[] acks = new boolean[8];
         boolean newWindow = true;
-        for(int i = 0; i < WINDOW_SIZE; i++) {
+        for(int i = 0; i<WINDOW_SIZE; i++) {
              if(frame_buffer[windowPtr+i] == null) {
                  ack+= Math.pow(2, (WINDOW_SIZE-1)-i);
                  acks[i] = false;
                  newWindow = false;
-             }
-             else {
+             } else {
                  acks[i] = true;
+             }
+             if(frame_buffer[windowPtr+i].isFin()){
+                 windowPtr = 0;
+                 recPtr = 0;
+                 newWindow = false;
+                 break;
              }
         }
         if(newWindow) {
@@ -119,7 +126,7 @@ public class HLReceiver extends Thread {
         System.out.println("HLR: newWindow: " + newWindow);
         System.out.println("HLR: ACK: " + Frame.toBinaryString(ack));
 
-        hls.ackToSend((byte)-128);
+        hls.ackToSend((byte)ack);
     }
     /**
      * Ik doe niets als true

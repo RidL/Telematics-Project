@@ -6,8 +6,8 @@ public class Frame {
 	private byte[] bytes;
 	private int index;
 	public static final int PAYLOAD_SIZE = 40;
-	public static final int ONES = -1;
-	public static final int ZEROS = 7;
+	public static final int ONES = 127;
+	public static final int ZEROS = -121;
 	/**
 	 * Creates a new instance of a Frame object.
 	 * @param data the data of this frame
@@ -29,7 +29,7 @@ public class Frame {
 		}
 		index = -1;
 	}
-	
+
 	public Frame(byte[] data, byte head){
 		//this(data, ((byte)(head&-128)==-128), ((byte)(head&64))==64);
         bytes = new byte[8];
@@ -39,7 +39,7 @@ public class Frame {
             bytes[i] = tmp[i-1];
         }
 	}
-	
+
 	/**
 	 * Performs bit stuffing for the byte array b. Flags 00000 and 11111
 	 * are escaped to 000010 and 111101 respectively. Note that the size of
@@ -53,17 +53,17 @@ public class Frame {
 		byte[] eBuff = new byte[7];
 		int addIndex = 0;
 		ByteBuilder build = new ByteBuilder();
-		
+
 		for(int byt = 0; byt<b.length; byt++){
 			for(int bit=0; bit<8; bit++){
 				ByteBuilder.ByteReturn retval;
 				int curr = 0;
-				
+
 				if((byte)(b[byt]<<bit)<0){
 					curr = 1;
 				}
 				retval = build.add(curr);
-				
+
 				if(retval == ByteBuilder.ByteReturn.FULL || retval == ByteBuilder.ByteReturn.CARRY){
 					eBuff[addIndex] = build.pop();
 					addIndex++;
@@ -86,19 +86,19 @@ public class Frame {
 		}
 		return eBuff;
 	}
-	
+
 	public byte[] getBytes(){
 		return bytes;
 	}
-	
+
 	public boolean isFin(){
 		return (byte)(bytes[0]&64)==64;
 	}
-	
+
 	public boolean isACK(){
 		return (byte)(bytes[0]&-128)==-128;
 	}
-	
+
 	/**
 	 * Performs the parsing of a byte array b so that the bitcodes that were
 	 * escaped are once again back to normal.
@@ -112,16 +112,16 @@ public class Frame {
 		int addIndex = 0;
 		int carry = 0;
 		ByteBuilder build = new ByteBuilder();
-		
+
 		for(int byt=0; byt<b.length; byt++){
 			for(int bit=carry; bit<8; bit++){
 				ByteBuilder.ByteReturn retval;
 				int curr = 0;
-				
+
 				if((byte)(b[byt]<<bit)<0){
 					curr = 1;
 				}
-				
+
 				carry = 0;
 				retval = build.add(curr);
 				if(retval==ByteBuilder.ByteReturn.FLAG || retval==ByteBuilder.ByteReturn.CARRY){
@@ -139,7 +139,7 @@ public class Frame {
 		}
 		return uBuff;
 	}
-	
+
 	/**
 	 * Returns the concatenation of start and tail, offset bits into start
 	 * @param start the beginning of result up to offset bits into start
@@ -164,9 +164,9 @@ public class Frame {
 		}else{
 			start[index] = tail;
 		}
-		
+
 	}
-	
+
 	public static String toBinaryString(byte[] buff){
 		String ret = new String();
 		for(int i=0; i<buff.length; i++){
@@ -177,7 +177,7 @@ public class Frame {
 		}
 		return ret;
 	}
-	
+
 	public static String toBinaryString(byte b){
 		StringBuilder sb = new StringBuilder("00000000");
 	     for (int bit = 0; bit<8; bit++) {
@@ -187,7 +187,7 @@ public class Frame {
 	     }
 	     return sb.toString();
 	}
-	
+
 	/**
 	 * First gives the head then gives the next five bits of this frame's pay-load
 	 * @return the next five bits of this frame
@@ -203,7 +203,7 @@ public class Frame {
 		int byt = index/8;
 		int bit = index %8;
 		int ret = 0;
-		
+
 		if(index == -1){
 			ret = bytes[0]>>3;
 			index = 8;
@@ -227,10 +227,10 @@ public class Frame {
 			index += 5;
 			ret = build.pop();
 		}
-		
+
 		return ret&0x1F;
 	}
-	
+
 	public static void main(String[] args){
 		byte[] buff = new byte[5];
 		buff[0] = 0;
@@ -238,31 +238,34 @@ public class Frame {
 		buff[2] = 0;
 		buff[3] = 0;
 		buff[4] = 0;
-//		System.out.println(toBinaryString(buff));
-//		byte[] esc = escape(buff);
-//		System.out.println(toBinaryString(esc));
-//		System.out.println(toBinaryString(unescape(esc)));
-		byte[] tmp = new byte[7];
-		byte head;
-		Frame f = new Frame(buff, true, true);
-		System.out.println(toBinaryString(f.getBytes()));
-		
-		int it = 0;
-		int n = f.next();
-		System.out.println((toBinaryString((byte)n)));
-		head = (byte)(n<<3);
-		n = f.next();
-		while(n!=-1){
-			bitConcat(tmp, (byte)(n<<3), it);
-			it+=5;
-			if(it>=51){
-				break;
-			}
-			System.out.println((toBinaryString((byte)n)));
-			n = f.next();
-		}
-		Frame rcv = new Frame(tmp, head);
-		System.out.println((toBinaryString(tmp)));
-		System.out.println((toBinaryString(rcv.getBytes())));
+////		System.out.println(toBinaryString(buff));
+////		byte[] esc = escape(buff);
+////		System.out.println(toBinaryString(esc));
+////		System.out.println(toBinaryString(unescape(esc)));
+//		byte[] tmp = new byte[7];
+//		byte head;
+//		Frame f = new Frame(buff, true, true);
+//		System.out.println(toBinaryString(f.getBytes()));
+//
+//		int it = 0;
+//		int n = f.next();
+//		System.out.println((toBinaryString((byte)n)));
+//		head = (byte)(n<<3);
+//		n = f.next();
+//		while(n!=-1){
+//			bitConcat(tmp, (byte)(n<<3), it);
+//			it+=5;
+//			if(it>=51){
+//				break;
+//			}
+//			System.out.println((toBinaryString((byte)n)));
+//			n = f.next();
+//		}
+//		Frame rcv = new Frame(tmp, head);
+//		System.out.println((toBinaryString(tmp)));
+//		System.out.println((toBinaryString(rcv.getBytes())));
+        Frame f = new Frame(buff, true, true);
+        System.out.println(f.isACK());
+        System.out.println(f.isFin());
 	}
 }
