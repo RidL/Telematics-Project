@@ -103,8 +103,8 @@ public class LLSender {
     		cable.writeLPT(31);
     		System.out.println("LLS: OUT: 31");
     	}
-    		
-    	do{
+    	
+    	while(n!= -1 && n!=0){
     		getNextRead();
     		if(lastNr!=n){
     			cable.writeLPT(n);
@@ -117,7 +117,7 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
-    	}while(n!= -1 && n!=0);
+    	}
     	getNextRead();
     	System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);

@@ -300,7 +300,7 @@ public class HLSender extends Thread {
             if((byte)(ack << i) < 0) {
                 retrans = true;
                 //Frame temp = frame_buffer[sendPointer+i];
-                if(frame_buffer[(sendPointer+i)-1].isFin()) {
+                if(frame_buffer[(sendPointer+i)].isFin()) {
                     i++;
                     break;
                 }
@@ -309,7 +309,7 @@ public class HLSender extends Thread {
         }
         if(!retrans) {
         	System.out.println("\nHLR: No retransmit, sendPointer updated \n");
-            if(frame_buffer[sendPointer+i-1].isFin()) {
+            if(frame_buffer[sendPointer+i].isFin()) {
                 sendPointer = 0;
                 framesInBuffer = 0;
                 segmentInBuffer = false;
