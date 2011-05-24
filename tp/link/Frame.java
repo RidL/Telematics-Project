@@ -238,31 +238,34 @@ public class Frame {
 		buff[2] = 0;
 		buff[3] = 0;
 		buff[4] = 0;
-//		System.out.println(toBinaryString(buff));
-//		byte[] esc = escape(buff);
-//		System.out.println(toBinaryString(esc));
-//		System.out.println(toBinaryString(unescape(esc)));
-		byte[] tmp = new byte[7];
-		byte head;
-		Frame f = new Frame(buff, true, true);
-		System.out.println(toBinaryString(f.getBytes()));
-
-		int it = 0;
-		int n = f.next();
-		System.out.println((toBinaryString((byte)n)));
-		head = (byte)(n<<3);
-		n = f.next();
-		while(n!=-1){
-			bitConcat(tmp, (byte)(n<<3), it);
-			it+=5;
-			if(it>=51){
-				break;
-			}
-			System.out.println((toBinaryString((byte)n)));
-			n = f.next();
-		}
-		Frame rcv = new Frame(tmp, head);
-		System.out.println((toBinaryString(tmp)));
-		System.out.println((toBinaryString(rcv.getBytes())));
+////		System.out.println(toBinaryString(buff));
+////		byte[] esc = escape(buff);
+////		System.out.println(toBinaryString(esc));
+////		System.out.println(toBinaryString(unescape(esc)));
+//		byte[] tmp = new byte[7];
+//		byte head;
+//		Frame f = new Frame(buff, true, true);
+//		System.out.println(toBinaryString(f.getBytes()));
+//
+//		int it = 0;
+//		int n = f.next();
+//		System.out.println((toBinaryString((byte)n)));
+//		head = (byte)(n<<3);
+//		n = f.next();
+//		while(n!=-1){
+//			bitConcat(tmp, (byte)(n<<3), it);
+//			it+=5;
+//			if(it>=51){
+//				break;
+//			}
+//			System.out.println((toBinaryString((byte)n)));
+//			n = f.next();
+//		}
+//		Frame rcv = new Frame(tmp, head);
+//		System.out.println((toBinaryString(tmp)));
+//		System.out.println((toBinaryString(rcv.getBytes())));
+        Frame f = new Frame(buff, true, true);
+        System.out.println(f.isACK());
+        System.out.println(f.isFin());
 	}
 }
