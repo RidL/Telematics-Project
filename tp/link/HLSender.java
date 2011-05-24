@@ -309,6 +309,7 @@ public class HLSender extends Thread {
             }
         }
         if(!retrans) {
+        	System.out.println("\nHLR: No retransmit, sendPointer updated \n");
             if(frame_buffer[sendPointer+i-1].isFin()) {
                 sendPointer = 0;
                 framesInBuffer = 0;
@@ -371,6 +372,7 @@ public class HLSender extends Thread {
          * Maakt een ack frame met behulp van byte 'ack', verstuurd deze ack,
          * zet ackToSend op false en informeer HLReceiver.
          */
+    	System.out.println("HLS:  Sending ack");
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
         ackToSend = false;
