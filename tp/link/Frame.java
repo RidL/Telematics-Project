@@ -23,11 +23,19 @@ public class Frame {
 		if(fin){
 			bytes[0] += 64;
 		}
-		bytes[0] += 8;
 		for(int i=1; i<=tmp.length; i++){
 			bytes[i] = tmp[i-1];
 		}
 		index = -1;
+        if(parity(bytes,0,4)==1){
+            bytes[0]+=32;
+        }
+        if(parity(bytes,4,8)==1){
+            bytes[0]+=16;
+        }
+        if(bytes[0]==0){
+            bytes[0]+=8;
+        }
 	}
 
 	public Frame(byte[] data, byte head){
@@ -40,7 +48,19 @@ public class Frame {
         }
 	}
 
-	/**
+    public static int parity(byte[] data, int byteOffset, int max){
+        int ones = 0;
+        for(int byt=byteOffset; byt<max; byt++){
+            for(int bit=0; bit<8; bit++){
+                if(((byte)(data[byt]<<bit))<0){
+                    ones++;
+                }
+            }
+        }
+        return ones%2;
+    }
+    
+    /**
 	 * Performs bit stuffing for the byte array b. Flags 00000 and 11111
 	 * are escaped to 000010 and 111101 respectively. Note that the size of
 	 * the return array could very well be bigger than the original one.
@@ -264,8 +284,8 @@ public class Frame {
 //		Frame rcv = new Frame(tmp, head);
 //		System.out.println((toBinaryString(tmp)));
 //		System.out.println((toBinaryString(rcv.getBytes())));
-        Frame f = new Frame(buff, true, true);
-        System.out.println(f.isACK());
-        System.out.println(f.isFin());
+        Frame f = new Frame(buff, false, false);
+        System.out.println(toBinaryString(f.getBytes()));
+        
 	}
 }
