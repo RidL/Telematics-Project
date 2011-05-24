@@ -49,6 +49,7 @@ public class LLReceiver {
                 }
 	        	tmp = lpt.readLPT();
 	        	System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+                System.out.println(tmp+"");
 	        	if(tmp == Frame.ONES && !validFrame && readThisFrame()){
 	        		System.out.println("LLR: set FrameValid!");
 	        		validFrame = true;
