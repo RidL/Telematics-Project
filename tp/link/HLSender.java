@@ -232,7 +232,7 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	System.out.println("HLS: PUSH THAT FRAME BIATCH");
+        	System.out.println("HLS: Unescaped data: "+Frame.toBinaryString(Frame.unescape(frame_buffer[i].getBytes())));
             lls.pushFrame(frame_buffer[i], true);
             i++;
         }
@@ -350,7 +350,11 @@ public class HLSender extends Thread {
          *
          */
     }
-
+    
+    public void pushFrame(Frame f){
+    	lls.pushFirstFrame(f);
+    }
+    
     /**
      * Informs this class that a certain ack needs to be send.
      *

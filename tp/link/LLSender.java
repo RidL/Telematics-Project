@@ -97,7 +97,6 @@ public class LLSender {
      */
     public void pushFrame(Frame f, boolean flag) {
 
-    	System.out.println(Frame.toBinaryString(f.getBytes()));
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
@@ -163,6 +162,7 @@ public class LLSender {
         	 } else {
         		 lastNr = f.next();
         		 cable.writeLPT(lastNr);
+        		 System.out.println("LLS: OUT: "+lastNr+"");
         		 pushFrame(f,false);
         		 succes = true;
           	 }

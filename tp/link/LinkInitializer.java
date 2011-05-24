@@ -28,7 +28,8 @@ public class LinkInitializer {
 //            9, 4, 4, 2, 16, 23, 2, 11, 3, 30, 1, 5, 12, 7, 4, 6, 9, 4, 4, 2, 16, 23, 2, 11, 3, 16, 14, 7, 9,
 //            26, 12, 13, 3, 30, 1, 5, 12, 7, 4, 6};   // 89 bytes
 
-
+        
+        
         hlr.start();
         hls.start();
         while (true) {
@@ -38,6 +39,11 @@ public class LinkInitializer {
                 }
             }
         }
-
+//
+//        byte []  payload = new byte[] {-64,127,-123,65,-1};
+//        System.out.println("LI: RAW DATA: "+Frame.toBinaryString(payload));
+//        Frame test = new Frame(payload, false, false);
+//        System.out.println("LI: ESCAPED DATA: "+Frame.toBinaryString(test.getBytes()));
+//        hls.pushFrame(test);
     }
 }

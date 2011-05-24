@@ -228,13 +228,14 @@ public class Frame {
 			ret = build.pop();
 		}
 		
+		System.out.println(toBinaryString((byte)(ret&0x1F)));
 		return ret&0x1F;
 	}
 	
 	public static void main(String[] args){
 		byte[] buff = new byte[5];
-		buff[0] = 0;
-		buff[1] = 0;
+		buff[0] = -32;
+		buff[1] = -1;
 		buff[2] = 0;
 		buff[3] = 0;
 		buff[4] = 0;
