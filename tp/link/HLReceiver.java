@@ -4,6 +4,7 @@ public class HLReceiver extends Thread {
 
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;
+
     private LLReceiver llr;
     private HLSender hls;
     private Frame[] frame_buffer;
@@ -13,6 +14,10 @@ public class HLReceiver extends Thread {
     private int recPtr;
     private int windowPtr;
 
+    /**
+     * Creates a new HLReceiver and initialises it, an HLSender must be set
+     * after instantiating this class with setSender(highLevelSender)
+     */
     public HLReceiver() {
         llr = new LLReceiver(this);
         frame_buffer = new Frame[BUFFER_SIZE];
@@ -20,8 +25,14 @@ public class HLReceiver extends Thread {
         expectingAck = false;
         recPtr = 0;
         windowPtr = 0;
+        hls = null;
     }
-    
+
+    /**
+     * Sets the High Level Sender of this receiver, must be done directly after
+     * creating an HLReceiver object
+     * @param hls the sender to be set
+     */
     public void setSender(HLSender hls){
     	this.hls = hls;
     }
@@ -67,8 +78,8 @@ public class HLReceiver extends Thread {
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
         System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
-        hls.ackReceived(ack);
         llr.setInvalidFrame();
+        hls.ackReceived(ack);
         expectingAck = false;
         // ackReceived non-existent, ik gebruik expectingAck
         // frameReceived setten lijkt me niet nodig
@@ -119,6 +130,10 @@ public class HLReceiver extends Thread {
     }
 
 
+    /**
+     * Checks whether this Receiver is expecting an acknoledgement
+     * @return true if an ACK is expected
+     */
     public boolean expectingAck(){
     	return expectingAck;
     }
@@ -131,6 +146,10 @@ public class HLReceiver extends Thread {
         hls.setReceiverActive(b);
     }
 
+    /**
+     * Buffers a frame and checks wheter an ACK-Frame must be sent
+     * @param tempFrame The Frame to be interpreted and buffered
+     */
     private void interpretFrame(Frame tempFrame) {
         // shit interpreten
         frame_buffer[recPtr] = tempFrame;
@@ -142,10 +161,13 @@ public class HLReceiver extends Thread {
         if(recPtr == BUFFER_SIZE) {
             recPtr = 0;
         }
-        /* elke keer als alle data is ontvangen (meestal 8 frames) llr.setInvalidFrame() aanroepen
-           om llr stop te zetten (geen data ontvangen)*/
     }
-    
+
+    /**
+     * Temp method
+     * @param frames
+     */
+    @Deprecated
     public void tempFill(Frame[] frames) {
         this.frame_buffer = frames;
     }

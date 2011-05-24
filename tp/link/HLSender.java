@@ -30,7 +30,7 @@ public class HLSender extends Thread {
     private boolean ackToSend;
 
     /**
-     * Creates a new High Level Sender
+     * Creates a new High Level Sender cooperating with an HLReceiver hlr
      * @param hlr The High Level Receiver with which it cooperates
      * @ensure readyToPushSegment() == true
      */
@@ -364,7 +364,8 @@ public class HLSender extends Thread {
     }
     
     /**
-     *
+     * Creates a new ACK-frame and lets the Low Level Sender send it to the other
+     * side of the connection
      */
     public void sendAck() {
         /*

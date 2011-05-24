@@ -31,7 +31,7 @@ public class Route extends Thread {
 	}
 	
 	public void rcvSegment(Segment s){
-		if(s.getAddress()==trans.getAddress()){
+		if(s.getDestinationAddress()==trans.getAddress()){
 			trans.rcvSeg(s);
 		}else{
 			routableSegs.add(s);
