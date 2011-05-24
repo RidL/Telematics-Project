@@ -232,8 +232,7 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	System.out.println("HLS: Unescaped data: "+Frame.toBinaryString(Frame.unescape(frame_buffer[i].getBytes())));
-            lls.pushFrame(frame_buffer[i], true);
+        	 lls.pushFrame(frame_buffer[i], true);
             i++;
         }
         while(i%WINDOW_SIZE != 0);
