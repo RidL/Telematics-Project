@@ -102,8 +102,12 @@ public class HLReceiver extends Thread {
              } else {
                  acks[i] = true;
              }
-             if(frame_buffer[windowPtr+i].isFin())
+             if(frame_buffer[windowPtr+i].isFin()){
+                 windowPtr = 0;
+                 recPtr = 0;
+                 newWindow = false;
                  break;
+             }
         }
         if(newWindow) {
             windowPtr += WINDOW_SIZE;
