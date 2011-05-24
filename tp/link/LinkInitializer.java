@@ -33,7 +33,7 @@ public class LinkInitializer {
         hls.start();
 
         while (true) {
-        	System.out.println("LI: "+hls.readyToPushSegment());
+        	//System.out.println("LI: "+hls.readyToPushSegment());
             if (hls.readyToPushSegment()) {
                 if (hls.readyToPushSegment()) {
                     hls.pushSegment(bytes);
