@@ -87,7 +87,7 @@ public class LLSender {
                 break;
             }
         }
-        System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        //System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     }
 
     /**
@@ -101,7 +101,7 @@ public class LLSender {
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
     		cable.writeLPT(31);
-    		System.out.println("LLS: OUT: 31");
+    		//System.out.println("LLS: OUT: 31");
     	}
     	
     	while(n!= -1 && n!=0){
@@ -110,19 +110,19 @@ public class LLSender {
     			cable.writeLPT(n);
     		}else{
     			cable.writeLPT(0);
-    			System.out.println("LLS: OUT: 0");
+    			//System.out.println("LLS: OUT: 0");
     			getNextRead();
     			cable.writeLPT(n);
     		}
-    		System.out.println("LLS: OUT: " + n + "");
+    		//System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
     	}
     	getNextRead();
-    	System.out.println("LLS: OUT: 31");
+    	//System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
     	getNextRead();
-    	System.out.println("LLS: OUT: 0");
+    	//System.out.println("LLS: OUT: 0");
 		cable.writeLPT(0);
  
     	System.out.println("LLS: ===frame sent===");
@@ -146,24 +146,24 @@ public class LLSender {
         boolean succes = false;
         
         changeNr = cable.readLPT();
-        System.out.println("LLS: InitialValue: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        //System.out.println("LLS: InitialValue: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     	cable.writeLPT(31);
-    	System.out.println("LLS: OUT: 31");
+    	//System.out.println("LLS: OUT: 31");
      	
     	if (changeNr == Frame.ONES) { //shift(changeNr) == 31
     		System.out.println("LLS: COLLISION DETECTED");
          	getNextRead();  //this should be 0
          	cable.writeLPT(0);
-         	System.out.println("LLS: OUT: 0");
+         	//System.out.println("LLS: OUT: 0");
          }else{
         	 getNextRead();
         	 if (changeNr == Frame.ONES) { //shift(changeNr) == 31
         		 cable.writeLPT(0);
-        		 System.out.println("LLS: "+"0 geschreven");
+        		 //System.out.println("LLS: "+"0 geschreven");
         	 } else {
         		 lastNr = f.next();
         		 cable.writeLPT(lastNr);
-        		 System.out.println("LLS: OUT: "+lastNr+"");
+        		 //System.out.println("LLS: OUT: "+lastNr+"");
         		 pushFrame(f,false);
         		 succes = true;
           	 }

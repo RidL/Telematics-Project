@@ -30,9 +30,9 @@ public class LLReceiver {
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
         tmp = lpt.readLPT();
-        System.out.println("LLR: Write initial value>: 10");
+        //System.out.println("LLR: Write initial value>: 10");
         int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-        System.out.println("LLR: Read initial value: " + i);
+        //System.out.println("LLR: Read initial value: " + i);
     }
 
     public Frame read() {
@@ -48,12 +48,12 @@ public class LLReceiver {
                     y++;
                 }
                 tmp = lpt.readLPT();
-                System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+                //System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
 
-                    System.out.println("LLR: set FrameValid!");
+                    //System.out.println("LLR: set FrameValid!");
                     validFrame = true;
                 }
                 if (validFrame) {
@@ -62,7 +62,7 @@ public class LLReceiver {
                 }
             }
         }
-        System.out.println("LLR:<!--Frame received--!>");
+        //System.out.println("LLR:<!--Frame received--!>");
         System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
         return f;
 
@@ -71,11 +71,11 @@ public class LLReceiver {
     private void sendResponse() {
         if (alt) {
             lpt.writeLPT(4);
-            System.out.println("LLR: OUT: 4");
+            //System.out.println("LLR: OUT: 4");
             alt = false;
         } else {
             lpt.writeLPT(10);
-            System.out.println("LLR: OUT: 10");
+            //System.out.println("LLR: OUT: 10");
             alt = true;
         }
 
@@ -92,14 +92,14 @@ public class LLReceiver {
             readingFrame = false;
         } else if ((i != Frame.ZEROS) && (i != Frame.ONES) && offset <= 50) { //shift(i)!=0 && shift(i)!=31
             if (!readingFrame) {
-                System.out.println("Setting Header");
+                //System.out.println("Setting Header");
                 header = (byte) (i^0x80);
                 readingFrame = true;
             } else {
-            	System.out.println("LLR: notShifted "+Frame.toBinaryString((byte)(i)));
-            	System.out.println("LLR: Shifted    "+(Frame.toBinaryString((byte)(i^0x80))));
+            	//System.out.println("LLR: notShifted "+Frame.toBinaryString((byte)(i)));
+            	//System.out.println("LLR: Shifted    "+(Frame.toBinaryString((byte)(i^0x80))));
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
-                System.out.println(Frame.toBinaryString(data));
+                //System.out.println(Frame.toBinaryString(data));
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
                 offset = offset + 5;
             }
@@ -108,7 +108,7 @@ public class LLReceiver {
 
     public void setInvalidFrame() {
         validFrame = false;
-        System.out.println("LLR: Ignoring data");
+        //System.out.println("LLR: Ignoring data");
     }
 
     public boolean readThisFrame() {
