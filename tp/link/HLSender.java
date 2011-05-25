@@ -100,7 +100,6 @@ public class HLSender extends Thread {
 // if receiverActive
             	
                 if (ackToSend) {
-                	System.out.println("HLS: rcv not active sending ack");
                     sendAck();
                 }
             }

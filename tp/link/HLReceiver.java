@@ -164,10 +164,8 @@ public class HLReceiver extends Thread {
     private void interpretFrame(Frame tempFrame) {
         // shit interpreten
     	if(errCount>0){
-    		System.out.println("HLR: Getting RETR errs: " + errCount);
     		for(int bit=0; bit<8; bit++){
     			if((byte)(ack<<bit)<0){
-    				System.out.println("HLR: Setting " + bit + "");
     				frameBuffer[recPtr-WINDOW_SIZE+bit] = tempFrame;
     				ack = (byte)(ack^((byte)Math.pow(2, 7-bit)));
     				break;

@@ -30,9 +30,9 @@ public class LLReceiver {
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
         tmp = lpt.readLPT();
-        System.out.println("LLR: Write initial value>: 10");
+        //System.out.println("LLR: Write initial value>: 10");
         int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-        System.out.println("LLR: Read initial value: " + i);
+        //System.out.println("LLR: Read initial value: " + i);
     }
 
     public Frame read() {
@@ -47,7 +47,7 @@ public class LLReceiver {
                     y++;
                 }
                 tmp = lpt.readLPT();
-                System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+                //System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
@@ -59,11 +59,11 @@ public class LLReceiver {
                 }
             }
         }
-        System.out.println("LLR:<!--Frame received--!>");
-        if(f!=null)
-        	System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
-        else
-        	System.out.println("LLR: null returned");
+        //System.out.println("LLR:<!--Frame received--!>");
+//        if(f!=null)
+//        	System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
+//        else
+//        	System.out.println("LLR: null returned");
         return f;
 
     }
@@ -71,11 +71,11 @@ public class LLReceiver {
     private void sendResponse() {
         if (alt) {
             lpt.writeLPT(4);
-            System.out.println("LLR: OUT: 4");
+            //System.out.println("LLR: OUT: 4");
             alt = false;
         } else {
             lpt.writeLPT(10);
-            System.out.println("LLR: OUT: 10");
+            //System.out.println("LLR: OUT: 10");
             alt = true;
         }
 
@@ -102,7 +102,6 @@ public class LLReceiver {
                      tmp = lpt.readLPT();
                      sendResponse();
                      temp =  false;
-                     System.out.println("LLR: 0 read, did lack and im gone now");
             	 }
             	}
             }
@@ -134,9 +133,9 @@ public class LLReceiver {
 			tempData[i]= data[i-1];
 		}
 		System.out.println("escaped: ");
-		System.out.println(Frame.toBinaryString(header) + Frame.toBinaryString(data));
-		System.out.println("calcing parity over: ");
-		System.out.println(Frame.toBinaryString(tempData));
+		System.out.println(Frame.toBinaryString(header) + Frame.toBinaryString(data) + "\n");
+//		System.out.println("calcing parity over: ");
+//		System.out.println(Frame.toBinaryString(tempData));
 		if(((byte)(header&32)>0) == (Frame.parity(tempData, 0, 4)==1)){
 			ret =  true;
 		}

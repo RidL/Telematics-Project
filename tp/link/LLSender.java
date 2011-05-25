@@ -87,7 +87,7 @@ public class LLSender {
                 break;
             }
         }
-        System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        //System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     }
 
     /**
@@ -100,7 +100,7 @@ public class LLSender {
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
     		cable.writeLPT(31);
-    		System.out.println("LLS: OUT: 31");
+    		//System.out.println("LLS: OUT: 31");
     	}
     	
     	while(n!= -1 && n!=0){
@@ -109,22 +109,22 @@ public class LLSender {
     			cable.writeLPT(n);
     		}else{
     			cable.writeLPT(0);
-    			System.out.println("LLS: OUT: 0");
+    			//System.out.println("LLS: OUT: 0");
     			getNextRead();
     			cable.writeLPT(n);
     		}
-    		System.out.println("LLS: OUT: " + n + "");
+    		//System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
     	}
     	getNextRead();
-    	System.out.println("LLS: OUT: 31");
+    	//System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
     	getNextRead();
-    	System.out.println("LLS: OUT: 0");
+    	//System.out.println("LLS: OUT: 0");
 		cable.writeLPT(0);
  
-    	System.out.println("LLS: ===frame sent===");
+    	//System.out.println("LLS: ===frame sent===");
     }
 
     /**
