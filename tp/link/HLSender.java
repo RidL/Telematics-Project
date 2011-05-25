@@ -273,6 +273,10 @@ public class HLSender extends Thread {
          */
     }
 
+    public byte getAck(){
+    	return ack;
+    }
+    
     /**
      * Sets this HLSender to receiving mode or non-receiving mode
      * @param b true for receiving mode, false for non-receiving mode
