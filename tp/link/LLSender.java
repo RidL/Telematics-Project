@@ -96,21 +96,15 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f, boolean flag) {
-    	changeNr = 0;
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
-    		System.out.println("LLS: BEFORE sending first flag");
-    		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before flag:" + changeNr);
     		cable.writeLPT(31);
-    		System.out.println("LLS: AFTER sending first flag");
-    		//System.out.println("LLS: OUT: 31");
+    		System.out.println("LLS: OUT: 31");
     	}
     	
     	while(n!= -1 && n!=0){
-    		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before sending:" + changeNr);
     		getNextRead();
-    		System.out.println("IZ in the while TROLOLO");
     		if(lastNr!=n){
     			cable.writeLPT(n);
     		}else{
@@ -122,9 +116,7 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
-    		System.out.println("lowack after sending:" + changeNr);
     	}
-    	System.out.println("im outta here");
     	getNextRead();
     	System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);

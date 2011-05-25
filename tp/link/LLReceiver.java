@@ -51,8 +51,6 @@ public class LLReceiver {
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
-
-                    //System.out.println("LLR: set FrameValid!");
                     validFrame = true;
                 }
                 if (validFrame) {
