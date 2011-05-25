@@ -91,6 +91,7 @@ public class LLReceiver {
             		System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
             		f = new Frame(data, header);
             	}else{
+            		
             		System.out.println("Parity failed");	
             	}
             }
@@ -114,13 +115,17 @@ public class LLReceiver {
     }
 
     private boolean checkParity() {
-		byte[] tempData = new byte[8];
+		
+    	byte[] tempData = new byte[8];
 		tempData[0] = (byte)(header&-64);
 		boolean ret = false;
 		for(int i = 1; i<=data.length;i++){
 			tempData[i]= data[i-1];
 		}
-		
+		System.out.println("escaped: ");
+		System.out.println(Frame.toBinaryString(header) + Frame.toBinaryString(data));
+		System.out.println("calcing parity over: ");
+		System.out.println(Frame.toBinaryString(tempData));
 		if(((byte)(header&32)>0) == (Frame.parity(tempData, 0, 4)==1)){
 			ret =  true;
 		}

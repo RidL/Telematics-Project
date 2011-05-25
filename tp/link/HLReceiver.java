@@ -113,7 +113,7 @@ public class HLReceiver extends Thread {
              } else {
                  acks[i] = true;
              }
-             if(frame_buffer[windowPtr+i].isFin()){
+             if(frame_buffer[windowPtr+i]!=null && frame_buffer[windowPtr+i].isFin()){
                  windowPtr = 0;
                  recPtr = 0;
                  newWindow = false;
@@ -161,7 +161,7 @@ public class HLReceiver extends Thread {
         // shit interpreten
         frame_buffer[recPtr] = tempFrame;
         recPtr++;
-        if(tempFrame != null && (tempFrame.isFin() || recPtr%WINDOW_SIZE == 0)) {   // if sequence of frames is received
+        if((tempFrame != null && tempFrame.isFin()) || recPtr%WINDOW_SIZE == 0) {   // if sequence of frames is received
             llr.setInvalidFrame();
             sendAck();
         }
