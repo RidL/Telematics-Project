@@ -87,10 +87,8 @@ public class LLReceiver {
             	if(checkParity()){
             		System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
             		f = new Frame(data, header);
-            		
-            	}else{
-            		
-            		System.out.println("Parity failed");	
+            		data[5] = 0;
+            		data[6] = 0;
             	}
             	boolean temp = true;
             	while(temp){
@@ -132,14 +130,11 @@ public class LLReceiver {
 		for(int i = 1; i<=data.length;i++){
 			tempData[i]= data[i-1];
 		}
-		System.out.println("escaped: ");
-		System.out.println(Frame.toBinaryString(header) + Frame.toBinaryString(data) + "\n");
-//		System.out.println("calcing parity over: ");
-//		System.out.println(Frame.toBinaryString(tempData));
 		if(((byte)(header&32)>0) == (Frame.parity(tempData, 0, 4)==1)){
 			ret =  true;
 		}
-		if(((byte)(header&16)>0) == (Frame.parity(tempData, 4,8)==0) && ret){
+		
+		if((((byte)(header&16)>0) == (Frame.parity(tempData, 4,8)==0)) && ret){
 			//in data 3 1s are appended (never removed) from readLPT(), hence parity calculated needs to be inverted
 			ret =  true;
 		}else{
