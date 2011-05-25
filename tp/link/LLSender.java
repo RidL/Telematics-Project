@@ -101,13 +101,14 @@ public class LLSender {
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
     		System.out.println("LLS: BEFORE sending first flag");
+    		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before flag:" + changeNr);
     		cable.writeLPT(31);
     		System.out.println("LLS: AFTER sending first flag");
     		//System.out.println("LLS: OUT: 31");
     	}
     	
     	while(n!= -1 && n!=0){
-    		System.out.println("IZ in the while" + Frame.toBinaryString((byte)n));
+    		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before sending:" + changeNr);
     		getNextRead();
     		System.out.println("IZ in the while TROLOLO");
     		if(lastNr!=n){
@@ -121,7 +122,9 @@ public class LLSender {
     		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
+    		System.out.println("lowack after sending:" + changeNr);
     	}
+    	System.out.println("im outta here");
     	getNextRead();
     	System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
@@ -197,9 +200,14 @@ public class LLSender {
     }
 
     private void microSleep() {
-        @SuppressWarnings("unused")
-		int i = (int) Math.random() * 9;
-        i++;
+    	try {
+			Thread.sleep(5);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		int i = (int) Math.random() * 9;
+//        i++;
     }
 
 } 
