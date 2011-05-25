@@ -96,7 +96,6 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f, boolean flag) {
-    	changeNr = 0;
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
