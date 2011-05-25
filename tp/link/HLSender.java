@@ -9,7 +9,7 @@ public class HLSender extends Thread {
 
     private HLReceiver hlr;
     private LLSender lls;
-    private Frame[] frame_buffer;
+    private Frame[] frameBuffer;
 
     private int sendPointer;
 // Count voor het aaltal frames in de buffer
@@ -37,7 +37,7 @@ public class HLSender extends Thread {
     public HLSender(HLReceiver hlr) {
         this.hlr = hlr;
         lls = new LLSender(this);
-        frame_buffer = new Frame[BUFFER_SIZE];
+        frameBuffer = new Frame[BUFFER_SIZE];
 
         sendPointer = 0;
         framesInBuffer = 0;
@@ -158,7 +158,7 @@ public class HLSender extends Thread {
                 isFin = true;
             }
             Frame frame = new Frame(newBytes, false, isFin);
-            frame_buffer[ptr] = frame;
+            frameBuffer[ptr] = frame;
             framesInBuffer++;
             ptr++;
         }
@@ -169,6 +169,7 @@ public class HLSender extends Thread {
      * Temp method for testing only!
      */
        public void pushSegment(byte[] bytes) {
+    	   System.out.println("HLS: ========== NEW SEG IN BUFFER ===========");
         /*
          * Deel segment op in frames en vul 'frame_buffer'.
          * Geeft het aantal frames aan in 'framesInBuffer'.
@@ -204,7 +205,7 @@ public class HLSender extends Thread {
                 isFin = true;
             }
             Frame frame = new Frame(newBytes, false, isFin);
-            frame_buffer[ptr] = frame;
+            frameBuffer[ptr] = frame;
             framesInBuffer++;
             ptr++;
             
@@ -220,7 +221,7 @@ public class HLSender extends Thread {
         if(sendPointer == 0) {  // if the first frame is encountered
         	i = sendPointer+1;
             hlr.setSenderActive(true);
-            boolean succ = lls.pushFirstFrame(frame_buffer[sendPointer]);
+            boolean succ = lls.pushFirstFrame(frameBuffer[sendPointer]);
             if(!succ) {
                 hlr.setSenderActive(false);
                 try {
@@ -235,7 +236,7 @@ public class HLSender extends Thread {
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	 lls.pushFrame(frame_buffer[i], true);
+        	 lls.pushFrame(frameBuffer[i], true);
             i++;
         }
         while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
@@ -311,23 +312,24 @@ public class HLSender extends Thread {
             if((byte)(ack << i) < 0) {
             	System.out.println("HLS: frame "+i+" was detected to be  false");
                 retrans = true;
-                frame_buffer[sendPointer+i].reset();
-                lls.pushFrame(frame_buffer[sendPointer+i], true);
+                frameBuffer[sendPointer+i].reset();
+                lls.pushFrame(frameBuffer[sendPointer+i], true);
             }
             //Frame temp = frame_buffer[sendPointer+i];
            // System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
-            if(frame_buffer[(sendPointer+i)].isFin()) {
+            if(frameBuffer[(sendPointer+i)].isFin()) {
             	System.out.println("HLS: DETECTED PREM FIN IN ACK");
                 break;
             }
         }
         if(!retrans) {
-        	System.out.println("HLR: No retransmit, sendPointer updated");
-            if(frame_buffer[sendPointer+i].isFin()) {
-            	System.out.println("HLR: ========COMPLETE SEGMENT HAS BEEN SENT=========");
+        	System.out.println("HLS: No retransmit, sendPointer updated");
+            if(frameBuffer[sendPointer+i].isFin()) {
+            	System.out.println("HLS: ========COMPLETE SEGMENT HAS BEEN SENT=========");
                 sendPointer = 0;
                 framesInBuffer = 0;
                 segmentInBuffer = false;
+                frameBuffer = new Frame[BUFFER_SIZE];
             }
             else {
                 sendPointer += i;
