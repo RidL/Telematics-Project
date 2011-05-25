@@ -240,7 +240,7 @@ public class HLSender extends Thread {
         }
         while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
 
-        System.out.println("HLS: \n--Window pushed--\n");
+        System.out.println("HLS: --Window pushed--");
         expectAck = true;
         hlr.setExpectingAck();
 
@@ -322,8 +322,9 @@ public class HLSender extends Thread {
             }
         }
         if(!retrans) {
-        	System.out.println("\nHLR: No retransmit, sendPointer updated \n");
+        	System.out.println("HLR: No retransmit, sendPointer updated");
             if(frame_buffer[sendPointer+i].isFin()) {
+            	System.out.println("HLR: ========COMPLETE SEGMENT HAS BEEN SENT=========");
                 sendPointer = 0;
                 framesInBuffer = 0;
                 segmentInBuffer = false;

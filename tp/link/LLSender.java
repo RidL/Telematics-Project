@@ -97,6 +97,7 @@ public class LLSender {
      */
     public void pushFrame(Frame f, boolean flag) {
     	int n = f.next();
+    	//System.out.println(Frame.toBinaryString(f.getBytes()));
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
     		cable.writeLPT(31);
@@ -192,14 +193,8 @@ public class LLSender {
     }
 
     private void microSleep() {
-    	try {
-			Thread.sleep(5);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		int i = (int) Math.random() * 9;
-//        i++;
+    	int i = (int) Math.random() * 9;
+    	i++;
     }
 
 } 
