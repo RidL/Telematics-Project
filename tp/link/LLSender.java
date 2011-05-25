@@ -100,29 +100,33 @@ public class LLSender {
     	int n = f.next();
     	if(flag){
     		getNextRead();//read first, because we didn't read after last send
+    		System.out.println("LLS: BEFORE sending first flag");
     		cable.writeLPT(31);
+    		System.out.println("LLS: AFTER sending first flag");
     		//System.out.println("LLS: OUT: 31");
     	}
     	
     	while(n!= -1 && n!=0){
+    		System.out.println("IZ in the while" + Frame.toBinaryString((byte)n));
     		getNextRead();
+    		System.out.println("IZ in the while TROLOLO");
     		if(lastNr!=n){
     			cable.writeLPT(n);
     		}else{
     			cable.writeLPT(0);
-    			//System.out.println("LLS: OUT: 0");
+    			System.out.println("LLS: OUT: 0");
     			getNextRead();
     			cable.writeLPT(n);
     		}
-    		//System.out.println("LLS: OUT: " + n + "");
+    		System.out.println("LLS: OUT: " + n + "");
     		lastNr = n;
     		n = f.next();
     	}
     	getNextRead();
-    	//System.out.println("LLS: OUT: 31");
+    	System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
     	getNextRead();
-    	//System.out.println("LLS: OUT: 0");
+    	System.out.println("LLS: OUT: 0");
 		cable.writeLPT(0);
  
     	System.out.println("LLS: ===frame sent===");

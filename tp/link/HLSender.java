@@ -98,7 +98,9 @@ public class HLSender extends Thread {
                 }
             } else {
 // if receiverActive
+            	
                 if (ackToSend) {
+                	System.out.println("HLS: rcv not active sending ack");
                     sendAck();
                 }
             }
@@ -391,8 +393,8 @@ public class HLSender extends Thread {
     	//System.out.println("HLS:  Sending ack");
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
-        ackToSend = false;
         lls.pushFrame(ackFrame, true);
+        ackToSend = false;
     }
 
 
