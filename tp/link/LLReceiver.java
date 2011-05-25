@@ -93,6 +93,7 @@ public class LLReceiver {
             		
             		System.out.println("Parity failed");	
             	}
+            	
             }
             frameReceived = true;
             offset = 0;

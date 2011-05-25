@@ -96,9 +96,10 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f, boolean flag) {
-
+    	
     	int n = f.next();
     	if(flag){
+    		changeNr = -1;
     		getNextRead();//read first, because we didn't read after last send
     		System.out.println("LLS: BEFORE sending first flag");
     		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before flag:" + changeNr);
