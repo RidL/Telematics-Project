@@ -304,14 +304,15 @@ public class HLSender extends Thread {
         int i;
         for(i = 0; i < WINDOW_SIZE; i++) {
             if((byte)(ack << i) < 0) {
+            	System.out.println("HLS: frame "+i+" was detected to be  false");
                 retrans = true;
+                frame_buffer[sendPointer+i].reset();
                 lls.pushFrame(frame_buffer[sendPointer+i], true);
             }
             //Frame temp = frame_buffer[sendPointer+i];
-            System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
+           // System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
             if(frame_buffer[(sendPointer+i)].isFin()) {
             	System.out.println("HLS: DETECTED PREM FIN IN ACK");
-       
                 break;
             }
         }

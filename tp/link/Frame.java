@@ -60,6 +60,10 @@ public class Frame {
         return ones%2;
     }
     
+    public void reset(){
+    	index = -1;
+    }
+    
     /**
 	 * Performs bit stuffing for the byte array b. Flags 00000 and 11111
 	 * are escaped to 000010 and 111101 respectively. Note that the size of
