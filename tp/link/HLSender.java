@@ -333,7 +333,6 @@ public class HLSender extends Thread {
         } else {
             System.out.println("\nHLR:--Retransmitting--\n");
             expectAck = true;
-            hlr.setSenderActive(false);
             hlr.setExpectingAck();
         }
 
