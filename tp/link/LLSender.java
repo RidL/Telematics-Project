@@ -80,14 +80,14 @@ public class LLSender {
         int nr;
         while (true) {
             nr = cable.readLPT();
-           // System.out.println("LLS: GNR: " +(((((byte) nr) >> 3) & 0x1f) ^ 0x10));
+            //System.out.println("LLS: GNR: " +(((((byte) nr) >> 3) & 0x1f) ^ 0x10));
             if (nr != changeNr) {
                 microSleep();
                 changeNr = cable.readLPT();
                 break;
             }
         }
-        //System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
     }
 
     /**
@@ -96,10 +96,9 @@ public class LLSender {
      * for the entire TP package.
      */
     public void pushFrame(Frame f, boolean flag) {
-    	
+    	changeNr = 0;
     	int n = f.next();
     	if(flag){
-    		changeNr = -1;
     		getNextRead();//read first, because we didn't read after last send
     		System.out.println("LLS: BEFORE sending first flag");
     		System.out.println("IZ in the while n:" + Frame.toBinaryString((byte)n) + " lowack before flag:" + changeNr);

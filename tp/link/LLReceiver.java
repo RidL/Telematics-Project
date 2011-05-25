@@ -73,11 +73,11 @@ public class LLReceiver {
     private void sendResponse() {
         if (alt) {
             lpt.writeLPT(4);
-            //System.out.println("LLR: OUT: 4");
+            System.out.println("LLR: OUT: 4");
             alt = false;
         } else {
             lpt.writeLPT(10);
-            //System.out.println("LLR: OUT: 10");
+            System.out.println("LLR: OUT: 10");
             alt = true;
         }
 
@@ -89,11 +89,19 @@ public class LLReceiver {
             	if(checkParity()){
             		System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
             		f = new Frame(data, header);
+            		
             	}else{
             		
             		System.out.println("Parity failed");	
             	}
-            	
+            	 if (lpt.readLPT() != tmp) {
+                     for (int z = 0; z < 2; z++) {
+                         int y = 3;
+                         y++;
+                     }
+                     tmp = lpt.readLPT();
+                     sendResponse();
+            	 }
             }
             frameReceived = true;
             offset = 0;
