@@ -63,7 +63,10 @@ public class LLReceiver {
             }
         }
         //System.out.println("LLR:<!--Frame received--!>");
-        System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
+        if(f!=null)
+        	System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
+        else
+        	System.out.println("LLR: null returned");
         return f;
 
     }
@@ -84,8 +87,12 @@ public class LLReceiver {
     private void bitInterpret(int i) {
         if ((i == Frame.ONES) && readingFrame) {
             if (offset < 51) {
-                System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
-                f = new Frame(data, header);
+            	if(checkParity()){
+            		System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
+            		f = new Frame(data, header);
+            	}else{
+            		System.out.println("Parity failed");	
+            	}
             }
             frameReceived = true;
             offset = 0;
@@ -106,7 +113,27 @@ public class LLReceiver {
         }
     }
 
-    public void setInvalidFrame() {
+    private boolean checkParity() {
+		byte[] tempData = new byte[8];
+		tempData[0] = (byte)(header&-64);
+		boolean ret = false;
+		for(int i = 1; i<=data.length;i++){
+			tempData[i]= data[i-1];
+		}
+		
+		if(((byte)(header&32)>0) == (Frame.parity(tempData, 0, 4)==1)){
+			ret =  true;
+		}
+		if(((byte)(header&16)>0) == (Frame.parity(tempData, 4,8)==0) && ret){
+			//in data 3 1s are appended (never removed) from readLPT(), hence parity calculated needs to be inverted
+			ret =  true;
+		}else{
+			ret = false;
+		}
+		return ret;
+	}
+
+	public void setInvalidFrame() {
         validFrame = false;
         //System.out.println("LLR: Ignoring data");
     }
