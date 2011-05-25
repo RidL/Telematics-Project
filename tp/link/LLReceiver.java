@@ -43,7 +43,6 @@ public class LLReceiver {
         while (!frameReceived) {
             if (lpt.readLPT() != tmp) {
                 for (int z = 0; z < 2; z++) {
-                    @SuppressWarnings("unused")
                     int y = 3;
                     y++;
                 }

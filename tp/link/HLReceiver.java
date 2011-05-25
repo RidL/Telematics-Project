@@ -7,10 +7,12 @@ public class HLReceiver extends Thread {
 
     private LLReceiver llr;
     private HLSender hls;
-    private Frame[] frame_buffer;
+    private Frame[] frameBuffer;
     private boolean senderActive;
     private boolean expectingAck;
-
+    
+    private byte ack;
+    private int errCount;
     private int recPtr;
     private int windowPtr;
 
@@ -20,9 +22,10 @@ public class HLReceiver extends Thread {
      */
     public HLReceiver() {
         llr = new LLReceiver(this);
-        frame_buffer = new Frame[BUFFER_SIZE];
+        frameBuffer = new Frame[BUFFER_SIZE];
         senderActive = false;
         expectingAck = false;
+        errCount = 0;
         recPtr = 0;
         windowPtr = 0;
         hls = null;
@@ -106,14 +109,15 @@ public class HLReceiver extends Thread {
         boolean[] acks = new boolean[8];
         boolean newWindow = true;
         for(int i = 0; i<WINDOW_SIZE; i++) {
-             if(frame_buffer[windowPtr+i] == null) {
+             if(frameBuffer[windowPtr+i] == null) {
                  ack+= Math.pow(2, (WINDOW_SIZE-1)-i);
                  acks[i] = false;
                  newWindow = false;
+                 errCount++;
              } else {
                  acks[i] = true;
              }
-             if(frame_buffer[windowPtr+i]!=null && frame_buffer[windowPtr+i].isFin()){
+             if(frameBuffer[windowPtr+i]!=null && frameBuffer[windowPtr+i].isFin()){
                  windowPtr = 0;
                  recPtr = 0;
                  newWindow = false;
@@ -125,8 +129,8 @@ public class HLReceiver extends Thread {
         }
         System.out.println("HLR: newWindow: " + newWindow);
         System.out.println("HLR: ACK: " + Frame.toBinaryString(ack));
-
-        hls.ackToSend((byte)ack);
+        this.ack = ack;
+        hls.ackToSend(ack);
     }
     /**
      * Ik doe niets als true
@@ -159,9 +163,24 @@ public class HLReceiver extends Thread {
      */
     private void interpretFrame(Frame tempFrame) {
         // shit interpreten
-        frame_buffer[recPtr] = tempFrame;
-        recPtr++;
-        if((tempFrame != null && tempFrame.isFin()) || recPtr%WINDOW_SIZE == 0) {   // if sequence of frames is received
+    	if(errCount>0){
+    		System.out.println("HLR: Getting RETR errs: " + errCount);
+    		for(int bit=0; bit<8; bit++){
+    			if((byte)(ack<<bit)<0){
+    				System.out.println("HLR: Setting " + bit + "");
+    				frameBuffer[recPtr-WINDOW_SIZE+bit] = tempFrame;
+    				ack = (byte)(ack^((byte)Math.pow(2, 7-bit)));
+    				break;
+    			}
+    		}
+    		frameBuffer[recPtr] = tempFrame;
+    		errCount--;
+            
+    	}else{
+    		frameBuffer[recPtr] = tempFrame;
+        	recPtr++;
+    	}
+        if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {   // if sequence of frames is received
             llr.setInvalidFrame();
             sendAck();
         }
@@ -176,7 +195,7 @@ public class HLReceiver extends Thread {
      */
     @Deprecated
     public void tempFill(Frame[] frames) {
-        this.frame_buffer = frames;
+        this.frameBuffer = frames;
     }
 
     public static void main(String[] args) {
