@@ -92,6 +92,8 @@ public class LLReceiver {
             		
             		System.out.println("Parity failed");	
             	}
+            	boolean temp = true;
+            	while(temp){
             	 if (lpt.readLPT() != tmp) {
                      for (int z = 0; z < 2; z++) {
                          int y = 3;
@@ -99,7 +101,10 @@ public class LLReceiver {
                      }
                      tmp = lpt.readLPT();
                      sendResponse();
+                     temp =  false;
+                     System.out.println("LLR: 0 read, did lack and im gone now");
             	 }
+            	}
             }
             frameReceived = true;
             offset = 0;
