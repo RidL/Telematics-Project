@@ -1,7 +1,8 @@
 package tp.link;
 
-public class HLReceiver extends Thread implements HLR{
+import tp.util.Log;
 
+public class HLReceiver extends Thread implements HLR{
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;
 
@@ -15,12 +16,16 @@ public class HLReceiver extends Thread implements HLR{
     private int errCount;
     private int recPtr;
     private int windowPtr;
-
+    
+    private boolean sysoutLog = false;
+    
+    
     /**
      * Creates a new HLReceiver and initialises it, an HLSender must be set
      * after instantiating this class with setSender(highLevelSender)
      */
     public HLReceiver() {
+    	Log.writeLog(" HLR", "booted", sysoutLog);
         llr = new LLReceiver(this);
         frameBuffer = new Frame[BUFFER_SIZE];
         senderActive = false;
@@ -60,12 +65,12 @@ public class HLReceiver extends Thread implements HLR{
         while (true) {
 
             Frame tempFrame = llr.read();
+            Log.writeLog(" HLR", "frame read", sysoutLog);
             // !senderActive == receiving || cable_free
             if (!senderActive) {
                 interpretFrame(tempFrame);
             } else {
             	// if senderActive
-            	//System.out.println("HLR: ACK PROCCESSING");
                 ackReceived(tempFrame);
             }
         }
@@ -81,12 +86,9 @@ public class HLReceiver extends Thread implements HLR{
 
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
-       // System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
-        
+        Log.writeLog(" HLR", "got ack, interpreting" + Frame.toBinaryString(ack), sysoutLog);
         llr.setInvalidFrame();
-      //  System.out.println("HLR: SET INVALID FRAME (ackReceived)");
         expectingAck = false;
-       // System.out.println("HLR: SET HLS TO EXPACT ACK");
         hls.ackReceived(ack);
         
         // ackReceived non-existent, ik gebruik expectingAck
@@ -117,6 +119,7 @@ public class HLReceiver extends Thread implements HLR{
                  acks[i] = false;
                  newWindow = false;
                  errCount++;
+                 Log.writeLog(" HLR", "error in window at: " + i + "", sysoutLog);
              } else {
                  acks[i] = true;
              }
@@ -128,10 +131,10 @@ public class HLReceiver extends Thread implements HLR{
              }
         }
         if(newWindow) {
+        	Log.writeLog(" HLR", "new window", sysoutLog);
             windowPtr += WINDOW_SIZE;
         }
-        System.out.println("HLR: newWindow: " + newWindow);
-        System.out.println("HLR: ACK: " + Frame.toBinaryString(ack));
+        Log.writeLog(" HLR", "sending ack: " + Frame.toBinaryString(ack), sysoutLog);
         this.ack = ack;
         hls.ackToSend(ack);
     }
@@ -167,6 +170,7 @@ public class HLReceiver extends Thread implements HLR{
     private void interpretFrame(Frame tempFrame) {
         // shit interpreten
     	if(errCount>0){
+    		Log.writeLog(" HLR", "had errors in last frame, rcving retransmit", sysoutLog);
     		for(int bit=0; bit<8; bit++){
     			if((byte)(ack<<bit)<0){
     				frameBuffer[recPtr-WINDOW_SIZE+bit] = tempFrame;
@@ -181,35 +185,14 @@ public class HLReceiver extends Thread implements HLR{
     		frameBuffer[recPtr] = tempFrame;
         	recPtr++;
     	}
-        if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {   // if sequence of frames is received
-          //  System.out.println("HLR: INPTFRM isFIN");
+        if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {
+        	Log.writeLog(" HLR", "Sending ACK", sysoutLog);
         	llr.setInvalidFrame();
-        //	System.out.println("HLR: SET INVALID FRAME (inptFrame)");
             sendAck();
         }
         if(recPtr == BUFFER_SIZE) {
             recPtr = 0;
         }
-    }
-
-    /**
-     * Temp method
-     * @param frames
-     */
-    @Deprecated
-    public void tempFill(Frame[] frames) {
-        this.frameBuffer = frames;
-    }
-
-    public static void main(String[] args) {
-        HLReceiver r = new HLReceiver();
-        byte[] data = new byte[]{12,4,3,9,0,3,1,2,6,3,2,6,8,0,5,4,3,3,6,7,89,32,2};
-        Frame[] frames = new Frame[]{null,null,
-            new Frame(data, false, false),new Frame(data, false, false),null,null,
-            null,new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),
-            new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),null,new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false),new Frame(data, false, false)};
-        r.tempFill(frames);
-        r.sendAck();
     }
 }
 

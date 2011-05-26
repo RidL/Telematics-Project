@@ -1,6 +1,7 @@
 package tp.link;
 
 import tp.trans.Segment;
+import tp.util.Log;
 
 public class HLSender extends Thread {
 
@@ -28,13 +29,15 @@ public class HLSender extends Thread {
     private boolean receiverActive;
 // Is er een ack die verzonden moet worden?
     private boolean ackToSend;
-
+    
+    private boolean sysoutLog = false;
     /**
      * Creates a new High Level Sender cooperating with an HLReceiver hlr
      * @param hlr The High Level Receiver with which it cooperates
      * @ensure readyToPushSegment() == true
      */
     public HLSender(HLReceiver hlr) {
+    	Log.writeLog(" HLS", "Booted", sysoutLog);
         this.hlr = hlr;
         lls = new LLSender();
         frameBuffer = new Frame[BUFFER_SIZE];
@@ -93,7 +96,6 @@ public class HLSender extends Thread {
                 if (ackReceived) {
                     retransmitWindow();
                 } else if (segmentInBuffer && !expectAck) {
-                	//System.out.println("HLS: pushWindow");
                     pushWindow();
                 }
             } else {
@@ -142,7 +144,6 @@ public class HLSender extends Thread {
             int i;
             for(i = 0; i < newBytes.length && segPtr < bytes.length; i++) {
                 newBytes[i] = bytes[segPtr];
-                //System.out.printf("HLS: bytePtr: %d & i: %d\n", segPtr, i);
                 segPtr++;
             }
             if((segPtr)%5 != 0) {  // if stuffing must occur
@@ -169,7 +170,7 @@ public class HLSender extends Thread {
      * Temp method for testing only!
      */
        public void pushSegment(byte[] bytes) {
-    	   System.out.println("HLS: ========== NEW SEG IN BUFFER ===========");
+    	   Log.writeLog(" HLS", "buffering new segment", sysoutLog);
         /*
          * Deel segment op in frames en vul 'frame_buffer'.
          * Geeft het aantal frames aan in 'framesInBuffer'.
@@ -188,7 +189,6 @@ public class HLSender extends Thread {
             int i;
             for(i = 0; i < newBytes.length && segPtr < bytes.length; i++) {
                 newBytes[i] = bytes[segPtr];
-                //System.out.printf("bytePtr: %d & i: %d\n", segPtr, i);
                 segPtr++;
             }
             if((segPtr)%5 != 0) {  // if stuffing must occur
@@ -201,14 +201,12 @@ public class HLSender extends Thread {
                     newBytes[i+3] = 4;
             }
             if(segPtr == bytes.length) {  // end of tl-seg
-            	//System.out.println("HLS: FINFIN");
                 isFin = true;
             }
             Frame frame = new Frame(newBytes, false, isFin);
             frameBuffer[ptr] = frame;
             framesInBuffer++;
             ptr++;
-            
         }
         segmentInBuffer = true;
     }
@@ -241,7 +239,7 @@ public class HLSender extends Thread {
         }
         while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
 
-        System.out.println("HLS: --Window pushed--");
+        Log.writeLog(" HLS", "window pushed", sysoutLog);
         expectAck = true;
         hlr.setExpectingAck();
 
@@ -301,7 +299,6 @@ public class HLSender extends Thread {
      * retransmits the incorrectly received frames
      */
     public void retransmitWindow() {
-    	//System.out.println("in rtrwindow");
         boolean retrans = false;
         
         ackReceived = false;
@@ -310,22 +307,19 @@ public class HLSender extends Thread {
         int i;
         for(i = 0; i < WINDOW_SIZE; i++) {
             if((byte)(ack << i) < 0) {
-            	//System.out.println("HLS: frame "+i+" was detected to be  false");
+            	Log.writeLog(" HLS", "frame that was detected to be false: " + i, sysoutLog);
                 retrans = true;
                 frameBuffer[sendPointer+i].reset();
                 lls.pushFrame(frameBuffer[sendPointer+i], true);
             }
-            //Frame temp = frame_buffer[sendPointer+i];
-           // System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
             if(frameBuffer[(sendPointer+i)].isFin()) {
-            	//System.out.println("HLS: DETECTED PREM FIN IN ACK");
                 break;
             }
         }
         if(!retrans) {
-        	//System.out.println("HLS: No retransmit, sendPointer updated");
+        	Log.writeLog(" HLS", "no retransmit", sysoutLog);
             if(frameBuffer[sendPointer+i].isFin()) {
-            	System.out.println("HLS: ========COMPLETE SEGMENT HAS BEEN SENT=========");
+            	Log.writeLog(" HLS", "segment has been sent", sysoutLog);
                 sendPointer = 0;
                 framesInBuffer = 0;
                 segmentInBuffer = false;
@@ -335,7 +329,7 @@ public class HLSender extends Thread {
                 sendPointer += i;
             }
         } else {
-           // System.out.println("HLS:--Retransmitting--\n");
+        	Log.writeLog(" HLS", "retransmitting", sysoutLog);
             expectAck = true;
             hlr.setExpectingAck();
         }
@@ -391,7 +385,7 @@ public class HLSender extends Thread {
          * Maakt een ack frame met behulp van byte 'ack', verstuurd deze ack,
          * zet ackToSend op false en informeer HLReceiver.
          */
-    	//System.out.println("HLS:  Sending ack");
+    	Log.writeLog(" HLS", "sending ack", sysoutLog);
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
         lls.pushFrame(ackFrame, true);

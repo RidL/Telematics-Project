@@ -1,7 +1,10 @@
 package tp.link;
 
-public class LinkInitializer {
+import tp.util.Log;
 
+
+public class LinkInitializer {
+	public static Log LOG = Log.getInstance("ROBIN");
     /**
      * This class is the temporary startup class of the link.
      *

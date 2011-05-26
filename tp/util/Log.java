@@ -22,20 +22,22 @@ public class Log {
 		}
 	}
 	
-	public static void writeLog(String mod, String msg, boolean sysout){
+	public static synchronized void writeLog(String mod, String msg, boolean sysout){
 		String logString = mod + " - " + msg;
 		if(sysout){
 			System.out.println(logString);
 		}
 		try {
 			write.write(pref + " - " + logString);
+			write.newLine();
+			write.flush();
 		} catch (IOException e) {
 			System.err.println("failed writing " + logString);
 			e.printStackTrace();
 		}
 	}
 	
-	public Log getInstance(String pref){
+	public static Log getInstance(String pref){
 		if(instance==null){
 			instance = new Log(pref);
 		}
