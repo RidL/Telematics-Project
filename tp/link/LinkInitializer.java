@@ -1,7 +1,10 @@
 package tp.link;
 
-public class LinkInitializer {
+import tp.util.Log;
 
+
+public class LinkInitializer {
+	public static Log LOG = Log.getInstance("ROBIN");
     /**
      * This class is the temporary startup class of the link.
      *
@@ -32,21 +35,21 @@ public class LinkInitializer {
         hlr.start();
         hls.start();
 
-        while (true) {
-        	//System.out.println("LI: "+hls.readyToPushSegment());
-            if (hls.readyToPushSegment()) {
-                if (hls.readyToPushSegment()) {
-                    hls.pushSegment(bytes);
-                }
-            }
-            //System.out.println("LI: DONE WITH SENDING");
-//            try {
-//				Thread.sleep(1);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-        
-        }
+//        while (true) {
+//        	//System.out.println("LI: "+hls.readyToPushSegment());
+//            if (hls.readyToPushSegment()) {
+//                if (hls.readyToPushSegment()) {
+//                    hls.pushSegment(bytes);
+//                }
+//            }
+//            //System.out.println("LI: DONE WITH SENDING");
+////            try {
+////				Thread.sleep(1);
+////			} catch (InterruptedException e) {
+////				// TODO Auto-generated catch block
+////				e.printStackTrace();
+////			}
+//        
+//        }
     }
 }

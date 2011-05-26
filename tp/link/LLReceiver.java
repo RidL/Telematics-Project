@@ -1,6 +1,7 @@
 package tp.link;
 
 import tp.test.TestHLR;
+import tp.util.Log;
 import lpt.Lpt;
 
 public class LLReceiver {
@@ -19,6 +20,7 @@ public class LLReceiver {
     private byte header;
     private boolean rcvedAck;
     
+    private boolean sysoutLog = false;
     public LLReceiver(HLR hlr) {
         this.hlr = hlr;
         lpt = new Lpt();
@@ -32,9 +34,7 @@ public class LLReceiver {
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
         tmp = lpt.readLPT();
-       // System.out.println("LLR: Write initial value>: 10");
-        int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-      //  System.out.println("LLR: Read initial value: " + i);
+        Log.writeLog(" LLR", Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
     }
 
@@ -54,6 +54,7 @@ public class LLReceiver {
                System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
+                Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
@@ -64,11 +65,7 @@ public class LLReceiver {
                 }
             }
         }
-        //System.out.println("LLR:<!--Frame received--!>");
-//        if(f!=null)
-//        	System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
-//        else
-//        	System.out.println("LLR: null returned");
+        Log.writeLog(" LLR", "frame received", sysoutLog);
         return f;
 
     }
@@ -76,11 +73,11 @@ public class LLReceiver {
     private void sendResponse() {
         if (alt) {
             lpt.writeLPT(4);
-           // System.out.println("LLR: OUT: 4");
+            Log.writeLog(" LLR", "OUT: 4", sysoutLog);
             alt = false;
         } else {
             lpt.writeLPT(10);
-           // System.out.println("LLR: OUT: 10");
+            Log.writeLog(" LLR", "OUT: 4", sysoutLog);
             alt = true;
         }
 
@@ -90,7 +87,7 @@ public class LLReceiver {
         if ((i == Frame.ONES) && readingFrame) {
             if (offset < 51) {
             	if(checkParity()){
-            		System.out.println("LLR: new Frame offset: " + offset + " data: " + data.length);
+            		Log.writeLog(" LLR", "new frame, offset: " + offset, sysoutLog);
             		f = new Frame(data, header);
             		data[5] = 0;
             		data[6] = 0;
@@ -103,7 +100,7 @@ public class LLReceiver {
                          y++;
                      }
                      tmp = lpt.readLPT();
-                    // System.out.println("LLR: IN: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                      sendResponse();
                      temp =  false;
             	 }
@@ -114,7 +111,6 @@ public class LLReceiver {
             readingFrame = false;
         } else if ((i != Frame.ZEROS) && (i != Frame.ONES) && offset <= 50) { //shift(i)!=0 && shift(i)!=31
             if (!readingFrame) {
-                //System.out.println("Setting Header");
                 header = (byte) (i^0x80);
                 readingFrame = true;
             } else {
@@ -123,6 +119,7 @@ public class LLReceiver {
             	System.out.println("LLR: offset: "+offset);
             	Frame.bitConcat(data, (byte) (i^0x80), offset);
                 //System.out.println(Frame.toBinaryString(data));
+                Frame.bitConcat(data, (byte) (i^0x80), offset);
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
                 offset = offset + 5;
             }
@@ -153,12 +150,11 @@ public class LLReceiver {
 	public void setInvalidFrame() {
         validFrame = false;
         rcvedAck = false;
-        //System.out.println("LLR: Ignoring data");
+        Log.writeLog(" LLR", "invalid frame - now ignoring data", sysoutLog);
     }
 
     public boolean readThisFrame() {
         boolean ret = false;
-        //Methode aangepast ten behoeve van UnitTest
         if (hlr.inSenderActiveMode()) {
             if (hlr.expectingAck()) {
                 ret = true;

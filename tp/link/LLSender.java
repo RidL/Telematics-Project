@@ -1,5 +1,6 @@
 package tp.link;
 
+import tp.util.Log;
 import lpt.Lpt;
 
 /**
@@ -33,7 +34,8 @@ public class LLSender {
     private int frameCount = 0;
     private int lastNr = -1;
     private long time;
-
+    
+    private boolean sysoutLog = false;
     /**
      * Creates a new low-level linklayer sender component and sets up the buffers.
      */
@@ -78,14 +80,13 @@ public class LLSender {
         int nr;
         while (true) {
             nr = cable.readLPT();
-            //System.out.println("LLS: GNR: " +(((((byte) nr) >> 3) & 0x1f) ^ 0x10));
             if (nr != changeNr) {
                 microSleep();
                 changeNr = cable.readLPT();
                 break;
             }
         }
-      // System.out.println("LLS: IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        Log.writeLog(" LLS", "IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
     }
 
     /**
@@ -95,11 +96,10 @@ public class LLSender {
      */
     public void pushFrame(Frame f, boolean flag) {
     	int n = f.next();
-    	//System.out.println(Frame.toBinaryString(f.getBytes()));
     	if(flag){
-    		getNextRead();//read first, because we didn't read after last send
+    		getNextRead();
     		cable.writeLPT(31);
-    		//System.out.println("LLS: OUT: 31");
+    		Log.writeLog(" LLS", "OUT: 31", sysoutLog);
     	}
     	
     	while(n!= -1 && n!=0){
@@ -108,22 +108,21 @@ public class LLSender {
     			cable.writeLPT(n);
     		}else{
     			cable.writeLPT(0);
-    			//System.out.println("LLS: OUT: 0");
+    			Log.writeLog(" LLS", "OUT: 0", sysoutLog);
     			getNextRead();
     			cable.writeLPT(n);
     		}
-    		//System.out.println("LLS: OUT: " + n + "");
+    		Log.writeLog(" LLS", "OUT: 3" + n, sysoutLog);
     		lastNr = n;
     		n = f.next();
     	}
     	getNextRead();
-    	//System.out.println("LLS: OUT: 31");
     	cable.writeLPT(31);
+    	Log.writeLog(" LLS", "OUT: 31", sysoutLog);
     	getNextRead();
-    	//System.out.println("LLS: OUT: 0");
+    	Log.writeLog(" LLS", "OUT: 0", sysoutLog);
 		cable.writeLPT(0);
- 
-    	System.out.println("LLS: ===frame sent===");
+		Log.writeLog(" LLS", "frame sent", sysoutLog);
     }
 
     /**
@@ -144,24 +143,24 @@ public class LLSender {
         boolean succes = false;
         
         changeNr = cable.readLPT();
-        //System.out.println("LLS: InitialValue: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10));
+        Log.writeLog(" LLS", "pushFirst initial: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
     	cable.writeLPT(31);
-    	//System.out.println("LLS: OUT: 31");
+    	Log.writeLog(" LLS", "OUT: 31", sysoutLog);
      	
     	if (changeNr == Frame.ONES) { //shift(changeNr) == 31
-    		System.out.println("LLS: COLLISION DETECTED");
+    		Log.writeLog(" LLS", "COLLISION", sysoutLog);
          	getNextRead();  //this should be 0
          	cable.writeLPT(0);
-         	//System.out.println("LLS: OUT: 0");
+         	Log.writeLog(" LLS", "OUT: 0", sysoutLog);
          }else{
         	 getNextRead();
         	 if (changeNr == Frame.ONES) { //shift(changeNr) == 31
         		 cable.writeLPT(0);
-        		// System.out.println("LLS: OUT: 0");
+        		 Log.writeLog(" LLS", "OUT: 0", sysoutLog);
         	 } else {
         		 lastNr = f.next();
         		 cable.writeLPT(lastNr);
-        		// System.out.println("LLS: OUT: "+lastNr+"");
+        		 Log.writeLog(" LLS", "OUT: " + lastNr, sysoutLog);
         		 pushFrame(f,false);
         		 succes = true;
           	 }
