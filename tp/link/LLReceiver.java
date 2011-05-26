@@ -16,6 +16,7 @@ public class LLReceiver {
     private byte[] data;
     private int offset;
     private byte header;
+    private boolean rcvedAck;
 
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
@@ -30,9 +31,10 @@ public class LLReceiver {
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
         tmp = lpt.readLPT();
-        System.out.println("LLR: Write initial value>: 10");
+       // System.out.println("LLR: Write initial value>: 10");
         int i = ((tmp >> 3) & 0x1f) ^ 0x10;
-        System.out.println("LLR: Read initial value: " + i);
+      //  System.out.println("LLR: Read initial value: " + i);
+        rcvedAck = false;
     }
 
     public Frame read() {
@@ -41,17 +43,18 @@ public class LLReceiver {
 
 
         while (!frameReceived) {
-            if (lpt.readLPT() != tmp) {
+            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck)) {
                 for (int z = 0; z < 2; z++) {
                     int y = 3;
                     y++;
                 }
                 tmp = lpt.readLPT();
-                System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+              //  System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
+                    rcvedAck = true;
                 }
                 if (validFrame) {
                     sendResponse();
@@ -59,7 +62,7 @@ public class LLReceiver {
                 }
             }
         }
-        System.out.println("LLR:<!--Frame received--!>");
+        //System.out.println("LLR:<!--Frame received--!>");
 //        if(f!=null)
 //        	System.out.println("LLR: unescaped: " + Frame.toBinaryString(f.getBytes()));
 //        else
@@ -71,11 +74,11 @@ public class LLReceiver {
     private void sendResponse() {
         if (alt) {
             lpt.writeLPT(4);
-            System.out.println("LLR: OUT: 4");
+           // System.out.println("LLR: OUT: 4");
             alt = false;
         } else {
             lpt.writeLPT(10);
-            System.out.println("LLR: OUT: 10");
+           // System.out.println("LLR: OUT: 10");
             alt = true;
         }
 
@@ -98,7 +101,7 @@ public class LLReceiver {
                          y++;
                      }
                      tmp = lpt.readLPT();
-                     System.out.println("LLR: IN: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+                    // System.out.println("LLR: IN: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                      sendResponse();
                      temp =  false;
             	 }
@@ -146,7 +149,8 @@ public class LLReceiver {
 
 	public void setInvalidFrame() {
         validFrame = false;
-        System.out.println("LLR: Ignoring data");
+        rcvedAck = false;
+        //System.out.println("LLR: Ignoring data");
     }
 
     public boolean readThisFrame() {

@@ -65,7 +65,7 @@ public class HLReceiver extends Thread {
                 interpretFrame(tempFrame);
             } else {
             	// if senderActive
-            	System.out.println("HLR: ACK PROCCESSING");
+            	//System.out.println("HLR: ACK PROCCESSING");
                 ackReceived(tempFrame);
             }
         }
@@ -81,11 +81,14 @@ public class HLReceiver extends Thread {
 
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
-        System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
-        hls.ackReceived(ack);
-        System.out.println("HLR: SET HLS TO EXPACT ACK");
+       // System.out.println("HLR: got ack interpreting: " + Frame.toBinaryString(ack));
+        
         llr.setInvalidFrame();
+      //  System.out.println("HLR: SET INVALID FRAME (ackReceived)");
         expectingAck = false;
+       // System.out.println("HLR: SET HLS TO EXPACT ACK");
+        hls.ackReceived(ack);
+        
         // ackReceived non-existent, ik gebruik expectingAck
         // frameReceived setten lijkt me niet nodig
 
@@ -179,7 +182,9 @@ public class HLReceiver extends Thread {
         	recPtr++;
     	}
         if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {   // if sequence of frames is received
-            llr.setInvalidFrame();
+          //  System.out.println("HLR: INPTFRM isFIN");
+        	llr.setInvalidFrame();
+        //	System.out.println("HLR: SET INVALID FRAME (inptFrame)");
             sendAck();
         }
         if(recPtr == BUFFER_SIZE) {

@@ -310,7 +310,7 @@ public class HLSender extends Thread {
         int i;
         for(i = 0; i < WINDOW_SIZE; i++) {
             if((byte)(ack << i) < 0) {
-            	System.out.println("HLS: frame "+i+" was detected to be  false");
+            	//System.out.println("HLS: frame "+i+" was detected to be  false");
                 retrans = true;
                 frameBuffer[sendPointer+i].reset();
                 lls.pushFrame(frameBuffer[sendPointer+i], true);
@@ -318,12 +318,12 @@ public class HLSender extends Thread {
             //Frame temp = frame_buffer[sendPointer+i];
            // System.out.println("HLS: frame: "+(sendPointer+i)+" "+frame_buffer[(sendPointer+i)].isFin());
             if(frameBuffer[(sendPointer+i)].isFin()) {
-            	System.out.println("HLS: DETECTED PREM FIN IN ACK");
+            	//System.out.println("HLS: DETECTED PREM FIN IN ACK");
                 break;
             }
         }
         if(!retrans) {
-        	System.out.println("HLS: No retransmit, sendPointer updated");
+        	//System.out.println("HLS: No retransmit, sendPointer updated");
             if(frameBuffer[sendPointer+i].isFin()) {
             	System.out.println("HLS: ========COMPLETE SEGMENT HAS BEEN SENT=========");
                 sendPointer = 0;
@@ -335,7 +335,7 @@ public class HLSender extends Thread {
                 sendPointer += i;
             }
         } else {
-            System.out.println("\nHLS:--Retransmitting--\n");
+           // System.out.println("HLS:--Retransmitting--\n");
             expectAck = true;
             hlr.setExpectingAck();
         }
