@@ -1,6 +1,6 @@
 package tp.link;
 
-public class HLReceiver extends Thread {
+public class HLReceiver extends Thread implements HLR{
 
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;

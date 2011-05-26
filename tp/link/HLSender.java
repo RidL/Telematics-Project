@@ -36,7 +36,7 @@ public class HLSender extends Thread {
      */
     public HLSender(HLReceiver hlr) {
         this.hlr = hlr;
-        lls = new LLSender(this);
+        lls = new LLSender();
         frameBuffer = new Frame[BUFFER_SIZE];
 
         sendPointer = 0;

@@ -32,14 +32,12 @@ public class LLSender {
     private int changeNr;
     private int frameCount = 0;
     private int lastNr = -1;
-    private HLSender hls;
     private long time;
 
     /**
      * Creates a new low-level linklayer sender component and sets up the buffers.
      */
-    public LLSender(HLSender hls) {
-        this.hls = hls;
+    public LLSender() {
        // frames = new Frame[8];
         frameData = new int[11];
         sentData = new boolean[11];
