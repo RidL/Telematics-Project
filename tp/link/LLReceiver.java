@@ -51,7 +51,7 @@ public class LLReceiver {
                     y++;
                 }
                 tmp = lpt.readLPT();
-              //  System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
+               System.out.println("LLR: INC: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                 //System.out.println((tmp == Frame.ONES) +"-" + !validFrame  +"-" + readThisFrame());
                 //System.out.println((tmp == Frame.ONES)+" "+!validFrame+" "+readThisFrame());
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
@@ -120,7 +120,8 @@ public class LLReceiver {
             } else {
             	//System.out.println("LLR: notShifted "+Frame.toBinaryString((byte)(i)));
             	//System.out.println("LLR: Shifted    "+(Frame.toBinaryString((byte)(i^0x80))));
-                Frame.bitConcat(data, (byte) (i^0x80), offset);
+            	System.out.println("LLR: offset: "+offset);
+            	Frame.bitConcat(data, (byte) (i^0x80), offset);
                 //System.out.println(Frame.toBinaryString(data));
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
                 offset = offset + 5;

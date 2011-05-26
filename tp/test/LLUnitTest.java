@@ -7,7 +7,7 @@ public class LLUnitTest {
 
 	private static TestHLR hlr;
 	private static LLSender lls;
-	public static final byte[] PAYLOAD_5BYTE = new byte[]{30, 1, 5, 12};
+	public static final byte[] PAYLOAD_5BYTE = new byte[]{10,4,10,4,10};
 
 	
 	public static void main(String[] args){
@@ -19,6 +19,7 @@ public class LLUnitTest {
 	}
 	
 	public static void testOneFrameSegment(){
+		
 		hlr.setSenderActive(true);
 		Frame f = new Frame(PAYLOAD_5BYTE,false, true);
 		Frame rcvdFrame = null;
@@ -26,6 +27,7 @@ public class LLUnitTest {
 
 		
 		while(true){
+			System.out.println("LLUT: Starting new run");
 		f.reset();
 		if(first){
 			lls.pushFirstFrame(f);
@@ -33,22 +35,23 @@ public class LLUnitTest {
 		}else{
 			lls.pushFrame(f, true);
 		}
-		System.out.println("LLUT: frame sent");
 		long time = System.currentTimeMillis();
 		hlr.setExpectingAck();
 		rcvdFrame =  null;
+		System.out.println("Ik kom hier!");
 		while(true){
 			if(hlr.receivedFrame()){
+				System.out.println("LLUT: Frame received");
 				 rcvdFrame = hlr.retriveFrame();
-				break;
-			}else if(System.currentTimeMillis() - time >= 1000 ){
-				System.out.println("LLUT: timeout bij ontvangen ack ");
+				 System.out.println("LLUT: Frame retrived");
 				break;
 			}
+//			else if(System.currentTimeMillis() - time >= 1000 ){
+//				System.out.println("LLUT: timeout bij ontvangen ack ");
+//				break;
+//			}
 		}
-		if(rcvdFrame!=null){
-			System.out.println("LLUT: frame received");
-		}
+		 System.out.println("LLUT: End of run");
 		}
 	}
 }
