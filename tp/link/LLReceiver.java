@@ -1,12 +1,13 @@
 package tp.link;
 
+import tp.test.TestHLR;
 import lpt.Lpt;
 
 public class LLReceiver {
 
     private static final int INITIAL_VALUE = 10;
     private Lpt lpt;
-    private HLReceiver hlr;
+    private HLR hlr;
     private boolean alt;
     private boolean frameReceived;
     private int tmp;
@@ -17,8 +18,8 @@ public class LLReceiver {
     private int offset;
     private byte header;
     private boolean rcvedAck;
-
-    public LLReceiver(HLReceiver hlr) {
+    
+    public LLReceiver(HLR hlr) {
         this.hlr = hlr;
         lpt = new Lpt();
         alt = true;
@@ -37,7 +38,8 @@ public class LLReceiver {
         rcvedAck = false;
     }
 
-    public Frame read() {
+
+	public Frame read() {
         f = null;
         frameReceived = false;
 
@@ -155,6 +157,7 @@ public class LLReceiver {
 
     public boolean readThisFrame() {
         boolean ret = false;
+        //Methode aangepast ten behoeve van UnitTest
         if (hlr.inSenderActiveMode()) {
             if (hlr.expectingAck()) {
                 ret = true;
