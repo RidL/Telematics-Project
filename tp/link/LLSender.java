@@ -193,14 +193,8 @@ public class LLSender {
     }
 
     private void microSleep() {
-    	try {
-			Thread.sleep(15);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//    	int i = (int) Math.random() * 9;
-//    	i++;
+    	int i = (int) Math.random() * 9;
+    	i++;
     }
 
 } 

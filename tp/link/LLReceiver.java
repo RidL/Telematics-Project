@@ -98,6 +98,7 @@ public class LLReceiver {
                          y++;
                      }
                      tmp = lpt.readLPT();
+                     System.out.println("LLR: IN: " + (((tmp >> 3) & 0x1f) ^ 0x10));
                      sendResponse();
                      temp =  false;
             	 }
