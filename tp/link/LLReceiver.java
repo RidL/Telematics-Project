@@ -71,13 +71,11 @@ public class LLReceiver {
         if (alt) {
             lpt.writeLPT(4);
             Log.writeLog(" LLR", "OUT: 4", sysoutLog);
-            alt = false;
         } else {
             lpt.writeLPT(10);
             Log.writeLog(" LLR", "OUT: 4", sysoutLog);
-            alt = true;
         }
-
+        alt=!alt;
     }
 
     private void bitInterpret(int i) {

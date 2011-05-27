@@ -12,13 +12,14 @@ public class HLReceiver extends Thread implements HLR{
     private boolean senderActive;
     private boolean expectingAck;
     
+    private long timeoutCount;
+    
     private byte ack;
     private int errCount;
     private int recPtr;
     private int windowPtr;
     
     private boolean sysoutLog = false;
-    
     
     /**
      * Creates a new HLReceiver and initialises it, an HLSender must be set
@@ -168,7 +169,6 @@ public class HLReceiver extends Thread implements HLR{
      * @param tempFrame The Frame to be interpreted and buffered
      */
     private void interpretFrame(Frame tempFrame) {
-        // shit interpreten
     	if(errCount>0){
     		Log.writeLog(" HLR", "had errors in last frame, rcving retransmit", sysoutLog);
     		for(int bit=0; bit<8; bit++){
@@ -185,13 +185,20 @@ public class HLReceiver extends Thread implements HLR{
     		frameBuffer[recPtr] = tempFrame;
         	recPtr++;
     	}
+    	// Moet er een ack worden gestuurd?
         if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {
         	Log.writeLog(" HLR", "Sending ACK", sysoutLog);
         	llr.setInvalidFrame();
             sendAck();
+            
         }
-        if(recPtr == BUFFER_SIZE) {
+        // Is dit het laatste frame van segment en geen retransmits meer?
+        if(tempFrame.isFin() && errCount==0) {
             recPtr = 0;
+            windowPtr = 0;
+            for(Frame f: frameBuffer){
+            	f = null;
+            }
         }
     }
 }
