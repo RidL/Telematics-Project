@@ -322,8 +322,8 @@ public class HLSender extends Thread {
             	Log.writeLog(" HLS", "segment has been sent", sysoutLog);
                 sendPointer = 0;
                 framesInBuffer = 0;
-                segmentInBuffer = false;
                 frameBuffer = new Frame[BUFFER_SIZE];
+                segmentInBuffer = false;
             }
             else {
                 sendPointer += i;

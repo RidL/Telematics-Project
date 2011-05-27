@@ -112,7 +112,7 @@ public class LLSender {
     			getNextRead();
     			cable.writeLPT(n);
     		}
-    		Log.writeLog(" LLS", "OUT: 3" + n, sysoutLog);
+    		Log.writeLog(" LLS", "OUT: " + n, sysoutLog);
     		lastNr = n;
     		n = f.next();
     	}
@@ -160,7 +160,7 @@ public class LLSender {
         	 } else {
         		 lastNr = f.next();
         		 cable.writeLPT(lastNr);
-        		 Log.writeLog(" LLS", "OUT: " + lastNr, sysoutLog);
+        		 Log.writeLog(" LLS", "OUT: " + (((((byte) lastNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
         		 pushFrame(f,false);
         		 succes = true;
           	 }
