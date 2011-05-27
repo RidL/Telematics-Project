@@ -64,7 +64,6 @@ public class LLReceiver {
         }
         Log.writeLog(" LLR", "frame received", sysoutLog);
         return f;
-
     }
 
     private void sendResponse() {
