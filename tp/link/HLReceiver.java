@@ -112,23 +112,19 @@ public class HLReceiver extends Thread implements HLR{
          * hij de gemaakte byte meegeeft
          */
         byte ack = 0;
-        boolean[] acks = new boolean[8];
         boolean newWindow = true;
+        boolean hasFin = false;
         for(int i = 0; i<WINDOW_SIZE; i++) {
              if(frameBuffer[windowPtr+i] == null) {
                  ack+= Math.pow(2, (WINDOW_SIZE-1)-i);
-                 acks[i] = false;
                  newWindow = false;
-                 errCount++;
+                 if(!hasFin)
+                	 errCount++;
                  Log.writeLog(" HLR", "error in window at: " + i + "", sysoutLog);
-             } else {
-                 acks[i] = true;
-             }
-             if(frameBuffer[windowPtr+i]!=null && frameBuffer[windowPtr+i].isFin()){
-                 windowPtr = 0;
-                 recPtr = 0;
-                 newWindow = false;
-                 break;
+             }else{
+            	 if(frameBuffer[windowPtr+i].isFin()){
+                	 hasFin = true;
+                 }
              }
         }
         if(newWindow) {
@@ -193,7 +189,8 @@ public class HLReceiver extends Thread implements HLR{
             
         }
         // Is dit het laatste frame van segment en geen retransmits meer?
-        if(tempFrame.isFin() && errCount==0) {
+        //TEMP CODE, TEMPFRAME ZOU NIET FIN MOGEN ZIJN NA TIMEOUT
+        if(tempFrame != null && tempFrame.isFin() && errCount==0) {
             recPtr = 0;
             windowPtr = 0;
             for(Frame f: frameBuffer){

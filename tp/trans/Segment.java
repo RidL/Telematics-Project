@@ -1,10 +1,13 @@
 package tp.trans;
 
+import tp.link.Frame;
 import java.security.NoSuchAlgorithmException;
 
 public class Segment {
 
     private byte[] bytes;
+    public static final int HEADER_LENGTH = 7;
+    private byte[] data;
 
     /**
      * Header is already filled by the transport layer with the hash-field zeroed.
@@ -20,6 +23,47 @@ public class Segment {
         for (int d = 0; d < data.length; d++, i++) {
             bytes[i] = data[d];
         }
+
+        this.data = data;
+        
+        calculateHash();
+    }
+
+    public Segment(byte[] data, int scrAddr, int scrPort, int destAddr, int destPort, boolean isAck, int ackSeq) {
+        byte length = (byte) data.length;
+        bytes = new byte[data.length + HEADER_LENGTH];
+        byte[] header = new byte[HEADER_LENGTH];
+
+        byte scrAddrPort = (byte) ((scrAddr << 4) | scrPort);
+        byte destAddrPort = (byte) ((destAddr << 4) | destPort);
+        byte options;
+
+        if (isAck) {
+            options = 8;
+        } else {
+            options = 0;
+        }
+
+        byte ack_Seq = (byte) ackSeq;
+
+        header[0] = scrAddrPort;
+        header[1] = destAddrPort;
+        header[2] = 0;
+        header[3] = 0;
+        header[4] = options;
+        header[5] = length;
+        header[6] = ack_Seq;
+
+        int i = 0;
+        for (int h = 0; h < header.length; h++, i++) {
+            bytes[i] = header[h];
+        }
+        for (int d = 0; d < data.length; d++, i++) {
+            bytes[i] = data[d];
+        }
+
+        this.data = data;
+
         calculateHash();
     }
 
@@ -45,6 +89,10 @@ public class Segment {
 
     public byte[] getBytes() {
         return bytes;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
     public boolean isValidSegment() {
@@ -76,10 +124,9 @@ public class Segment {
         bytes[3] = 0;
         bytes[4] = (byte) (bytes[4] & 0x0f);
 
-        try{
+        try {
             hash = SHA1Hash.SHA1(bytes);
-        }catch (NoSuchAlgorithmException nsae) {
-
+        } catch (NoSuchAlgorithmException nsae) {
         }
 
         bytes[2] = hash[0];
@@ -102,15 +149,6 @@ public class Segment {
         return bytes[6];
     }
 
-    public byte[] getData() {
-        int length = getLength();
-        byte[] data = new byte[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = bytes[7 + i];
-        }
-        return data;
-    }
-
     public static void main(String[] args) {
         byte[] header = new byte[]{113, 67, 34, 88, 12, 12, 98};
         byte[] shitLoadAanData = new byte[]{9, 5, 34, 3, 1, 4, 6, 8, 5, 3, 6, 89};
@@ -130,5 +168,11 @@ public class Segment {
         System.out.println(seg.isValidSegment());
         System.out.println("Dest adwess: " + seg.getDestinationAddress());
         System.out.println("Dest puwt: " + seg.getDestinationPort());
+
+        Segment seg2 = new Segment(shitLoadAanData, 5, 2, 4, 8, true, 111);
+        for (int p = 0; p < seg2.getBytes().length; p++) {
+            System.out.println(Frame.toBinaryString(seg2.getBytes()[p]));
+        }
+        System.out.println(seg2.isValidSegment());
     }
 }
