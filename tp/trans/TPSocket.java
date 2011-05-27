@@ -20,7 +20,6 @@ public class TPSocket {
     private boolean inDirty;
     private boolean outDirty;
 
-    ///// private boolean isFlushed;
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
         ack_nr = 0;
@@ -46,19 +45,24 @@ public class TPSocket {
      * @param bytes
      * @require bytes.length <= 96
      */ // app
-    public void writeOut(byte[] bytes) {
+    public synchronized void writeOut(byte[] bytes) {
+        System.out.println("ik probeer echt wel die shit op true te zette");
         if (bytes.length <= 96) {
             outBuffer = bytes;
             outDirty = true;
         }
         while (outDirty) {
+           System.out.println("spinwait, wachten op !outdirty");
         }
+        System.out.println("is !outdirty");
     }
 
     // vanuit trans naar app
-    public byte[] readOut() {
+    public synchronized byte[] readOut() {
+        System.out.println("imma be outReading");
         byte[] temp = null;
         if (outDirty) {
+            System.out.println("new datas");
             temp = outBuffer;
             outDirty = false;
         }
@@ -99,5 +103,19 @@ public class TPSocket {
 
     public int getCurrentAck() {
         return ack_nr;
+    }
+
+    /**
+     * @return the outDirty
+     */
+    public boolean isOutDirty() {
+        return outDirty;
+    }
+
+    /**
+     * @return the inDirty
+     */
+    public boolean isInDirty() {
+        return inDirty;
     }
 }

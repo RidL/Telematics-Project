@@ -2,6 +2,7 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import tp.link.Frame;
 
 public class Trans extends Thread {
 
@@ -12,20 +13,32 @@ public class Trans extends Thread {
     private ArrayList<Segment> rcvBuff;
 
     private Trans(int address) {
-        route = new Route(this);
-        this.address = address;
+        //   route = new Route(this);
+        //   this.address = address;
         socksList = new ArrayList<TPSocket>();
-        route.start();
+    //   route.start();
     }
 
     @Override
     public void run() {
+        System.out.println("p0p");
         while (true) {
             for (int i = 0; i < socksList.size(); i++) {
-                byte[] data = socksList.get(i).readOut();   //app heeft data die naar route moet
+                byte[] data = socksList.get(i).readOut();
+               // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                     Segment seg = createSegment(data, socksList.get(i), false);
-                    route.rcvSegment(seg);
+                   // System.out.println("hhh");
+                    int o = 0;
+                    for (int p = 0; p < seg.getBytes().length; p++) {
+                        o++;
+                        System.out.println(Frame.toBinaryString(seg.getBytes()[p]));
+                    }
+                    System.out.println("seg ended" + o + " bytes");
+                //route.rcvSegment(seg);
+                }
+                else {
+                    System.out.println("outdirty is false@" + i);
                 }
             }
         }
@@ -59,7 +72,7 @@ public class Trans extends Thread {
                 if (seg.isValidSegment()) {
                     socksList.get(i).writeIn(seg.getData());
                 }
-                //else: wait for retransmit
+            //else: wait for retransmit
             }
         }
     }

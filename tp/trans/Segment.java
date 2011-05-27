@@ -1,5 +1,6 @@
 package tp.trans;
 
+import tp.link.Frame;
 import java.security.NoSuchAlgorithmException;
 
 public class Segment {
@@ -148,15 +149,6 @@ public class Segment {
         return bytes[6];
     }
 
-   /* public byte[] getData() {
-        int length = getLength();
-        byte[] data = new byte[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = bytes[7 + i];
-        }
-        return data;
-    }*/
-
     public static void main(String[] args) {
         byte[] header = new byte[]{113, 67, 34, 88, 12, 12, 98};
         byte[] shitLoadAanData = new byte[]{9, 5, 34, 3, 1, 4, 6, 8, 5, 3, 6, 89};
@@ -176,5 +168,11 @@ public class Segment {
         System.out.println(seg.isValidSegment());
         System.out.println("Dest adwess: " + seg.getDestinationAddress());
         System.out.println("Dest puwt: " + seg.getDestinationPort());
+
+        Segment seg2 = new Segment(shitLoadAanData, 5, 2, 4, 8, true, 111);
+        for (int p = 0; p < seg2.getBytes().length; p++) {
+            System.out.println(Frame.toBinaryString(seg2.getBytes()[p]));
+        }
+        System.out.println(seg2.isValidSegment());
     }
 }
