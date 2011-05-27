@@ -52,8 +52,10 @@ public class TestHLR extends Thread implements HLR{
 			if(!receivedFrame){
 				System.out.println("THLR: Reading new frame");
 				rcvdFrame = llr.read();
+				llr.setInvalidFrame();
 				System.out.println("THLR: Frame read");
 				receivedFrame= true;
+				expectingAck = false;
 			}
 		}
 	}
