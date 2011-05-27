@@ -73,7 +73,7 @@ public class LLReceiver {
             Log.writeLog(" LLR", "OUT: 4", sysoutLog);
         } else {
             lpt.writeLPT(10);
-            Log.writeLog(" LLR", "OUT: 4", sysoutLog);
+            Log.writeLog(" LLR", "OUT: 10", sysoutLog);
         }
         alt = (!alt);
     }
