@@ -83,6 +83,9 @@ public class LLReceiver {
             	if(checkParity()){
             		Log.writeLog(" LLR", "new frame, offset: " + offset, sysoutLog);
             		f = new Frame(data, header);
+            		/*
+            		 * Controleer of 
+            		 */
             		data[5] = 0;
             		data[6] = 0;
             	}else{
@@ -101,6 +104,8 @@ public class LLReceiver {
                      temp =  false;
             	 }
             	}
+            }else{
+            	Log.writeLog("LLR",  "OVERFLOWAGE",sysoutLog);
             }
             frameReceived = true;
             offset = 0;
