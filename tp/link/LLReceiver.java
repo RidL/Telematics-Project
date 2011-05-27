@@ -73,9 +73,9 @@ public class LLReceiver {
             Log.writeLog(" LLR", "OUT: 4", sysoutLog);
         } else {
             lpt.writeLPT(10);
-            Log.writeLog(" LLR", "OUT: 4", sysoutLog);
+            Log.writeLog(" LLR", "OUT: 10", sysoutLog);
         }
-        alt=!alt;
+        alt = (!alt);
     }
 
     private void bitInterpret(int i) {
@@ -86,6 +86,8 @@ public class LLReceiver {
             		f = new Frame(data, header);
             		data[5] = 0;
             		data[6] = 0;
+            	}else{
+            		Log.writeLog("LLR", "parity failed", sysoutLog);
             	}
             	boolean temp = true;
             	while(temp){
