@@ -14,7 +14,9 @@ public class Log {
 	private Log(String pref){
 		Log.pref = pref;
 		file = new File("tp.log");
+		file.delete();
 		try {
+			file.createNewFile();
 			write = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
 			System.err.println("Could not create buffers for writing log");
