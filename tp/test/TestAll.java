@@ -13,7 +13,8 @@ public class TestAll {
 	
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
-		suite.addTestSuite(TestLinkReceiver.class);
+		//suite.addTestSuite(TestLinkReceiver.class);
+		suite.addTestSuite(TestFrame.class);
 		return suite;
 	}
 

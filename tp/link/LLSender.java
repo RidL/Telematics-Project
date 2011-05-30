@@ -28,44 +28,15 @@ public class LLSender {
 
     private Lpt cable;
    // private Frame[] frames;
-    private int[] frameData;
-    private boolean[] sentData;
     private int changeNr;
-    private int frameCount = 0;
     private int lastNr = -1;
-    private long time;
     
     private boolean sysoutLog = false;
     /**
      * Creates a new low-level linklayer sender component and sets up the buffers.
      */
     public LLSender() {
-       // frames = new Frame[8];
-        frameData = new int[11];
-        sentData = new boolean[11];
         cable = new Lpt();
-        time = System.currentTimeMillis();
-       /* fillRand();
-        if (pushFirstFrame(frames[0])) {
-            for (int i = 1; i < 2000; i++) {
-                fillRand();
-                pushFrame(frames[0]);
-            }
-        }*/
-    }
-
-    /**
-     * Fills the data-buffer with random data
-     */
-    private void fillRand() {
-        frameData[0] = 31;
-        sentData[0] = false;
-        for (int i = 1; i < frameData.length - 1; i++) {
-            frameData[i] = (int) (30 * (Math.random()) + 1);
-            sentData[i] = false;
-        }
-        frameData[10] = 31;
-        sentData[10] = false;
     }
 
     /**
@@ -189,8 +160,9 @@ public class LLSender {
         return succes;
     }
 
-    private void microSleep() {
-    	int i = (int) Math.random() * 9;
+    private static void microSleep() {
+    	@SuppressWarnings("unused")
+		int i = (int) Math.random() * 9;
     	i++;
     }
 

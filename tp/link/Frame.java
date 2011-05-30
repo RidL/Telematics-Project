@@ -1,6 +1,7 @@
 package tp.link;
 
 import tp.util.ByteBuilder;
+import tp.util.Log;
 
 public class Frame {
 	private byte[] bytes;
@@ -39,13 +40,9 @@ public class Frame {
 	}
 
 	public Frame(byte[] data, byte head){
-		//this(data, ((byte)(head&-128)==-128), ((byte)(head&64))==64);
-        bytes = new byte[8];
+		bytes = new byte[6];
         bytes[0] = head;
-        byte[] tmp = unescape(data);
-        for(int i=1; i<=data.length; i++){
-            bytes[i] = tmp[i-1];
-        }
+        Log.writeLog("FRM", unescape(data, bytes, 1) + " bits unescaped", true);
 	}
 
     public static int parity(byte[] data, int byteOffset, int max){
@@ -60,15 +57,10 @@ public class Frame {
         return ones%2;
     }
     
-    public void reset(){
-    	index = -1;
-    }
-    
     /**
 	 * Performs bit stuffing for the byte array b. Flags 00000 and 11111
 	 * are escaped to 000010 and 111101 respectively. Note that the size of
 	 * the return array could very well be bigger than the original one.
-	 * @ensure unescape(escape(b)) == b;
 	 * @ensure result.length >= b.length
 	 * @param b the array to escape
 	 * @return an array that is free of the flags 11111 and 00000
@@ -111,18 +103,6 @@ public class Frame {
 		return eBuff;
 	}
 
-	public byte[] getBytes(){
-		return bytes;
-	}
-
-	public boolean isFin(){
-		return (byte)(bytes[0]&64)==64;
-	}
-
-	public boolean isACK(){
-		return (byte)(bytes[0]&-128)==-128;
-	}
-
 	/**
 	 * Performs the parsing of a byte array b so that the bitcodes that were
 	 * escaped are once again back to normal.
@@ -131,6 +111,50 @@ public class Frame {
 	 * @param b the byte array to unescape
 	 * @return the unescaped array
 	 */
+	public static int unescape(byte[] b, byte[] uBuff, int index){
+		ByteBuilder build = new ByteBuilder();
+		int carry = 0;
+		int byt = 0;
+		int bit = 0;
+		
+		int ones = 0;
+		int count = 0;
+		for(byt=0; byt<b.length; byt++){
+			for(bit=carry; bit<8; bit++){
+				ByteBuilder.ByteReturn retval;
+				int curr = 0;
+
+				if((byte)(b[byt]<<bit)<0){
+					count = 0;
+					ones++;
+					if((ones==3)&&(curr==0)){
+						count = (8*byt)+(bit-3);
+						System.out.println("asd");
+					}
+					curr = 1;
+				}else{
+					ones = 0;
+				}
+				
+				carry = 0;
+				retval = build.add(curr);
+				if(retval==ByteBuilder.ByteReturn.FLAG || retval==ByteBuilder.ByteReturn.CARRY){
+					build.flagSeen(curr);
+					if(bit==7)
+						carry = 1;
+					bit++;
+					count--;
+				}
+				if(retval==ByteBuilder.ByteReturn.FULL || retval==ByteBuilder.ByteReturn.CARRY){
+					uBuff[index] = build.pop();
+					index++;
+				}
+			}
+		}
+		return count;
+	}
+	
+	@Deprecated
 	public static byte[] unescape(byte[] b){
 		byte[] uBuff = new byte[8];
 		int addIndex = 0;
@@ -163,6 +187,7 @@ public class Frame {
 		}
 		return uBuff;
 	}
+
 
 	/**
 	 * Returns the concatenation of start and tail, offset bits into start
@@ -211,7 +236,23 @@ public class Frame {
 	     }
 	     return sb.toString();
 	}
+	
+	public byte[] getBytes(){
+		return bytes;
+	}
 
+	public boolean isFin(){
+		return (byte)(bytes[0]&64)==64;
+	}
+
+	public boolean isACK(){
+		return (byte)(bytes[0]&-128)==-128;
+	}
+	
+	public void reset(){
+    	index = -1;
+    }
+	
 	/**
 	 * First gives the head then gives the next five bits of this frame's pay-load
 	 * @return the next five bits of this frame
