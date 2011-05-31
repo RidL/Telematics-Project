@@ -41,9 +41,9 @@ public class Frame {
 	}
 
 	public Frame(byte[] data, byte head){
-		bytes = new byte[6];
+		bytes = new byte[8];
         bytes[0] = head;
-        Log.writeLog("FRM", unescape(data, bytes, 1) + " bits unescaped", true);
+        Log.writeLog(" FRM", unescape(data, bytes, 1) + " bits unescaped", true);
 	}
 
     public static int parity(byte[] data, int byteOffset, int max){
@@ -120,19 +120,20 @@ public class Frame {
 		
 		int ones = 0;
 		int count = 0;
+		boolean possibleFlag = false;
+		int bitsFromFlag = 0;
 		for(byt=0; byt<b.length; byt++){
 			for(bit=carry; bit<8; bit++){
 				ByteBuilder.ByteReturn retval;
 				int curr = 0;
-
 				if((byte)(b[byt]<<bit)<0){
-					count = 0;
 					ones++;
 					curr = 1;
+					possibleFlag = false;
 				}else{
 					if(ones==3){
-						count = (8*byt)+(bit-3);
-						System.out.println("asd");
+						possibleFlag = true;
+						bitsFromFlag = 4;
 					}
 					ones = 0;
 				}
@@ -150,9 +151,19 @@ public class Frame {
 					uBuff[index] = build.pop();
 					index++;
 				}
+				
+				if(possibleFlag){
+					bitsFromFlag++;
+				}else{
+					if(bitsFromFlag>0){
+						count += (bitsFromFlag);
+					}
+					bitsFromFlag = 0;
+					count++;
+				}
 			}
 		}
-		return count;
+		return count-3;
 	}
 	
 	@Deprecated
@@ -295,43 +306,5 @@ public class Frame {
 		}
 
 		return ret&0x1F;
-	}
-
-	public static void main(String[] args){
-		byte[] buff = new byte[5];
-		buff[0] = 0;
-		buff[1] = 0;
-		buff[2] = 0;
-		buff[3] = 0;
-		buff[4] = 0;
-////		System.out.println(toBinaryString(buff));
-////		byte[] esc = escape(buff);
-////		System.out.println(toBinaryString(esc));
-////		System.out.println(toBinaryString(unescape(esc)));
-//		byte[] tmp = new byte[7];
-//		byte head;
-//		Frame f = new Frame(buff, true, true);
-//		System.out.println(toBinaryString(f.getBytes()));
-//
-//		int it = 0;
-//		int n = f.next();
-//		System.out.println((toBinaryString((byte)n)));
-//		head = (byte)(n<<3);
-//		n = f.next();
-//		while(n!=-1){
-//			bitConcat(tmp, (byte)(n<<3), it);
-//			it+=5;
-//			if(it>=51){
-//				break;
-//			}
-//			System.out.println((toBinaryString((byte)n)));
-//			n = f.next();
-//		}
-//		Frame rcv = new Frame(tmp, head);
-//		System.out.println((toBinaryString(tmp)));
-//		System.out.println((toBinaryString(rcv.getBytes())));
-        Frame f = new Frame(buff, false, false);
-        System.out.println(toBinaryString(f.getBytes()));
-        
 	}
 }
