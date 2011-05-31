@@ -4,6 +4,8 @@
  */
 package tp.trans;
 
+import tp.link.Frame;
+
 /**
  *
  * @author STUDENT\s1012886
@@ -46,31 +48,39 @@ public class TPSocket {
      * @param bytes
      * @require bytes.length <= 96
      */ // app
-    public void writeOut(byte[] bytes) {
+    public boolean writeOut(byte[] bytes) {
         //System.out.println("ik probeer echt wel die shit op true te zette");
+        boolean suc = false;
         synchronized (this) {
             if (!outDirty) {
-        if (bytes.length <= 96) {
-            outBuffer = bytes;
-            outDirty = true;
-        }}
+                if (bytes.length <= 96) {
+                    outBuffer = bytes;
+                    outDirty = true;
+                    suc = true;
+                }
+            } else {
+                suc = false;
+            }
         }
-      //  while (outDirty) {
-        //   System.out.println("spinwait, wachten op !outdirty");
-       // }
-       // System.out.println("is !outdirty");
+        //while (outDirty){
+        //System.out.println("spinwait, wachten op !outdirty");
+        // }
+        // System.out.println("is !outdirty");
+        return suc;
     }
 
     // vanuit trans naar app
     public byte[] readOut() {
-      //  System.out.println("imma be outReading");
+        //  System.out.println("imma be outReading");
         byte[] temp = null;
         synchronized (this) {
-        if (outDirty) {
-           // System.out.println("new datas");
-            temp = outBuffer;
-            outDirty = false;
-        }}
+            if (outDirty) {
+                // System.out.println("new datas");
+                temp = outBuffer;
+                // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
+                outDirty = false;
+            }
+        }
         return temp;
     }
 
