@@ -4,6 +4,7 @@ import tp.util.ByteBuilder;
 import tp.util.Log;
 
 public class Frame {
+	Log LOG = Log.getInstance("RMS");
 	private byte[] bytes;
 	private int index;
 	public static final int PAYLOAD_SIZE = 40;
@@ -127,12 +128,12 @@ public class Frame {
 				if((byte)(b[byt]<<bit)<0){
 					count = 0;
 					ones++;
-					if((ones==3)&&(curr==0)){
+					curr = 1;
+				}else{
+					if(ones==3){
 						count = (8*byt)+(bit-3);
 						System.out.println("asd");
 					}
-					curr = 1;
-				}else{
 					ones = 0;
 				}
 				
