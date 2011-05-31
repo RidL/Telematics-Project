@@ -5,7 +5,7 @@ import lpt.Lpt;
 
 public class LLReceiver {
     private static final int INITIAL_VALUE = 10;
-    private static final int LL_SLEEP_TIME = 200;
+    private static final int LL_SLEEP_TIME = 20;
     private Lpt lpt;
     private HLReceiver hlr;
     private boolean alt;
@@ -44,12 +44,12 @@ public class LLReceiver {
         frameReceived = false;
         timeoutCount = System.currentTimeMillis();
         while (!frameReceived) {
-            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)) {
+            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
+            	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
+            		hlr.resetTimer();
+            		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
+            	}
             	timeoutCount = System.currentTimeMillis();
-//            	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
-//            		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
-//            		timeoutCount+=500;
-//            	}
             	microSleep();
                 tmp = lpt.readLPT();
                 Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
@@ -95,15 +95,15 @@ public class LLReceiver {
             		Log.writeLog("LLR", "parity failed", sysoutLog);
             	}
             	boolean temp = true;
-            	while(temp){
-            	 if (lpt.readLPT() != tmp) {
-                     microSleep();
-                     tmp = lpt.readLPT();
-                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-                     sendResponse();
-                     temp =  false;
-            	 }
-            	}
+//            	while(temp){
+//            	 if (lpt.readLPT() != tmp) {
+//                     microSleep();
+//                     tmp = lpt.readLPT();
+//                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+//                     sendResponse();
+//                     temp =  false;
+//            	 }
+//            	}
             }else{
             	Log.writeLog("LLR",  "OVERFLOWAGE",sysoutLog);
             }
