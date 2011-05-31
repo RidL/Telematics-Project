@@ -38,7 +38,7 @@ public class Trans extends Thread {
                 //route.rcvSegment(seg);
                 }
                 else {
-                    System.out.println("outdirty is false@" + i);
+                   // System.out.println("outdirty is false@" + i);
                 }
             }
         }
