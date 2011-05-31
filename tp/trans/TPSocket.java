@@ -36,9 +36,13 @@ public class TPSocket {
     // app
     public byte[] readIn() {
         byte[] temp = null;
-        if (inDirty) {
-            temp = inBuffer;
-            inDirty = false;
+        synchronized (this) {
+            if (inDirty) {
+                // System.out.println("new datas");
+                temp = inBuffer;
+                // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
+                inDirty = false;
+            }
         }
         return temp;
     }
@@ -85,13 +89,20 @@ public class TPSocket {
     }
 
     // trans
-    public void writeIn(byte[] bytes) {
-        if (bytes.length <= 96) {
-            inBuffer = bytes;
-            inDirty = true;
+    public boolean writeIn(byte[] bytes) {
+        boolean suc = false;
+        synchronized (this) {
+            if (!inDirty) {
+                if (bytes.length <= 96) {
+                    inBuffer = bytes;
+                    inDirty = true;
+                    suc = true;
+                }
+            } else {
+                suc = false;
+            }
         }
-        while (inDirty) {
-        }
+        return suc;
     }
 
     /**

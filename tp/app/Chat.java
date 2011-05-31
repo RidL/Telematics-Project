@@ -1,6 +1,5 @@
 package tp.app;
 
-import tp.link.Frame;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -22,31 +21,22 @@ public class Chat {
     }
 
     public void sendMessage(String message) {
+        String senderInfo = sender + ": ";
+        message = senderInfo += message;
         byte[] origBytes = message.getBytes();
         int messLength = origBytes.length;
 
         byte length1 = (byte) (messLength >>> 8);
         byte length2 = (byte) messLength;
 
-        String senderInfo = sender + ": ";
-
-        byte[] senderInfoBytes = senderInfo.getBytes();
-        int senderLength = senderInfo.length();
-        byte[] bytemessage = new byte[2 + senderLength + messLength];
-
+        byte[] bytemessage = new byte[2 + messLength];
 
         bytemessage[0] = length1;
         bytemessage[1] = length2;
 
-        for (int d = 2, e = 0; e < senderLength; d++, e++) {
-            bytemessage[d] = senderInfoBytes[e];
-        }
-
-        for (int k = 2 + senderLength, p = 0; k < bytemessage.length; k++, p++) {
+        for (int k = 2, p = 0; k < bytemessage.length; k++, p++) {
             bytemessage[k] = origBytes[p];
         }
-
-        System.out.println(bytemessage.length);
 
         byte[] tempMssg;
         int end = 0;
@@ -54,18 +44,22 @@ public class Chat {
             if (bytemessage.length > (i + 96)) {
                 end = 96;
             } else {
-                end = 96 - ((i + 96) % bytemessage.length);
+                end = bytemessage.length - i;
             }
 
             tempMssg = new byte[end];
             for (int j = 0; j < end; j++) {
                 tempMssg[j] = bytemessage[j + i];
             }
-            //  System.out.println(Frame.toBinaryString(tempMssg) + "-in buffer gepleurd");
             boolean suc;
             do {
                 suc = socket.writeOut(tempMssg);
             } while (!suc);
         }
+        System.out.println("Verzonden; " + message);
+    }
+
+    public TPSocket getSocket() {
+        return socket;
     }
 }
