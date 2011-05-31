@@ -7,7 +7,7 @@ public class LLReceiver {
 
     private static final int INITIAL_VALUE = 10;
     private Lpt lpt;
-    private HLR hlr;
+    private HLReceiver hlr;
     private boolean alt;
     private boolean frameReceived;
     private int tmp;
@@ -20,7 +20,7 @@ public class LLReceiver {
     private boolean rcvedAck;
     
     private boolean sysoutLog = false;
-    public LLReceiver(HLR hlr) {
+    public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
         lpt = new Lpt();
         alt = true;
@@ -51,11 +51,16 @@ public class LLReceiver {
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
+                    hlr.resetTimer();
                 }
                 if (validFrame) {
                     sendResponse();
                     bitInterpret(tmp);
                 }
+            }
+            if(hlr.timeOut()&&validFrame){
+            	Log.writeLog(" LLR", "Timeout while waiting", sysoutLog);
+            	break;
             }
         }
         Log.writeLog(" LLR", "frame received", sysoutLog);

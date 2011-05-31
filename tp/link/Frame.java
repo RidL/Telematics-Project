@@ -41,7 +41,7 @@ public class Frame {
 	}
 
 	public Frame(byte[] data, byte head){
-		bytes = new byte[6];
+		bytes = new byte[8];
         bytes[0] = head;
         Log.writeLog("FRM", unescape(data, bytes, 1) + " bits unescaped", true);
 	}
@@ -120,6 +120,7 @@ public class Frame {
 		
 		int ones = 0;
 		int count = 0;
+		boolean possibleFlag = false;
 		for(byt=0; byt<b.length; byt++){
 			for(bit=carry; bit<8; bit++){
 				ByteBuilder.ByteReturn retval;
@@ -131,8 +132,7 @@ public class Frame {
 					curr = 1;
 				}else{
 					if(ones==3){
-						count = (8*byt)+(bit-3);
-						System.out.println("asd");
+						possibleFlag = true;
 					}
 					ones = 0;
 				}
@@ -144,7 +144,6 @@ public class Frame {
 					if(bit==7)
 						carry = 1;
 					bit++;
-					count--;
 				}
 				if(retval==ByteBuilder.ByteReturn.FULL || retval==ByteBuilder.ByteReturn.CARRY){
 					uBuff[index] = build.pop();
