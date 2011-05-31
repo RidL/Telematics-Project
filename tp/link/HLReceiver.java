@@ -135,7 +135,9 @@ public class HLReceiver extends Thread {
         boolean newWindow = true;
         boolean hasFin = false;
         for(int i = 0; i<WINDOW_SIZE; i++) {
-             if(frameBuffer[windowPtr+i] == null) {
+            if((windowPtr+i>20))
+            	break;
+        	if((frameBuffer[windowPtr+i] == null)) {
                  ack+= Math.pow(2, (WINDOW_SIZE-1)-i);
                  newWindow = false;
                  if(!hasFin)

@@ -95,15 +95,15 @@ public class LLReceiver {
             		Log.writeLog("LLR", "parity failed", sysoutLog);
             	}
             	boolean temp = true;
-            	while(temp){
-            	 if (lpt.readLPT() != tmp) {
-                     microSleep();
-                     tmp = lpt.readLPT();
-                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-                     sendResponse();
-                     temp =  false;
-            	 }
-            	}
+//            	while(temp){
+//            	 if (lpt.readLPT() != tmp) {
+//                     microSleep();
+//                     tmp = lpt.readLPT();
+//                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+//                     sendResponse();
+//                     temp =  false;
+//            	 }
+//            	}
             }else{
             	Log.writeLog("LLR",  "OVERFLOWAGE",sysoutLog);
             }

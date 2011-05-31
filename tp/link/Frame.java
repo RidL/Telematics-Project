@@ -126,14 +126,12 @@ public class Frame {
 			for(bit=carry; bit<8; bit++){
 				ByteBuilder.ByteReturn retval;
 				int curr = 0;
-				System.out.println("curr: " + curr + " @ byte:" + byt + "  bit:" + bit);
 				if((byte)(b[byt]<<bit)<0){
 					ones++;
 					curr = 1;
 					possibleFlag = false;
 				}else{
 					if(ones==3){
-						System.out.println("mightbe flag");
 						possibleFlag = true;
 						bitsFromFlag = 4;
 					}
@@ -148,7 +146,6 @@ public class Frame {
 						carry = 1;
 					bit++;
 					count--;
-					System.out.println("less counts for u");
 				}
 				if(retval==ByteBuilder.ByteReturn.FULL || retval==ByteBuilder.ByteReturn.CARRY){
 					uBuff[index] = build.pop();
@@ -158,9 +155,7 @@ public class Frame {
 				if(possibleFlag){
 					bitsFromFlag++;
 				}else{
-					System.out.println("no flag here " + count);
 					if(bitsFromFlag>0){
-						System.out.println("we haz some bugzez");
 						count += (bitsFromFlag);
 					}
 					bitsFromFlag = 0;
