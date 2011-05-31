@@ -5,7 +5,7 @@ import tp.util.Log;
 public class HLReceiver extends Thread {
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;
-    private static final int HL_SLEEP_TIME = 200;
+    private static final int HL_SLEEP_TIME = 1000;
 
     private LLReceiver llr;
     private HLSender hls;
