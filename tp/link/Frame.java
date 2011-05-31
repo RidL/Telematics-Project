@@ -43,7 +43,7 @@ public class Frame {
 	public Frame(byte[] data, byte head){
 		bytes = new byte[8];
         bytes[0] = head;
-        Log.writeLog("FRM", unescape(data, bytes, 1) + " bits unescaped", true);
+        Log.writeLog(" FRM", unescape(data, bytes, 1) + " bits unescaped", true);
 	}
 
     public static int parity(byte[] data, int byteOffset, int max){

@@ -4,8 +4,8 @@ import tp.util.Log;
 import lpt.Lpt;
 
 public class LLReceiver {
-
     private static final int INITIAL_VALUE = 10;
+    private static final int LL_SLEEP_TIME = 200;
     private Lpt lpt;
     private HLReceiver hlr;
     private boolean alt;
@@ -18,6 +18,7 @@ public class LLReceiver {
     private int offset;
     private byte header;
     private boolean rcvedAck;
+    private long timeoutCount;
     
     private boolean sysoutLog = false;
     public LLReceiver(HLReceiver hlr) {
@@ -41,11 +42,15 @@ public class LLReceiver {
 	public Frame read() {
         f = null;
         frameReceived = false;
-
-
+        timeoutCount = System.currentTimeMillis();
         while (!frameReceived) {
-            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck)) {
-                microSleep();
+            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)) {
+            	timeoutCount = System.currentTimeMillis();
+//            	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
+//            		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
+//            		timeoutCount+=500;
+//            	}
+            	microSleep();
                 tmp = lpt.readLPT();
                 Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {

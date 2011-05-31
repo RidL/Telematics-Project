@@ -5,7 +5,7 @@ import tp.util.Log;
 public class HLReceiver extends Thread {
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;
-    private static final int SLEEP_TIME = 200;
+    private static final int HL_SLEEP_TIME = 200;
 
     private LLReceiver llr;
     private HLSender hls;
@@ -70,6 +70,9 @@ public class HLReceiver extends Thread {
             if(tempFrame==null&&timeOut()){
             	llr.setInvalidFrame();
             	Log.writeLog(" HLR", "TIMEOUT @ NULL FRAME", sysoutLog);
+                for(int i=(recPtr-(recPtr%WINDOW_SIZE)); i<frameBuffer.length; i++){
+                	frameBuffer[i] = null;
+                }
             	sendAck();
             	errCount = recPtr%WINDOW_SIZE;
             }else{
@@ -94,7 +97,7 @@ public class HLReceiver extends Thread {
     }
     
     public boolean timeOut(){
-    	return System.currentTimeMillis()>(timeoutCount+SLEEP_TIME);
+    	return System.currentTimeMillis()>(timeoutCount+HL_SLEEP_TIME);
     }
     
     public void resetTimer(){
