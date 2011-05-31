@@ -11,7 +11,6 @@ public class TestHLR extends Thread implements HLR{
 	private Frame rcvdFrame;
 	
 	public TestHLR(){
-		llr = new LLReceiver(this);
         senderActive = false;
         expectingAck = false;
         receivedFrame = false;
