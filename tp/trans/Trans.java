@@ -21,12 +21,12 @@ public class Trans extends Thread {
 
     @Override
     public void run() {
-        System.out.println("p0p");
         while (true) {
             for (int i = 0; i < socksList.size(); i++) {
                 byte[] data = socksList.get(i).readOut();
                // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
+                    System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, socksList.get(i), false);
                    // System.out.println("hhh");
                     int o = 0;
@@ -34,7 +34,7 @@ public class Trans extends Thread {
                         o++;
                         System.out.println(Frame.toBinaryString(seg.getBytes()[p]));
                     }
-                    System.out.println("seg ended" + o + " bytes");
+                    System.out.println("Segment ended: length: " + o + " bytes");
                 //route.rcvSegment(seg);
                 }
                 else {
