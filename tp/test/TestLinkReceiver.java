@@ -45,13 +45,13 @@ public class TestLinkReceiver extends TestCase{
 		for(int i=0;i<2;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	
 		}
+		pushFrame((byte)12,PAYLOAD_8BYTE);
 		getNextRead();
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		if(changeNr!=Frame.ONES){
 			getNextRead();
 			System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		}
-		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
@@ -64,7 +64,7 @@ public class TestLinkReceiver extends TestCase{
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
-		assertTrue("Eerste gedeelte ack fout",changeNr==-113);
+		assertTrue("Eerste gedeelte ack fout",changeNr==-97);
 		getNextRead();
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
@@ -73,29 +73,7 @@ public class TestLinkReceiver extends TestCase{
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
-		assertTrue("tweede gedeelte ack fout",changeNr==-113);
-		while(changeNr!=Frame.ONES){
-			getNextRead();
-			sendResponse();
-		}
-		
-		pushFrame((byte)12,PAYLOAD_8BYTE);
-		getNextRead();
-		if(changeNr!=Frame.ONES){
-			getNextRead();
-			System.out.println(changeNr);
-		}
-		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
-		sendResponse();
-		getNextRead();
-		sendResponse();
-		assertTrue("Geen ack header ontvangen",changeNr>0);
-		getNextRead();
-		sendResponse();
-		assertTrue("Eerste gedeelte ack fout",changeNr==-1);
-		getNextRead();
-		sendResponse();
-		assertTrue("tweede gedeelte ack fout",changeNr==-9);
+		assertTrue("tweede gedeelte ack fout",changeNr==87);
 		while(changeNr!=Frame.ONES){
 			getNextRead();
 			sendResponse();
