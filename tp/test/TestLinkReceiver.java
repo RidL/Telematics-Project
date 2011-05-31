@@ -40,7 +40,6 @@ public class TestLinkReceiver extends TestCase{
 		}
 	}
 	
-	
 	public void testThreeFrameSegment(){
 		for(int i=0;i<2;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	
@@ -64,15 +63,14 @@ public class TestLinkReceiver extends TestCase{
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
 		assertTrue("Eerste gedeelte ack fout",changeNr==-97);
 		getNextRead();
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
-		getNextRead();
-		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
-		sendResponse();
-		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		System.out.println("Tweede gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		System.out.println("TLR: ChangeNR : "+changeNr);
 		assertTrue("tweede gedeelte ack fout",changeNr==87);
 		while(changeNr!=Frame.ONES){
 			getNextRead();
@@ -80,7 +78,47 @@ public class TestLinkReceiver extends TestCase{
 		}
 		
 	}
-	
+	public void testEigthFrameSegment(){
+		for(int i=0;i<7;i++){
+			pushFrame((byte)1,PAYLOAD_8BYTE);	
+		}
+		pushFrame((byte)12,PAYLOAD_8BYTE);
+		
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		}
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		sendResponse();
+		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		sendResponse();
+		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		assertTrue("Eerste gedeelte ack fout",changeNr==-113);
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		sendResponse();
+		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		sendResponse();
+		System.out.println("TLR: OUT LOWLVLRESPONSE");
+		assertTrue("tweede gedeelte ack fout",changeNr==-113);
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		
+	}
 	public void testNineFrameSegment(){
 		for(int i=0;i<8;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	
@@ -143,8 +181,38 @@ public class TestLinkReceiver extends TestCase{
 		
 	}
 	
-	public void testDetectionTooShortFrame(){
-		pushFrame((byte)12,PAYLOAD_9BYTE);
+	public void testFirstParityBroken(){
+		System.out.println("TLR:  start test FirstParityBroken");
+		pushFrame((byte)8,PAYLOAD_8BYTE);
+		System.out.println("TLR:  Verzonden frame");
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		System.out.println("INC: "+ changeNr+ " = Frames.ONES = "+Frame.ONES);
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("Eerste gedeelte ack fout",changeNr==119);
+		getNextRead();
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("tweede gedeelte ack fout",changeNr==119);
+		System.out.println("TLR: beide ack's ontvangen");
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		
+		pushFrame((byte)12,PAYLOAD_8BYTE);
 		getNextRead();
 		if(changeNr!=Frame.ONES){
 			getNextRead();
@@ -156,20 +224,287 @@ public class TestLinkReceiver extends TestCase{
 		sendResponse();
 		assertTrue("Geen ack header ontvangen",changeNr>0);
 		getNextRead();
-
 		sendResponse();
-		System.out.println(Frame.toBinaryString((byte)changeNr));
-		assertEquals("Eerste gedeelte ack fout",changeNr,119);
+		assertTrue("Eerste gedeelte ack fout",changeNr==-1);
 		getNextRead();
 		sendResponse();
-		getNextRead();
-		sendResponse();
-		assertEquals("Tweede gedeelte ack fout",changeNr,119);
+		assertTrue("tweede gedeelte ack fout",changeNr==-9);
 		while(changeNr!=Frame.ONES){
 			getNextRead();
 			sendResponse();
 		}
 	}
+	
+	public void testSecondParityBroken(){
+		pushFrame((byte)14,PAYLOAD_8BYTE);
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		assertTrue("Eerste gedeelte ack fout",changeNr==119);
+		getNextRead();
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("tweede gedeelte ack fout",changeNr==119);
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		pushFrame((byte)12,PAYLOAD_8BYTE);
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		assertTrue("Eerste gedeelte ack fout",changeNr==-1);
+		getNextRead();
+		sendResponse();
+		assertTrue("tweede gedeelte ack fout",changeNr==-9);
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+	}
+	
+	public void testTwiceSame5bits(){
+		System.out.println("TLR:  start test FirstParityBroken");
+		byte head = (byte)8;
+		byte data[] = PAYLOAD_8BYTE;
+		//--------
+		getNextRead();
+		System.out.println("New frame ga ik verzenden nu!");
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		assertNotSame("Bij begin verzenden frame geen 31 op kabel", changeNr, Frame.ONES);
+		lpt.writeLPT(31);
+		System.out.println("TLR: OUT 31");
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		assertNotSame("Na eerste flag geen flag terug", changeNr, Frame.ONES);
+		lpt.writeLPT(head);
+		int lastNr = head;
+		for(int i=0;i<7;i++){
+			getNextRead();
+			System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+			if(i==5){
+				lpt.writeLPT(data[i]);
+				getNextRead();
+			}
+			if(lastNr!=data[i]){
+				lpt.writeLPT(data[i]);
+				System.out.println("TLR: OUT:"+data[i]);
+			}else{
+				lpt.writeLPT(0);
+				System.out.println("TLR: OUT: 0");
+				getNextRead();
+				System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+				lpt.writeLPT(data[i]);
+				System.out.println("TLR: OUT:"+data[i]);
+			}
+			lastNr=data[i];
+		}
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		lpt.writeLPT(31);
+		System.out.println("TLR: OUT 31");
+    	getNextRead();
+    	System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+    	lpt.writeLPT(0);
+    	System.out.println("TLR: OUT 0");
+		//-------------
+		System.out.println("TLR:  Verzonden frame");
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		System.out.println("INC: "+ changeNr+ " = Frames.ONES = "+Frame.ONES);
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("Eerste gedeelte ack fout",changeNr==119);
+		getNextRead();
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("tweede gedeelte ack fout",changeNr==119);
+		System.out.println("TLR: beide ack's ontvangen");
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		
+		pushFrame((byte)12,PAYLOAD_8BYTE);
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		assertTrue("Eerste gedeelte ack fout",changeNr==-1);
+		getNextRead();
+		sendResponse();
+		assertTrue("tweede gedeelte ack fout",changeNr==-9);
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		System.out.println("Done the   teast yeah");
+	}
+	
+	public void testBrokenEndFlagMidData(){
+		for(int i=0;i<3;i++){
+			pushFrame((byte)1,PAYLOAD_8BYTE);	
+		}
+		//-----------
+		byte head = 1;
+		byte data [] = PAYLOAD_8BYTE;
+		getNextRead();
+		System.out.println("New frame ga ik verzenden nu!");
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		assertNotSame("Bij begin verzenden frame geen 31 op kabel", changeNr, Frame.ONES);
+		lpt.writeLPT(31);
+		System.out.println("TLR: OUT 31");
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		assertNotSame("Na eerste flag geen flag terug", changeNr, Frame.ONES);
+		lpt.writeLPT(head);
+		int lastNr = head;
+		for(int i=0;i<8;i++){
+			getNextRead();
+			System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+			if(lastNr!=data[i]){
+				lpt.writeLPT(data[i]);
+				System.out.println("TLR: OUT:"+data[i]);
+			}else{
+				lpt.writeLPT(0);
+				System.out.println("TLR: OUT: 0");
+				getNextRead();
+				System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+				lpt.writeLPT(data[i]);
+				System.out.println("TLR: OUT:"+data[i]);
+			}
+			lastNr=data[i];
+		}
+		getNextRead();
+		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+		lpt.writeLPT(30);
+		System.out.println("TLR: OUT BROKEN 31 > 30");
+    	getNextRead();
+    	System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
+    	lpt.writeLPT(0);
+    	System.out.println("TLR: OUT 0");
+		//-----------
+		for(int i=0;i<3;i++){
+			pushFrame((byte)1,PAYLOAD_8BYTE);	
+		}
+		pushFrame((byte)12,PAYLOAD_8BYTE);
+		
+		System.out.println("TLR:  Verzonden frame");
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		System.out.println("INC: "+ changeNr+ " = Frames.ONES = "+Frame.ONES);
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("Eerste gedeelte ack fout",changeNr==119);
+		getNextRead();
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
+		assertTrue("tweede gedeelte ack fout",changeNr==119);
+		System.out.println("TLR: beide ack's ontvangen");
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+		//Retransmit + ack of  frame 3
+		
+		pushFrame((byte)1,PAYLOAD_8BYTE);
+		getNextRead();
+		if(changeNr!=Frame.ONES){
+			getNextRead();
+			System.out.println(changeNr);
+		}
+		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+		sendResponse();
+		getNextRead();
+		sendResponse();
+		assertTrue("Geen ack header ontvangen",changeNr>0);
+		getNextRead();
+		sendResponse();
+		assertTrue("Eerste gedeelte ack fout",changeNr==-1);
+		getNextRead();
+		sendResponse();
+		assertTrue("tweede gedeelte ack fout",changeNr==-9);
+		while(changeNr!=Frame.ONES){
+			getNextRead();
+			sendResponse();
+		}
+	}
+//	public void testDetectionTooShortFrame(){
+//		pushFrame((byte)12,PAYLOAD_9BYTE);
+//		getNextRead();
+//		if(changeNr!=Frame.ONES){
+//			getNextRead();
+//			System.out.println(changeNr);
+//		}
+//		assertEquals("readAck: ontvangt geen flag voor ack",Frame.ONES, changeNr);
+//		sendResponse();
+//		getNextRead();
+//		sendResponse();
+//		assertTrue("Geen ack header ontvangen",changeNr>0);
+//		getNextRead();
+//
+//		sendResponse();
+//		System.out.println(Frame.toBinaryString((byte)changeNr));
+//		assertEquals("Eerste gedeelte ack fout",changeNr,119);
+//		getNextRead();
+//		sendResponse();
+//		getNextRead();
+//		sendResponse();
+//		assertEquals("Tweede gedeelte ack fout",changeNr,119);
+//		while(changeNr!=Frame.ONES){
+//			getNextRead();
+//			sendResponse();
+//		}
+//	}
 	
 	// NON TEST METHODES
 	
