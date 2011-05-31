@@ -48,20 +48,25 @@ public class TPSocket {
      * @param bytes
      * @require bytes.length <= 96
      */ // app
-    public void writeOut(byte[] bytes) {
+    public boolean writeOut(byte[] bytes) {
         //System.out.println("ik probeer echt wel die shit op true te zette");
+        boolean suc = false;
         synchronized (this) {
             if (!outDirty) {
                 if (bytes.length <= 96) {
                     outBuffer = bytes;
                     outDirty = true;
+                    suc = true;
                 }
+            } else {
+                suc = false;
             }
         }
-    //  while (outDirty) {
-    //   System.out.println("spinwait, wachten op !outdirty");
-    // }
-    // System.out.println("is !outdirty");
+        //while (outDirty){
+        //System.out.println("spinwait, wachten op !outdirty");
+        // }
+        // System.out.println("is !outdirty");
+        return suc;
     }
 
     // vanuit trans naar app
@@ -72,7 +77,7 @@ public class TPSocket {
             if (outDirty) {
                 // System.out.println("new datas");
                 temp = outBuffer;
-              //  System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
+                // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
                 outDirty = false;
             }
         }

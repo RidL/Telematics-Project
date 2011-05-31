@@ -24,12 +24,9 @@ public class Chat {
     public void sendMessage(String message) {
         byte[] origBytes = message.getBytes();
         int messLength = origBytes.length;
-        byte length1 = (byte) 0;
-        byte length2 = (byte) 0;
-        if (messLength < 255) {
-            length1 = (byte) 0;
-            length2 = (byte) messLength;
-        }
+
+        byte length1 = (byte) (messLength >>> 8);
+        byte length2 = (byte) messLength;
 
         String senderInfo = sender + ": ";
 
@@ -49,23 +46,26 @@ public class Chat {
             bytemessage[k] = origBytes[p];
         }
 
+        System.out.println(bytemessage.length);
+
         byte[] tempMssg;
         int end = 0;
         for (int i = 0; i < bytemessage.length; i += 96) {
-            if (bytemessage.length % (i + 96) == 0) {
+            if (bytemessage.length > (i + 96)) {
                 end = 96;
             } else {
-                end = bytemessage.length % (i + 96);
+                end = 96 - ((i + 96) % bytemessage.length);
             }
+
             tempMssg = new byte[end];
             for (int j = 0; j < end; j++) {
                 tempMssg[j] = bytemessage[j + i];
             }
-
-            System.out.println(Frame.toBinaryString(tempMssg) + "-in buffer gepleurd");
-
-            socket.writeOut(tempMssg);
+            //  System.out.println(Frame.toBinaryString(tempMssg) + "-in buffer gepleurd");
+            boolean suc;
+            do {
+                suc = socket.writeOut(tempMssg);
+            } while (!suc);
         }
-
     }
 }

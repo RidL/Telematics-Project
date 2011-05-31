@@ -2,6 +2,8 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tp.link.Frame;
 
 public class Trans extends Thread {
@@ -38,7 +40,7 @@ public class Trans extends Thread {
                 //route.rcvSegment(seg);
                 }
                 else {
-                   // System.out.println("outdirty is false@" + i);
+                  //  System.out.println("outdirty is false@" + i);
                 }
             }
         }
