@@ -26,7 +26,7 @@ public class FileTransfer {
                 data[i] = (byte) (30 * (Math.random()) + 1);
             }
             tpsocket.writeOut(data);
-            System.out.println(tpsocket.isOutDirty() + "writer");
+           // System.out.println(tpsocket.isOutDirty() + "writer");
         }
     }
 
