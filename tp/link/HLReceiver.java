@@ -2,9 +2,10 @@ package tp.link;
 
 import tp.util.Log;
 
-public class HLReceiver extends Thread implements HLR{
+public class HLReceiver extends Thread {
     private static final int WINDOW_SIZE = 8;
     private static final int BUFFER_SIZE = 21;
+    private static final int HL_SLEEP_TIME = 200;
 
     private LLReceiver llr;
     private HLSender hls;
@@ -64,15 +65,25 @@ public class HLReceiver extends Thread implements HLR{
     @Override
     public void run() {
         while (true) {
-
+        	resetTimer();
             Frame tempFrame = llr.read();
-            Log.writeLog(" HLR", "frame read", sysoutLog);
-            // !senderActive == receiving || cable_free
-            if (!senderActive) {
-                interpretFrame(tempFrame);
-            } else {
-            	// if senderActive
-                ackReceived(tempFrame);
+            if(tempFrame==null&&timeOut()){
+            	llr.setInvalidFrame();
+            	Log.writeLog(" HLR", "TIMEOUT @ NULL FRAME", sysoutLog);
+                for(int i=(recPtr-(recPtr%WINDOW_SIZE)); i<frameBuffer.length; i++){
+                	frameBuffer[i] = null;
+                }
+            	sendAck();
+            	errCount = recPtr%WINDOW_SIZE;
+            }else{
+            	Log.writeLog(" HLR", "frame read", sysoutLog);
+                // !senderActive == receiving || cable_free
+                if (!senderActive) {
+                    interpretFrame(tempFrame);
+                } else {
+                	// if senderActive
+                    ackReceived(tempFrame);
+                }
             }
         }
     }
@@ -84,7 +95,15 @@ public class HLReceiver extends Thread implements HLR{
     public void setExpectingAck() {
         expectingAck = true;
     }
-
+    
+    public boolean timeOut(){
+    	return System.currentTimeMillis()>(timeoutCount+HL_SLEEP_TIME);
+    }
+    
+    public void resetTimer(){
+    	timeoutCount = System.currentTimeMillis();
+    }
+    
     public void ackReceived(Frame tempFrame) {
         byte ack = tempFrame.getBytes()[1]; //first byte = header.
         Log.writeLog(" HLR", "got ack, interpreting" + Frame.toBinaryString(ack), sysoutLog);
@@ -111,6 +130,7 @@ public class HLReceiver extends Thread implements HLR{
          * Vervolgens roept hij 'HLSender' aan met 'ackToSend(byte) waaarbij
          * hij de gemaakte byte meegeeft
          */
+    	this.ack = 0;
         byte ack = 0;
         boolean newWindow = true;
         boolean hasFin = false;
@@ -169,12 +189,11 @@ public class HLReceiver extends Thread implements HLR{
     		Log.writeLog(" HLR", "had errors in last frame, rcving retransmit", sysoutLog);
     		for(int bit=0; bit<8; bit++){
     			if((byte)(ack<<bit)<0){
-    				frameBuffer[recPtr-WINDOW_SIZE+bit] = tempFrame;
+    				frameBuffer[recPtr-(recPtr%WINDOW_SIZE)+bit] = tempFrame;
     				ack = (byte)(ack^((byte)Math.pow(2, 7-bit)));
     				break;
     			}
     		}
-    		frameBuffer[recPtr] = tempFrame;
     		errCount--;
             
     	}else{
@@ -186,15 +205,15 @@ public class HLReceiver extends Thread implements HLR{
         	Log.writeLog(" HLR", "Sending ACK", sysoutLog);
         	llr.setInvalidFrame();
             sendAck();
-            
         }
         // Is dit het laatste frame van segment en geen retransmits meer?
         //TEMP CODE, TEMPFRAME ZOU NIET FIN MOGEN ZIJN NA TIMEOUT
         if(tempFrame != null && tempFrame.isFin() && errCount==0) {
             recPtr = 0;
             windowPtr = 0;
-            for(Frame f: frameBuffer){
-            	f = null;
+            Log.writeLog(" HLR", "fin detected", sysoutLog);
+            for(int i=0; i<frameBuffer.length; i++){
+            	frameBuffer[i] = null;
             }
         }
     }
