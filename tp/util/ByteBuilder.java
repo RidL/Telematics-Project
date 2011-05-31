@@ -68,6 +68,14 @@ public class ByteBuilder {
 		return popped;
 	}
 	
+	public int ones(){
+		return ones;
+	}
+	
+	public int zeros(){
+		return zeros;
+	}
+	
 	public void flagSeen(int curr){
 		if(curr == 1){
 			zeros = 1;
