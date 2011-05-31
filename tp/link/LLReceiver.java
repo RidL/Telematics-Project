@@ -1,6 +1,5 @@
 package tp.link;
 
-import tp.test.TestHLR;
 import tp.util.Log;
 import lpt.Lpt;
 
@@ -46,10 +45,7 @@ public class LLReceiver {
 
         while (!frameReceived) {
             if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck)) {
-                for (int z = 0; z < 2; z++) {
-                    int y = 3;
-                    y++;
-                }
+                microSleep();
                 tmp = lpt.readLPT();
                 Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                 if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
@@ -64,7 +60,6 @@ public class LLReceiver {
         }
         Log.writeLog(" LLR", "frame received", sysoutLog);
         return f;
-
     }
 
     private void sendResponse() {
@@ -92,16 +87,15 @@ public class LLReceiver {
             	boolean temp = true;
             	while(temp){
             	 if (lpt.readLPT() != tmp) {
-                     for (int z = 0; z < 2; z++) {
-                         int y = 3;
-                         y++;
-                     }
+                     microSleep();
                      tmp = lpt.readLPT();
                      Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                      sendResponse();
                      temp =  false;
             	 }
             	}
+            }else{
+            	Log.writeLog("LLR",  "OVERFLOWAGE",sysoutLog);
             }
             frameReceived = true;
             offset = 0;
@@ -118,7 +112,6 @@ public class LLReceiver {
     }
 
     private boolean checkParity() {
-		
     	byte[] tempData = new byte[8];
 		tempData[0] = (byte)(header&-64);
 		boolean ret = false;
@@ -157,6 +150,14 @@ public class LLReceiver {
             ret = true;
         }
         return ret;
+    }
+    
+    private static void microSleep(){
+    	for (int z = 0; z < 2; z++) {
+            @SuppressWarnings("unused")
+			int y = 3;
+            y++;
+        }
     }
 }
 
