@@ -1,6 +1,7 @@
 package tp.trans;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class Route extends Thread {
 		BufferedReader read;
 		routingTable = new HashMap<Integer, Link>();
 		try {
-			read = new BufferedReader(new FileReader("routing.conf"));
+			read = new BufferedReader(new FileReader("./src/routing.conf"));
 			String s = read.readLine();
 			while(s != null){
 				Scanner scan = new Scanner(s);
@@ -60,6 +61,7 @@ public class Route extends Thread {
 					t.start();
 				}
 				routingTable.put(addr, l);
+				s = read.readLine();
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not open routing file");
