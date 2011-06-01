@@ -35,7 +35,7 @@ public class Trans extends Thread {
                 if (data != null) {
                  //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
-                    // System.out.println("hhh");
+                     System.out.println("Segment aangemaakt");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
                         o++;
@@ -52,6 +52,7 @@ public class Trans extends Thread {
                     //  System.out.println("outdirty is false@" + i);
                 }
             }
+
             //TODO: handle incoming segs from rcvBuff
         }
     }
