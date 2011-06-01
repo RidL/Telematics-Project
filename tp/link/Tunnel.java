@@ -30,14 +30,17 @@ public class Tunnel extends Thread implements Link {
 		} catch (IOException e) {
 			System.out.println("Could not connect, host might not be looking for tunnel.");
 		}
+		this.port = port;
 	}
 	
 	@Override
 	public void run(){
 		if(sock == null){
 			try {
+				System.out.println("waiting on socket request;");
 				ServerSocket serv = new ServerSocket(port);
 				sock = serv.accept();
+				System.out.println("socket request accepted;");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
