@@ -45,7 +45,7 @@ public class Route extends Thread {
 		BufferedReader read;
 		routingTable = new HashMap<Integer, Link>();
 		try {
-			read = new BufferedReader(new FileReader("./src/routing.conf"));
+			read = new BufferedReader(new FileReader("routing.conf"));
 			String s = read.readLine();
 			while(s != null){
 				Scanner scan = new Scanner(s);
@@ -56,7 +56,7 @@ public class Route extends Thread {
 					//TODO: INIT RCV, INIT SENDER
 				}else{
 					String IPAdd = scan.next();
-					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()));
+					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
 					l = t;
 					t.start();
 				}
