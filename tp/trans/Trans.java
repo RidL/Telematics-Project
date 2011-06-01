@@ -2,32 +2,39 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
-import tp.link.Frame;
 
 public class Trans extends Thread {
 
     private static Trans ref;
     private static Route route;
     private int address;
-    private List<TPSocket> socksList;
+    private List<TPSocket> sockList;
     private ArrayList<Segment> rcvBuff;
 
     private Trans(int address) {
-        //   route = new Route(this);
-        //   this.address = address;
-        socksList = new ArrayList<TPSocket>();
-    //   route.start();
+    	route = new Route(this);
+        this.address = address;
+        sockList = new ArrayList<TPSocket>();
+        route.start();
     }
-
+    
+    public static Trans getTrans() {
+        if (ref == null) {
+            ref = new Trans(0);
+            ref.start();
+        }
+        return ref;
+    }
+    
     @Override
     public void run() {
         while (true) {
-            for (int i = 0; i < socksList.size(); i++) {
-                byte[] data = socksList.get(i).readOut();
+            for (int i = 0; i < sockList.size(); i++) {
+                byte[] data = sockList.get(i).readOut();
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                  //   System.out.println("Upcoming segment...");
-                    Segment seg = createSegment(data, socksList.get(i), false);
+                    Segment seg = createSegment(data, sockList.get(i), false);
                     // System.out.println("hhh");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
@@ -38,13 +45,14 @@ public class Trans extends Thread {
                    // System.out.println("Segment ended: length: " + o + " bytes");
                     boolean suc = false;
                     do {
-                        suc = socksList.get(i).writeIn(seg.getData());
+                        suc = sockList.get(i).writeIn(seg.getData());
                     } while (!suc);
                 //route.rcvSegment(seg);
                 } else {
                     //  System.out.println("outdirty is false@" + i);
                 }
             }
+            //TODO: handle incoming segs from rcvBuff
         }
     }
 
@@ -52,17 +60,15 @@ public class Trans extends Thread {
         return address;
     }
 
-    public static Trans getTrans() {
-        if (ref == null) {
-            ref = new Trans(0);
-        }
-        return ref;
-    }
-
     public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) {
+    	//TODO:IS PORT TAKEN?
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
-        socksList.add(sock);
+        sockList.add(sock);
         return sock;
+    }
+    
+    public void closeSocket(TPSocket sock){
+    	sockList.remove(sock);
     }
 
     /**
@@ -71,10 +77,10 @@ public class Trans extends Thread {
      */
     public void rcvSeg(Segment seg) {
         // rcvBuff.add(seg);
-        for (int i = 0; i < socksList.size(); i++) {
-            if (socksList.get(i).getSourcePort() == seg.getDestinationPort()) {
+        for (int i = 0; i < sockList.size(); i++) {
+            if (sockList.get(i).getSourcePort() == seg.getDestinationPort()) {
                 if (seg.isValidSegment()) {
-                    socksList.get(i).writeIn(seg.getData());
+                    sockList.get(i).writeIn(seg.getData());
                 }
             //else: wait for retransmit
             }

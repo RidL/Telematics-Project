@@ -3,7 +3,7 @@ package tp.link;
 import tp.trans.Segment;
 import tp.util.Log;
 
-public class HLSender extends Thread {
+public class HLSender extends Thread implements Link{
 
     final int WINDOW_SIZE = 8;
     final int BUFFER_SIZE = 21;

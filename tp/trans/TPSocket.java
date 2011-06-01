@@ -4,8 +4,6 @@
  */
 package tp.trans;
 
-import tp.link.Frame;
-
 /**
  *
  * @author STUDENT\s1012886
@@ -62,8 +60,6 @@ public class TPSocket {
                     outDirty = true;
                     suc = true;
                 }
-            } else {
-                suc = false;
             }
         }
         //while (outDirty){

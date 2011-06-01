@@ -81,7 +81,7 @@ public class Tunnel extends Thread implements Link {
 	}
 
 	@Override
-	public boolean readyToPushSegment(Segment s) {
+	public boolean readyToPushSegment() {
 		return true;
 	}
 

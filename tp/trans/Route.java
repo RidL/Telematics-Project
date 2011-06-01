@@ -26,7 +26,8 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-			//code
+			//TODO:check routables
+			//TODO:check links
 		}
 	}
 	
