@@ -10,19 +10,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import tp.trans.Route;
 import tp.trans.Segment;
+import tp.util.Log;
 
 public class Tunnel extends Thread implements Link {
-	Socket sock;
-	BufferedReader read;
-	BufferedWriter write;
+	private Socket sock;
+	private BufferedReader read;
+	private BufferedWriter write;
 	
-	InetAddress addr;
-	int port;
+	private InetAddress addr;
+	private int port;
+	private Route route;
 	
-	
-	public Tunnel(String addr, int port){
+	public Tunnel(String addr, int port, Route route){
 		try {
+			Log.writeLog(" TUN", "trying new tunnel @ " + addr + ":" + port, true);
 			this.addr = InetAddress.getByName(addr);
 			sock = new Socket(addr, port);
 		} catch (UnknownHostException e) {
@@ -30,7 +33,8 @@ public class Tunnel extends Thread implements Link {
 		} catch (IOException e) {
 			System.out.println("Could not connect, host might not be looking for tunnel.");
 		}
-		this.port = port; 
+		this.port = port;
+		this.route = route;
 	}
 	
 	@Override
@@ -54,13 +58,17 @@ public class Tunnel extends Thread implements Link {
 		}
 		while(true){
 			Segment s;
-			byte[] data = new byte[103];
+			byte[] data = new byte[104];
 			
 			int in;
 			try {
 				in = read.read();
+				System.out.println("Read an int: "+in+" binary string: "+Frame.toBinaryString((byte)(in)));
 				for(int i=0; in>0; in = read.read(), i+=4){
-					data[i] = (byte)in;
+					for(int shift=0; shift<2; shift++){
+						System.out.println("Adding to buffer: "+Frame.toBinaryString((byte)(in>>((1-shift)*8))));
+						data[i+shift] = (byte)(in>>((1-shift)*8));
+					}
 				}
 			} catch (IOException e) {
 				System.err.println("Error whilst reading from the stream @ " + addr.getHostAddress() + ":" + port + "");

@@ -56,7 +56,7 @@ public class Route extends Thread {
 					//TODO: INIT RCV, INIT SENDER
 				}else{
 					String IPAdd = scan.next();
-					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()));
+					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
 					l = t;
 					t.start();
 				}
