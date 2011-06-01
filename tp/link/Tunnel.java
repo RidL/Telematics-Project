@@ -30,7 +30,7 @@ public class Tunnel extends Thread implements Link {
 		} catch (IOException e) {
 			System.out.println("Could not connect, host might not be looking for tunnel.");
 		}
-		this.port = port;
+		this.port = port; 
 	}
 	
 	@Override
