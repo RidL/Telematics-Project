@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import tp.trans.Segment;
+import tp.util.Log;
 
 public class Tunnel extends Thread implements Link {
 	Socket sock;
@@ -23,6 +24,7 @@ public class Tunnel extends Thread implements Link {
 	
 	public Tunnel(String addr, int port){
 		try {
+			Log.writeLog(" TUN", "trying new tunnel @ " + addr + ":" + port, true);
 			this.addr = InetAddress.getByName(addr);
 			sock = new Socket(addr, port);
 		} catch (UnknownHostException e) {
