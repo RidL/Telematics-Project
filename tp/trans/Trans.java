@@ -2,6 +2,8 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Trans extends Thread {
 
@@ -12,12 +14,12 @@ public class Trans extends Thread {
     private ArrayList<Segment> rcvBuff;
 
     private Trans(int address) {
-    	route = new Route(this);
+        route = new Route(this);
         this.address = address;
         sockList = new ArrayList<TPSocket>();
         route.start();
     }
-    
+
     public static Trans getTrans() {
         if (ref == null) {
             ref = new Trans(0);
@@ -25,35 +27,48 @@ public class Trans extends Thread {
         }
         return ref;
     }
-    
+
     @Override
     public void run() {
+        System.out.println("nou, twetje is gestawt");
+        int temp = 0;
         while (true) {
+            // System.out.println(sockList.size());
+
             for (int i = 0; i < sockList.size(); i++) {
                 byte[] data = sockList.get(i).readOut();
+
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
-                 //   System.out.println("Upcoming segment...");
+                    temp = 0;
+                    //System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
-                     System.out.println("Segment aangemaakt");
+                    System.out.println("Segment aangemaakt");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
                         o++;
-                      //  System.out.println(Frame.toBinaryString(seg.getBytes()[p]));
+                    //  System.out.println(Frame.toBinaryString(seg.getBytes()[p]));
                     }
 
-                   // System.out.println("Segment ended: length: " + o + " bytes");
+                    // System.out.println("Segment ended: length: " + o + " bytes");
                     boolean suc = false;
                     do {
                         suc = sockList.get(i).writeIn(seg.getData());
+                    //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
+                    System.out.println("segment weer teruggerost");
                 //route.rcvSegment(seg);
                 } else {
-                    //  System.out.println("outdirty is false@" + i);
+
+                    temp++;
+                    if ((temp % 100000) == 0) {
+                        System.out.println("i just won't read any valid data");
+                    }
+                //  System.out.println("outdirty is false@" + i);
                 }
             }
 
-            //TODO: handle incoming segs from rcvBuff
+        //TODO: handle incoming segs from rcvBuff
         }
     }
 
@@ -62,14 +77,14 @@ public class Trans extends Thread {
     }
 
     public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) {
-    	//TODO:IS PORT TAKEN?
+        //TODO:IS PORT TAKEN?
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
         sockList.add(sock);
         return sock;
     }
-    
-    public void closeSocket(TPSocket sock){
-    	sockList.remove(sock);
+
+    public void closeSocket(TPSocket sock) {
+        sockList.remove(sock);
     }
 
     /**

@@ -8,6 +8,7 @@ import java.io.IOException;
 import tp.link.Frame;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
+import tp.util.Log;
 
 /**
  *
@@ -18,25 +19,38 @@ public class FileReceiver extends Thread {
     private static final int MAX_SEGMENT_DATA = 96;
 
     private Trans trans;
-    //private TPSocket tpSocket;
-    private FakeSocket tpSocket;
+    private TPSocket tpSocket;
+    //private FakeSocket tpSocket;
     private File file;
     private FileInputStream fis;
     private FileOutputStream fos;
 
+
     public FileReceiver(int address, int srcPort, int dstPort) {
+
+        
+
+        trans = Trans.getTrans();
+        //trans.start();
+        tpSocket = trans.createSocket(address, srcPort, dstPort);
+        //tpSocket = new FakeSocket(false);
+    }
+
+    public FileReceiver(int address, int srcPort, int dstPort, FileSender sender) {
         trans = Trans.getTrans();
         //trans.start();
         //tpSocket = trans.createSocket(address, srcPort, dstPort);
-        tpSocket = new FakeSocket(false);
+        //tpSocket = new FakeSocket(false);
+
+        tpSocket = sender.getSocket();
     }
 
     public void receive() {
         byte[] bytesIn = null;
         while(bytesIn == null) {    // wait until tpSocket returns data
             bytesIn = tpSocket.readIn();
-            //System.out.println("0st loop");
         }
+        System.out.println("bytesIN: " + bytesIn);
         int fileNameLength = (int)bytesIn[0];
         byte[] fileName = new byte[fileNameLength];
 
@@ -82,8 +96,13 @@ public class FileReceiver extends Thread {
 
             // keep reading data from tpSocket
             int dataPtr = firstData.length;
+                            byte[] read = null;
             while(dataPtr < bytesToLong(fileLength)) {
-                fos.write(tpSocket.readIn());
+
+                while(read == null) {
+                    read = tpSocket.readIn();
+                }
+                fos.write(read);
                 dataPtr += MAX_SEGMENT_DATA;
             }
         }
@@ -97,7 +116,7 @@ public class FileReceiver extends Thread {
         }
     }
 
-    public byte[] longToBytes(long in) {
+    public static byte[] longToBytes(long in) {
         byte[] result = new byte[8];
 
         result[0] = (byte)(in >>> 56);
@@ -108,17 +127,12 @@ public class FileReceiver extends Thread {
         result[5] = (byte)(in >>> 16);
         result[6] = (byte)(in >>>  8);
         result[7] = (byte)(in >>>  0);
-        System.out.println(Frame.toBinaryString(result) + " result");
+        //System.out.println(Frame.toBinaryString(result) + " result");
         return result;
     }
 
-    public long bytesToLong(byte[] bytes) {
+    public static long bytesToLong(byte[] bytes) {
         long result = 0;
-
-//        for (int i = 0; i < 8; i++) {
-//            result |= bytes[i];
-//            result <<= 8;
-//        }
 
         result += ((long)bytes[0] << 56);
         result += ((long)bytes[1] << 48);
@@ -128,8 +142,7 @@ public class FileReceiver extends Thread {
         result += ((long)bytes[5] << 16);
         result += ((long)bytes[6] << 8);
         result += ((long)bytes[7] << 0);
-        //System.out.println(Frame.toBinaryString(bytes) + " bytes");
-        System.out.println(Long.toBinaryString(result) + " result");
+        //System.out.println(Long.toBinaryString(result) + " result");
 
         return result;
     }
@@ -142,6 +155,7 @@ public class FileReceiver extends Thread {
     }
 
     public static void main(String[] args) {
+        Log.getInstance("FileReceiver");
         FileReceiver f = null;
 
         if(args.length == 4) {
