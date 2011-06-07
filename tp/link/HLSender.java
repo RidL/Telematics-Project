@@ -386,7 +386,7 @@ public class HLSender extends Thread implements Link{
          * zet ackToSend op false en informeer HLReceiver.
          */
     	Log.writeLog(" HLS", "sending ack", sysoutLog);
-        byte[] ackData = {ack,10,4,10,4};
+        byte[] ackData = {ack,ack,ack,ack,ack};
         Frame ackFrame = new Frame(ackData, true, false);
         boolean succ = lls.pushFirstFrame(ackFrame);
         if(!succ) {
