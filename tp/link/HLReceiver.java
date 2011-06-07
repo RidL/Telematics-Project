@@ -70,7 +70,7 @@ public class HLReceiver extends Thread {
             if(tempFrame==null&&timeOut()){
             	llr.setInvalidFrame();
             	Log.writeLog(" HLR", "TIMEOUT @ NULL FRAME", sysoutLog);
-                for(int i=(recPtr-(recPtr%WINDOW_SIZE)); i<frameBuffer.length; i++){
+                for(int i=windowPtr; i<frameBuffer.length; i++){
                 	frameBuffer[i] = null;
                 }
             	sendAck();
@@ -191,7 +191,8 @@ public class HLReceiver extends Thread {
     		Log.writeLog(" HLR", "had errors in last frame, rcving retransmit", sysoutLog);
     		for(int bit=0; bit<8; bit++){
     			if((byte)(ack<<bit)<0){
-    				frameBuffer[recPtr-(recPtr%WINDOW_SIZE)+bit] = tempFrame;
+    				frameBuffer[windowPtr+bit] = tempFrame;
+    				Log.writeLog(" HLR", "put retransmit frame at: "+(windowPtr+bit), sysoutLog);
     				ack = (byte)(ack^((byte)Math.pow(2, 7-bit)));
     				break;
     			}

@@ -1,6 +1,7 @@
 package tp.trans;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,7 +27,8 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-			//code
+			//TODO:check routables
+			//TODO:check links
 		}
 	}
 	
@@ -54,11 +56,12 @@ public class Route extends Thread {
 					//TODO: INIT RCV, INIT SENDER
 				}else{
 					String IPAdd = scan.next();
-					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()));
+					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
 					l = t;
 					t.start();
 				}
 				routingTable.put(addr, l);
+				s = read.readLine();
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not open routing file");

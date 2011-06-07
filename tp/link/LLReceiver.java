@@ -84,7 +84,7 @@ public class LLReceiver {
     }
 
     private void bitInterpret(int i) {
-        if ((i == Frame.ONES) && readingFrame) {
+        if ((i == Frame.ONES) && readingFrame && (offset>=40)) {
             if (offset < 51) {
             	if(checkParity()){
             		Log.writeLog(" LLR", "new frame, offset: " + offset, sysoutLog);
@@ -95,22 +95,32 @@ public class LLReceiver {
             		Log.writeLog("LLR", "parity failed", sysoutLog);
             	}
             	boolean temp = true;
-//            	while(temp){
-//            	 if (lpt.readLPT() != tmp) {
-//                     microSleep();
-//                     tmp = lpt.readLPT();
-//                     Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-//                     sendResponse();
-//                     temp =  false;
-//            	 }
-//            	}
+            	
+// !!!!!!!!!!Onderstaande while moet worden vervangen!!!!!!!!!!, want hij gaat er vanuit dat er alleen maar
+            	// 0 kan worden ontvangen, maar deze kan breken. De huidige implementatie lost een sync issue op dat
+            	// de begin  flag van ack niet als low level ack op de laatste 0 kan worden gezien, maar als er mid data
+            	// flag breekt de eerste 5 bit's na header niet als standaard 0 woorden gezien
+            	while(temp){
+	            	if (lpt.readLPT() != tmp) {
+	                    microSleep();
+	                    if(lpt.readLPT()==Frame.ZEROS){
+	                    	tmp = lpt.readLPT();
+	  	                    Log.writeLog(" LLR", "IN: " + (((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+	  	                    sendResponse();
+	                    }else{
+	                    	Log.writeLog(" LLR", "geen 0 terug", sysoutLog );
+	                    }
+	                  
+	                    temp =  false;
+	            	}
+            	}
             }else{
             	Log.writeLog("LLR",  "OVERFLOWAGE",sysoutLog);
             }
             frameReceived = true;
             offset = 0;
             readingFrame = false;
-        } else if ((i != Frame.ZEROS) && (i != Frame.ONES) && offset <= 50) { //shift(i)!=0 && shift(i)!=31
+        } else if ((i != Frame.ZEROS) && (i != Frame.ONES) && offset <= 45) { //shift(i)!=0 && shift(i)!=31
             if (!readingFrame) {
                 header = (byte) (i^0x80);
                 readingFrame = true;

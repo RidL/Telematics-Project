@@ -25,7 +25,6 @@ public class Segment {
         }
 
         this.data = data;
-        
         calculateHash();
     }
 
