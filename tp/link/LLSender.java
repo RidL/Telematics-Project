@@ -72,10 +72,12 @@ public class LLSender {
     		getNextRead();
     		cable.writeLPT(31);
     		Log.writeLog(" LLS", "OUT: 31", sysoutLog);
+    		getNextRead();
+    	} else {
+    		getNextRead();
     	}
     	
     	while(n!= -1 && n!=0){
-    		getNextRead();
     		if(lastNr!=n){
     			cable.writeLPT(n);
     		}else{
@@ -87,8 +89,8 @@ public class LLSender {
     		Log.writeLog(" LLS", "OUT: " + n, sysoutLog);
     		lastNr = n;
     		n = f.next();
+    		getNextRead();
     	}
-    	getNextRead();
     	cable.writeLPT(31);
     	Log.writeLog(" LLS", "OUT: 31", sysoutLog);
     	getNextRead();
