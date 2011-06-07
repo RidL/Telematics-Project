@@ -1,16 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package tp.trans;
-
-import tp.link.Frame;
+package tp.app;
 
 /**
  *
- * @author STUDENT\s1012886
+ * @author jesse
  */
-public class TPSocket {
+public class FakeSocket {
 
     private int seq_nr;
     private int ack_nr;
@@ -21,9 +15,12 @@ public class TPSocket {
     private byte[] outBuffer;
     private boolean inDirty;
     private boolean outDirty;
+
+    private SocketReader reader;
+    private SocketWriter writer;
     public static final int LOCK = 0;
 
-    public TPSocket(int dstAddress, int srcPort, int dstPort) {
+    public FakeSocket(boolean isWriter) {
         seq_nr = 0;
         ack_nr = 0;
         this.dstAddress = dstAddress;
@@ -31,9 +28,17 @@ public class TPSocket {
         this.dstPort = dstPort;
         inDirty = false;
         outDirty = false;
+        if(!isWriter) {
+            reader = new SocketReader(this);
+            reader.start();
+        }
+        else {
+            writer = new SocketWriter(this);
+            writer.start();
+        }
     }
 
-    // app
+    // aangeroepen door app voor data van trans
     public byte[] readIn() {
         byte[] temp = null;
         synchronized (this) {
@@ -48,12 +53,14 @@ public class TPSocket {
     }
 
     /**
-     *
+     * Van app naar trans
      * @param bytes
      * @require bytes.length <= 96
-     */ // app
+     */
+    // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
         //System.out.println("ik probeer echt wel die shit op true te zette");
+        System.out.println("sock.writeOut is aangeroepen");
         boolean suc = false;
         synchronized (this) {
             if (!outDirty) {
@@ -61,11 +68,13 @@ public class TPSocket {
                     outBuffer = bytes;
                     outDirty = true;
                     suc = true;
+                    //writer.write(outBuffer);
+                    //outDirty = false;
+
                 }
-            } else {
-                suc = false;
             }
         }
+        System.out.println("Data verzonden");
         //while (outDirty){
         //System.out.println("spinwait, wachten op !outdirty");
         // }
@@ -73,9 +82,9 @@ public class TPSocket {
         return suc;
     }
 
-    // vanuit trans naar app
+    // door trans aangeroepen voor data van app
     public byte[] readOut() {
-        //  System.out.println("imma be outReading");
+        System.out.println("imma be outReading");
         byte[] temp = null;
         synchronized (this) {
             if (outDirty) {
@@ -85,10 +94,13 @@ public class TPSocket {
                 outDirty = false;
             }
         }
+        if (temp != null) {
+            System.out.println("Data gegeven aan trans");
+        }
         return temp;
     }
 
-    // trans
+    // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
         boolean suc = false;
         synchronized (this) {
