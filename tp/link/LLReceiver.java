@@ -128,6 +128,11 @@ public class LLReceiver {
                 Frame.bitConcat(data, (byte) (i^0x80), offset);
                 offset = offset + 5;
             }
+        } else if( offset >= 50){
+        	offset += 5;
+        	if(offset >= 60){
+        		hlr.windowBroken();
+        	}
         }
     }
 

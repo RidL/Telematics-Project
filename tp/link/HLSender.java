@@ -216,7 +216,7 @@ public class HLSender extends Thread implements Link{
      */
     public void pushWindow() {
     	int i = sendPointer;	// for do-while loop
-        if(sendPointer == 0) {  // if the first frame is encountered
+        // if the first frame is encountered
         	i = sendPointer+1;
             hlr.setSenderActive(true);
             boolean succ = lls.pushFirstFrame(frameBuffer[sendPointer]);
@@ -230,7 +230,7 @@ public class HLSender extends Thread implements Link{
                 }
                 return;
             }
-        }
+        
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
@@ -388,7 +388,11 @@ public class HLSender extends Thread implements Link{
     	Log.writeLog(" HLS", "sending ack", sysoutLog);
         byte[] ackData = {ack,10,4,10,4};
         Frame ackFrame = new Frame(ackData, true, false);
-        lls.pushFrame(ackFrame, true);
+        boolean succ = lls.pushFirstFrame(ackFrame);
+        if(!succ) {
+        	Log.writeLog(" HLS", "Flag of ack broken, returning method to try again", sysoutLog);
+            return;
+        }
         ackToSend = false;
     }
 
