@@ -1,3 +1,6 @@
+
+
+
 package tp.link;
 
 import tp.util.Log;
@@ -33,10 +36,10 @@ public class LinkInitializer {
 
         while (true) {
         	//System.out.println("LI: "+hls.readyToPushSegment());
-                if (hls.readyToPushSegment()) {
-                	Log.writeLog("LLI" , "readyToPushNewSegment", true);
-                    hls.pushSegment(bytes);
-                }
+//                if (hls.readyToPushSegment()) {
+//                	Log.writeLog("LLI" , "readyToPushNewSegment", true);
+//                    hls.pushSegment(bytes);
+//                }
                 //Log.writeLog("LLI" , "segmentDone", true);
             
            

@@ -210,9 +210,8 @@ public class FileTransfer {
         else {
             System.out.println("ERROR: Wrong arguments");
         }
-
         long test = (long)87367243;
-        
+
         System.out.println(Long.toBinaryString(test) + " werthers original");
         System.out.println(f.bytesToLong(f.longToBytes(test)));
     }
