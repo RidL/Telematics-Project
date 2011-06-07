@@ -92,6 +92,7 @@ public class FileSender {
                     break;
                 }
             }
+            //fis.close();
 
             bytes = new byte[MAX_SEGMENT_DATA];
             while (dataRead != -1) {

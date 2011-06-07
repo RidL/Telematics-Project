@@ -105,7 +105,8 @@ public class FileReceiver extends Thread {
 
             // keep reading data from tpSocket
             int dataPtr = firstData.length;
-                            byte[] read = null;
+            byte[] read = null;
+            //long length = bytesToLong(fileLength);
             while(dataPtr < bytesToLong(fileLength)) {
 
                 while(read == null) {
@@ -119,6 +120,7 @@ public class FileReceiver extends Thread {
                 fos.write(read);
                 dataPtr += MAX_SEGMENT_DATA;
             }
+            //fos.close();
         }
         catch(FileNotFoundException ex) {
             System.out.println("File not found");
@@ -168,9 +170,7 @@ public class FileReceiver extends Thread {
 
     @Override
     public void run() {
-        while(true) {
             receive();
-        }
     }
 
     public static void main(String[] args) {
