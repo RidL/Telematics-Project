@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tp.link.Frame;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
@@ -22,14 +25,10 @@ public class FileReceiver extends Thread {
     private TPSocket tpSocket;
     //private FakeSocket tpSocket;
     private File file;
-    private FileInputStream fis;
     private FileOutputStream fos;
 
 
     public FileReceiver(int address, int srcPort, int dstPort) {
-
-        
-
         trans = Trans.getTrans();
         //trans.start();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
@@ -62,6 +61,11 @@ public class FileReceiver extends Thread {
             System.out.println("1st loop");
             if(i == MAX_SEGMENT_DATA-1) {
                 do {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     bytesIn = tpSocket.readIn();
                     i = 0;
                 } while(bytesIn == null);
@@ -75,6 +79,11 @@ public class FileReceiver extends Thread {
             System.out.println("2nd loop");
             if(i == MAX_SEGMENT_DATA-1) {
                 do {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     bytesIn = tpSocket.readIn();
                     i = 0;
                 } while(bytesIn == null);
@@ -100,6 +109,11 @@ public class FileReceiver extends Thread {
             while(dataPtr < bytesToLong(fileLength)) {
 
                 while(read == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     read = tpSocket.readIn();
                 }
                 fos.write(read);
@@ -134,15 +148,20 @@ public class FileReceiver extends Thread {
     public static long bytesToLong(byte[] bytes) {
         long result = 0;
 
-        result += ((long)bytes[0] << 56);
-        result += ((long)bytes[1] << 48);
-        result += ((long)bytes[2] << 40);
-        result += ((long)bytes[3] << 32);
-        result += ((long)bytes[4] << 24);
-        result += ((long)bytes[5] << 16);
-        result += ((long)bytes[6] << 8);
-        result += ((long)bytes[7] << 0);
-        //System.out.println(Long.toBinaryString(result) + " result");
+//        result += ((long) bytes[0] << 56);
+//        result += ((long) bytes[1] << 48);
+//        result += ((long) bytes[2] << 40);
+//        result += ((long) bytes[3] << 32);
+//        result += ((long) bytes[4] << 24);
+//        result += ((long) bytes[5] << 16);
+//        result += ((long) bytes[6] << 8);
+//        result += ((long) bytes[7] << 0);
+// Why doesn't this work???
+
+        BigInteger b = new BigInteger(bytes);
+        result = b.longValue();
+        System.out.println(Long.toBinaryString(result) + " result");
+
 
         return result;
     }

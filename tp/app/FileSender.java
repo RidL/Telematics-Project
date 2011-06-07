@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tp.link.Frame;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
@@ -23,11 +25,9 @@ public class FileSender {
     //private FakeSocket tpSocket;
     private File file;
     private FileInputStream fis;
-    private FileOutputStream fos;
 
     public FileSender(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
-        //trans.start();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
     //tpSocket = new FakeSocket(true);
     }
@@ -45,14 +45,20 @@ public class FileSender {
                     //hasWritten = tpSocket.writeIn(writeData);
                     boolean suc;
                     do {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                         suc = tpSocket.writeOut(writeData);
+                  //      System.out.println("number of bytes written: " + writeData.length);
                         temp++;
-                        if ((temp % 100000) == 0) {
+                        if ((temp % 100) == 0) {
                             System.out.println("trying to write to socket1");
                         }
                     } while (!suc);
                     writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
-                   // System.out.println("DATA: " + Frame.toBinaryString(writeData));
+                    // System.out.println("DATA: " + Frame.toBinaryString(writeData));
                     i = 0;
                 }
             }
@@ -66,17 +72,23 @@ public class FileSender {
             for (j = 0; j < bytes.length; i++, j++) {
                 writeData[i] = bytes[j];
                 if (i == MAX_SEGMENT_DATA - 1) {
-                    int temp = 0;
+                   
                     boolean suc;
                     do {
-                        suc = tpSocket.writeOut(writeData);
-                        temp++;
-                        if ((temp % 10000000) == 0) {
-                            System.out.println("trying to write to socket2");
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        suc = tpSocket.writeOut(writeData);
+                    //    System.out.println("number of bytes written: " + writeData.length);
+
+                        
+                            System.out.println("trying to write to socket2");
+                        
                     } while (!suc);
                     //hasWritten = tpSocket.writeIn(writeData);
-                   // System.out.println("DATA: " + Frame.toBinaryString(writeData));
+                    // System.out.println("DATA: " + Frame.toBinaryString(writeData));
                     break;
                 }
             }
@@ -88,14 +100,20 @@ public class FileSender {
                 System.out.println("bytes read: " + dataRead);
                 boolean suc;
                 do {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     suc = tpSocket.writeOut(bytes);
+                //    System.out.println("number of bytes written: " + bytes.length);
                     temp++;
-                    if ((temp % 10000000) == 0) {
+                    if ((temp % 100) == 0) {
                         System.out.println("trying to write to socket3");
                     }
                 } while (!suc);
-                //hasWritten = tpSocket.writeIn(bytes);
-                //System.out.println("DATA: " + Frame.toBinaryString(writeData));
+            //hasWritten = tpSocket.writeIn(bytes);
+            //System.out.println("DATA: " + Frame.toBinaryString(writeData));
             }
         } catch (FileNotFoundException ex) {
             System.out.println("ERROR: File not found ( " + fileName + ")");
@@ -174,16 +192,16 @@ public class FileSender {
         FileSender f = null;
 
         if (args.length == 4) {
-            try {
-                f = new FileSender(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
-                        Integer.parseInt(args[2]));
-            } catch (NumberFormatException nfe) {
-                System.out.println("ERROR: Wrong arguments");
-                System.out.println("Number format exception");
-            }
-            f.send(args[3]);
+        try {
+        f = new FileSender(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
+        Integer.parseInt(args[2]));
+        } catch (NumberFormatException nfe) {
+        System.out.println("ERROR: Wrong arguments");
+        System.out.println("Number format exception");
+        }
+        f.send(args[3]);
         } else {
-            System.out.println("ERROR: Wrong arguments");
+        System.out.println("ERROR: Wrong arguments");
         }*/
         long test = 9603727748442390L;
         System.out.println(test + "--> original");

@@ -32,16 +32,17 @@ public class Trans extends Thread {
     public void run() {
         System.out.println("nou, twetje is gestawt");
         int temp = 0;
+        byte[] data = null;
         while (true) {
             // System.out.println(sockList.size());
 
             for (int i = 0; i < sockList.size(); i++) {
-                byte[] data = sockList.get(i).readOut();
+                data = sockList.get(i).readOut();
 
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                     temp = 0;
-                    //System.out.println("Upcoming segment...");
+                    System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
                     System.out.println("Segment aangemaakt");
                     int o = 0;
@@ -54,24 +55,28 @@ public class Trans extends Thread {
                     boolean suc = false;
                     do {
                         try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                            Thread.sleep(10);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                         suc = sockList.get(i).writeIn(seg.getData());
                     //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
                     System.out.println("segment weer teruggerost");
                 //route.rcvSegment(seg);
                 } else {
-
-
+                    
+                    temp++;
                     try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                    //  System.out.println("outdirty is false@" + i);
+                        Thread.sleep(10);
+                        System.out.println("wakker geworre");
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (temp % 100 == 0) {
+                        System.out.println("null gelezen");
+                    }
+                //  System.out.println("outdirty is false@" + i);
 
                 }
             }
