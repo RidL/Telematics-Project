@@ -53,7 +53,7 @@ public class TPSocket {
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
         //System.out.println("ik probeer echt wel die shit op true te zette");
-    	 System.out.println("sock.writeOut is aangeroepen");
+    //	 System.out.println("sock.writeOut is aangeroepen");
         boolean suc = false;
         synchronized (this) {
             if (!outDirty) {
@@ -64,7 +64,7 @@ public class TPSocket {
                 }
             }
         }
-        System.out.println("Data verzonden");
+     //   System.out.println("Data verzonden");
         //while (outDirty){
         //System.out.println("spinwait, wachten op !outdirty");
         // }
@@ -74,7 +74,7 @@ public class TPSocket {
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-       System.out.println("imma be outReading");
+      // System.out.println("imma be outReading");
         byte[] temp = null;
         synchronized (this) {
             if (outDirty) {
@@ -84,8 +84,8 @@ public class TPSocket {
                 outDirty = false;
             }
         }
-        if(temp!=null)
-        System.out.println("Data gegeven aan trans");
+     //   if(temp!=null)
+     //   System.out.println("Data gegeven aan trans");
         return temp;
     }
 

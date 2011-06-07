@@ -2,6 +2,8 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Trans extends Thread {
 
@@ -35,7 +37,7 @@ public class Trans extends Thread {
                 if (data != null) {
                  //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
-                     System.out.println("Segment aangemaakt");
+                    System.out.println("Segment aangemaakt");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
                         o++;
@@ -45,10 +47,20 @@ public class Trans extends Thread {
                    // System.out.println("Segment ended: length: " + o + " bytes");
                     boolean suc = false;
                     do {
+                        try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                }
                         suc = sockList.get(i).writeIn(seg.getData());
                     } while (!suc);
                 //route.rcvSegment(seg);
                 } else {
+                    try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                }
                     //  System.out.println("outdirty is false@" + i);
                 }
             }

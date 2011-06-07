@@ -65,7 +65,7 @@ public class Route extends Thread {
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not open routing file");
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
