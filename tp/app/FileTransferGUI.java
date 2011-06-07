@@ -24,7 +24,7 @@ public class FileTransferGUI extends JFrame {
     private FileReceiver fr;
     private JPanel filePanel;
     private ButtonHandler bHandler;
-    private JTextField addressField, sourcePortField, destPortField, fileField;
+    private JTextField addressField,  sourcePortField,  destPortField,  fileField;
 
     public FileTransferGUI(String title) {
         super(title);
@@ -102,15 +102,14 @@ public class FileTransferGUI extends JFrame {
 
         boolean init = false;
 
-        
         public void actionPerformed(ActionEvent e) {
             if (!init) {
-            int  address = Integer.parseInt(addressField.getText());
-            int sourcePort = Integer.parseInt(addressField.getText());
-            int destPort = Integer.parseInt(destPortField.getText());
-            fs = new FileSender(address, sourcePort, destPort);
-            fr = new FileReceiver(address, sourcePort, destPort, fs);
-            init = true;
+                int address = Integer.parseInt(addressField.getText());
+                int sourcePort = Integer.parseInt(addressField.getText());
+                int destPort = Integer.parseInt(destPortField.getText());
+                fs = new FileSender(address, sourcePort, destPort);
+                fr = new FileReceiver(address, sourcePort, destPort, fs);
+                init = true;
             }
 
             if (e.getActionCommand().equals("add_file")) {
@@ -121,14 +120,12 @@ public class FileTransferGUI extends JFrame {
                     fileField.setText(file.getAbsolutePath());
                 }
 
-            }
-            else if (e.getActionCommand().equals("send")) {
+            } else if (e.getActionCommand().equals("send")) {
 //                int  address = Integer.parseInt(addressField.getText());
 //                int sourcePort = Integer.parseInt(addressField.getText());
 //                int destPort = Integer.parseInt(destPortField.getText());
                 fs.send(file.getAbsolutePath());
-            }
-            else if (e.getActionCommand().equals("receive")) {
+            } else if (e.getActionCommand().equals("receive")) {
 //                int  address = Integer.parseInt(addressField.getText());
 //                int sourcePort = Integer.parseInt(addressField.getText());
 //                int destPort = Integer.parseInt(destPortField.getText());

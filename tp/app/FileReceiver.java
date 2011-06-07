@@ -107,6 +107,7 @@ public class FileReceiver extends Thread {
             int dataPtr = firstData.length;
                             byte[] read = null;
             while(dataPtr < bytesToLong(fileLength)) {
+                System.out.println(dataPtr);
 
                 while(read == null) {
                     try {
@@ -128,6 +129,12 @@ public class FileReceiver extends Thread {
             System.out.println("IO GEZEIK");
             ioe.printStackTrace();
         }
+        try {
+            fos.close();
+        } catch (IOException ex) {
+            Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public static byte[] longToBytes(long in) {
@@ -168,9 +175,9 @@ public class FileReceiver extends Thread {
 
     @Override
     public void run() {
-        while(true) {
+      //  while(true) {
             receive();
-        }
+       // }
     }
 
     public static void main(String[] args) {

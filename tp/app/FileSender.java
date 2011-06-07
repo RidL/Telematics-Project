@@ -97,6 +97,7 @@ public class FileSender {
             while (dataRead != -1) {
                 int temp = 0;
                 dataRead = fis.read(bytes);
+                
                 System.out.println("bytes read: " + dataRead);
                 boolean suc;
                 do {

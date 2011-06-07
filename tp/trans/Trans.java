@@ -42,7 +42,7 @@ public class Trans extends Thread {
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                     temp = 0;
-                    System.out.println("Upcoming segment...");
+                 //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
                     //System.out.println("Segment aangemaakt");
                     int o = 0;
@@ -63,7 +63,7 @@ public class Trans extends Thread {
                         suc = sockList.get(i).writeIn(seg.getData());
                     //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
-                    System.out.println("segment weer teruggerost");
+                  //  System.out.println("segment weer teruggerost");
                 //route.rcvSegment(seg);
                 } else {
                     

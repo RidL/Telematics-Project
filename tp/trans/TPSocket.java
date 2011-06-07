@@ -59,7 +59,7 @@ public class TPSocket {
                     outBuffer = bytes;
                     outDirty = true;
                     suc = true;
-                    System.out.println("Data verzonden");
+                 //   System.out.println("Data verzonden");
                 }
             }
         }
