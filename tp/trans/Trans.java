@@ -53,6 +53,11 @@ public class Trans extends Thread {
                     // System.out.println("Segment ended: length: " + o + " bytes");
                     boolean suc = false;
                     do {
+                        try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                }
                         suc = sockList.get(i).writeIn(seg.getData());
                     //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
@@ -60,11 +65,14 @@ public class Trans extends Thread {
                 //route.rcvSegment(seg);
                 } else {
 
-                    temp++;
-                    if ((temp % 100000) == 0) {
-                        System.out.println("i just won't read any valid data");
-                    }
-                //  System.out.println("outdirty is false@" + i);
+
+                    try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                    //  System.out.println("outdirty is false@" + i);
+
                 }
             }
 
