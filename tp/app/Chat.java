@@ -28,17 +28,18 @@ public class Chat {
         byte[] origBytes = message.getBytes();
         int messLength = origBytes.length;
 
-        System.out.println(messLength);
+//        System.out.println(messLength);
 
-        if (messLength >= (40)) {
+        if (messLength >= (65536)) {
             System.out.println("message too long: size: " + messLength);
+            return;
         }
 
         byte length1 = (byte) (messLength >>> 8);
         byte length2 = (byte) messLength;
 
-        System.out.println(Integer.toBinaryString(length1));
-        System.out.println(Integer.toBinaryString(length2));
+      //  System.out.println(Integer.toBinaryString(length1));
+      //  System.out.println(Integer.toBinaryString(length2));
 
 
         byte[] bytemessage = new byte[2 + messLength];
@@ -69,7 +70,7 @@ public class Chat {
             boolean suc;
             do {
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
                 }

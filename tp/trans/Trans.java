@@ -37,7 +37,7 @@ public class Trans extends Thread {
                 if (data != null) {
                  //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
-                    System.out.println("Segment aangemaakt");
+                    //System.out.println("Segment aangemaakt");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
                         o++;
@@ -48,7 +48,7 @@ public class Trans extends Thread {
                     boolean suc = false;
                     do {
                         try {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -57,7 +57,7 @@ public class Trans extends Thread {
                 //route.rcvSegment(seg);
                 } else {
                     try {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                 }
