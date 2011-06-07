@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import tp.util.Log;
 
 /**
  *
@@ -33,6 +34,7 @@ public class FileTransferGUI extends JFrame {
         setSize(400, 400);
         setVisible(true);
         pack();
+        new ButtonHandler();
     }
 
     private void buildGUI() {
@@ -41,17 +43,21 @@ public class FileTransferGUI extends JFrame {
         JLabel addressLabel = new JLabel("Address");
         addressField = new JTextField();
         addressField.setColumns(10);
+        addressField.setText("1");
         JLabel sourcePortLabel = new JLabel("Source port");
         sourcePortField = new JTextField();
         sourcePortField.setColumns(10);
+        sourcePortField.setText("4");
         JLabel destPortLabel = new JLabel("Destination port");
         destPortField = new JTextField();
         destPortField.setColumns(10);
+        destPortField.setText("4");
 
         JLabel fileLabel = new JLabel("File");
         JButton fileButton = new JButton("Browse");
         fileField = new JTextField();
         fileField.setColumns(20);
+        //fileField.setText("/home/STUDENT/s1012886/SNSD-Gee.jpg");
         fileButton.setActionCommand("add_file");
         fileButton.addActionListener(bHandler);
         JButton sendButton = new JButton("Send");
@@ -88,12 +94,24 @@ public class FileTransferGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        Log.getInstance("FileTransfer");
         new FileTransferGUI("File Transfer");
     }
 
     class ButtonHandler implements ActionListener {
 
+        boolean init = false;
+
+        
         public void actionPerformed(ActionEvent e) {
+            if (!init) {
+            int  address = Integer.parseInt(addressField.getText());
+            int sourcePort = Integer.parseInt(addressField.getText());
+            int destPort = Integer.parseInt(destPortField.getText());
+            fs = new FileSender(address, sourcePort, destPort);
+            fr = new FileReceiver(address, sourcePort, destPort, fs);
+            init = true;
+            }
 
             if (e.getActionCommand().equals("add_file")) {
                 JFileChooser jfs = new JFileChooser();
@@ -105,17 +123,15 @@ public class FileTransferGUI extends JFrame {
 
             }
             else if (e.getActionCommand().equals("send")) {
-                int  address = Integer.parseInt(addressField.getText());
-                int sourcePort = Integer.parseInt(addressField.getText());
-                int destPort = Integer.parseInt(destPortField.getText());
-                fs = new FileSender(address, sourcePort, destPort);
+//                int  address = Integer.parseInt(addressField.getText());
+//                int sourcePort = Integer.parseInt(addressField.getText());
+//                int destPort = Integer.parseInt(destPortField.getText());
                 fs.send(file.getAbsolutePath());
             }
             else if (e.getActionCommand().equals("receive")) {
-                int  address = Integer.parseInt(addressField.getText());
-                int sourcePort = Integer.parseInt(addressField.getText());
-                int destPort = Integer.parseInt(destPortField.getText());
-                fr = new FileReceiver(address, sourcePort, destPort);
+//                int  address = Integer.parseInt(addressField.getText());
+//                int sourcePort = Integer.parseInt(addressField.getText());
+//                int destPort = Integer.parseInt(destPortField.getText());
                 fr.start();
             }
         }
