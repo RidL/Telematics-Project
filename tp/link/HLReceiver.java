@@ -69,7 +69,7 @@ public class HLReceiver extends Thread {
         while (true) {
         	resetTimer();
             Frame tempFrame = llr.read();
-            if(tempFrame==null&&timeOut() || frameBroken){
+            if(tempFrame==null&&timeOut() || (tempFrame != null && tempFrame.isFin() && frameBroken)){
             	llr.setInvalidFrame();
             	Log.writeLog(" HLR", "TIMEOUT @ NULL FRAME", sysoutLog);
                 for(int i=windowPtr; i<frameBuffer.length; i++){
