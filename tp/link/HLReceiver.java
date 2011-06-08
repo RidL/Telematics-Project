@@ -20,6 +20,7 @@ public class HLReceiver extends Thread {
     private int recPtr;
     private int windowPtr;
     
+    private boolean frameBroken;
     private boolean sysoutLog = false;
     
     /**
@@ -32,6 +33,7 @@ public class HLReceiver extends Thread {
         frameBuffer = new Frame[BUFFER_SIZE];
         senderActive = false;
         expectingAck = false;
+        frameBroken = false;
         errCount = 0;
         recPtr = 0;
         windowPtr = 0;
@@ -67,7 +69,7 @@ public class HLReceiver extends Thread {
         while (true) {
         	resetTimer();
             Frame tempFrame = llr.read();
-            if(tempFrame==null&&timeOut()){
+            if(tempFrame==null&&timeOut() || (tempFrame != null && tempFrame.isFin() && frameBroken)){
             	llr.setInvalidFrame();
             	Log.writeLog(" HLR", "TIMEOUT @ NULL FRAME", sysoutLog);
                 for(int i=windowPtr; i<frameBuffer.length; i++){
@@ -75,6 +77,7 @@ public class HLReceiver extends Thread {
                 }
             	sendAck();
             	errCount = recPtr%WINDOW_SIZE;
+            	frameBroken = false;
             }else{
             	Log.writeLog(" HLR", "frame read", sysoutLog);
                 // !senderActive == receiving || cable_free
@@ -105,11 +108,27 @@ public class HLReceiver extends Thread {
     }
     
     public void ackReceived(Frame tempFrame) {
-        byte ack = tempFrame.getBytes()[1]; //first byte = header.
+    	byte[] ack = new byte[5];
+    	for(int i = 0; i<5;i++){
+    		ack[i] =  tempFrame.getBytes()[i];
+    	}
+    	int[] ackScore = new int[5];
+    	int	bestAck = 0;
+    	for(int i = 0;i<5;i++){
+    		for(int y = 0;i<5;i++){
+    			if(ack[y]==ack[i]){
+    				ackScore[i] += 1;
+    			}
+    		}
+    		if(ackScore[i]>ackScore[bestAck]){
+    			bestAck = i;
+    		}
+    	}
+
         Log.writeLog(" HLR", "got ack, interpreting" + Frame.toBinaryString(ack), sysoutLog);
         llr.setInvalidFrame();
         expectingAck = false;
-        hls.ackReceived(ack);
+        hls.ackReceived(ack[bestAck]);
         
         // ackReceived non-existent, ik gebruik expectingAck
         // frameReceived setten lijkt me niet nodig
@@ -220,5 +239,9 @@ public class HLReceiver extends Thread {
             }
         }
     }
+
+	public void windowBroken() {
+		frameBroken = true;	
+	}
 }
 

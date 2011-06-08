@@ -1,5 +1,7 @@
 package tp.app;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -15,7 +17,7 @@ public class Chat {
 
     public Chat(int destAddr, int destPort, int scrPort, String sender) {
         trans = Trans.getTrans();
-        trans.start();
+      //  trans.start();
         socket = trans.createSocket(destAddr, scrPort, destPort);
         this.sender = sender;
     }
@@ -26,8 +28,19 @@ public class Chat {
         byte[] origBytes = message.getBytes();
         int messLength = origBytes.length;
 
+//        System.out.println(messLength);
+
+        if (messLength >= (65536)) {
+            System.out.println("message too long: size: " + messLength);
+            return;
+        }
+
         byte length1 = (byte) (messLength >>> 8);
         byte length2 = (byte) messLength;
+
+      //  System.out.println(Integer.toBinaryString(length1));
+      //  System.out.println(Integer.toBinaryString(length2));
+
 
         byte[] bytemessage = new byte[2 + messLength];
 
@@ -37,6 +50,9 @@ public class Chat {
         for (int k = 2, p = 0; k < bytemessage.length; k++, p++) {
             bytemessage[k] = origBytes[p];
         }
+
+
+
 
         byte[] tempMssg;
         int end = 0;
@@ -53,10 +69,15 @@ public class Chat {
             }
             boolean suc;
             do {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 suc = socket.writeOut(tempMssg);
             } while (!suc);
         }
-        System.out.println("Verzonden; " + message);
+        System.out.println("Verzonden: " + message);
     }
 
     public TPSocket getSocket() {

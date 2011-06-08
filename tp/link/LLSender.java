@@ -30,6 +30,7 @@ public class LLSender {
    // private Frame[] frames;
     private int changeNr;
     private int lastNr = -1;
+    private static final int LL_TIME_OUT = 200;
     
     private boolean sysoutLog = false;
     /**
@@ -71,10 +72,12 @@ public class LLSender {
     		getNextRead();
     		cable.writeLPT(31);
     		Log.writeLog(" LLS", "OUT: 31", sysoutLog);
+    		getNextRead();
+    	} else {
+    		getNextRead();
     	}
     	
     	while(n!= -1 && n!=0){
-    		getNextRead();
     		if(lastNr!=n){
     			cable.writeLPT(n);
     		}else{
@@ -86,8 +89,8 @@ public class LLSender {
     		Log.writeLog(" LLS", "OUT: " + n, sysoutLog);
     		lastNr = n;
     		n = f.next();
+    		getNextRead();
     	}
-    	getNextRead();
     	cable.writeLPT(31);
     	Log.writeLog(" LLS", "OUT: 31", sysoutLog);
     	getNextRead();
@@ -112,7 +115,7 @@ public class LLSender {
      */
     public boolean pushFirstFrame(Frame f) {
         boolean succes = false;
-        
+        long timeoutCount = System.currentTimeMillis();
         changeNr = cable.readLPT();
         Log.writeLog(" LLS", "pushFirst initial: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
     	cable.writeLPT(31);
@@ -120,11 +123,41 @@ public class LLSender {
      	
     	if (changeNr == Frame.ONES) { //shift(changeNr) == 31
     		Log.writeLog(" LLS", "COLLISION", sysoutLog);
-         	getNextRead();  //this should be 0
+    		 //--------- readNext() + timeout
+    		int nr;
+            while (true) {
+                nr = cable.readLPT();
+                if (nr != changeNr) {
+                    microSleep();
+                    changeNr = cable.readLPT();
+                    break;
+                }
+                if(System.currentTimeMillis()>(timeoutCount+LL_TIME_OUT)){
+              	  changeNr = Frame.ONES;
+              	  break;
+                }
+            }
+            Log.writeLog(" LLS", "IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
+            //------------
          	cable.writeLPT(0);
          	Log.writeLog(" LLS", "OUT: 0", sysoutLog);
          }else{
-        	 getNextRead();
+        	 //--------- readNext() + timeout
+        	  int nr;
+              while (true) {
+                  nr = cable.readLPT();
+                  if (nr != changeNr) {
+                      microSleep();
+                      changeNr = cable.readLPT();
+                      break;
+                  }
+                  if(System.currentTimeMillis()>(timeoutCount+LL_TIME_OUT)){
+                	  changeNr = Frame.ONES;
+                	  break;
+                  }
+              }
+              Log.writeLog(" LLS", "IN: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
+              //------------
         	 if (changeNr == Frame.ONES) { //shift(changeNr) == 31
         		 cable.writeLPT(0);
         		 Log.writeLog(" LLS", "OUT: 0", sysoutLog);
