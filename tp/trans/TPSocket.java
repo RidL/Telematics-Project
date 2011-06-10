@@ -37,6 +37,7 @@ public class TPSocket {
         synchronized (INLOCK) {
             if (inDirty) {
                 temp = inBuffer;
+                inBuffer = null;
                 inDirty = false;
             }
         }

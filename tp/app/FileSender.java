@@ -14,7 +14,7 @@ import tp.trans.Trans;
 import tp.util.Log;
 
 /**
- *
+ * Is responsible for sending file data on the application layer
  * @author STUDENT\s1012886
  */
 public class FileSender {
@@ -26,12 +26,22 @@ public class FileSender {
     private File file;
     private FileInputStream fis;
 
+    /**
+     * Creates a new FileSender
+     * @param address the address of the receiver
+     * @param srcPort the port through which data is sent
+     * @param dstPort the port through which data is received at the destination
+     */
     public FileSender(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
     //tpSocket = new FakeSocket(true);
     }
 
+    /**
+     * Sends a file identified by fileName through the socket
+     * @param fileName the name of the file to be send
+     */
     public void send(String fileName) {
         file = new File(fileName);
         byte[] header = createHeader();
@@ -42,23 +52,22 @@ public class FileSender {
                 writeData[i] = header[j];
                 if (i == MAX_SEGMENT_DATA - 1) {
                     int temp = 0;
-                    //hasWritten = tpSocket.writeIn(writeData);
-                    boolean suc;
+                    boolean hasWritten;
                     do {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        suc = tpSocket.writeOut(writeData);
-                  //      System.out.println("number of bytes written: " + writeData.length);
+                        hasWritten = tpSocket.writeOut(writeData);
+                        //System.out.println("number of bytes written: " + writeData.length);
                         temp++;
                         if ((temp % 100) == 0) {
                             System.out.println("trying to write to socket1");
                         }
-                    } while (!suc);
+                    } while (!hasWritten);
                     writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
-                    // System.out.println("DATA: " + Frame.toBinaryString(writeData));
+                    //System.out.println("DATA: " + Frame.toBinaryString(writeData));
                     i = 0;
                 }
             }
@@ -68,26 +77,23 @@ public class FileSender {
             int dataRead = fis.read(bytes);
             System.out.println("dataRead: " + dataRead);
 
-            // fill last segment with header-data up with the first real data
+            // fill last segment containing header-data up with the first file data
             for (j = 0; j < bytes.length; i++, j++) {
                 writeData[i] = bytes[j];
                 if (i == MAX_SEGMENT_DATA - 1) {
-                   
-                    boolean suc;
+                    boolean hasWritten;
                     do {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        suc = tpSocket.writeOut(writeData);
-                    //    System.out.println("number of bytes written: " + writeData.length);
+                        hasWritten = tpSocket.writeOut(writeData);
+                        //System.out.println("number of bytes written: " + writeData.length)
+                        System.out.println("trying to write to socket2");
 
-                        
-                            System.out.println("trying to write to socket2");
-                        
-                    } while (!suc);
-                    //hasWritten = tpSocket.writeIn(writeData);
+                    } while (!hasWritten);
+                    System.out.println("DATA SENT: " + new String(writeData));
                     // System.out.println("DATA: " + Frame.toBinaryString(writeData));
                     break;
                 }
@@ -97,22 +103,23 @@ public class FileSender {
             while (dataRead != -1) {
                 int temp = 0;
                 dataRead = fis.read(bytes);
-                
-                System.out.println("bytes read: " + dataRead);
-                boolean suc;
+
+              //  System.out.println("bytes read: " + dataRead);
+                boolean hasWritten;
                 do {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(5);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    suc = tpSocket.writeOut(bytes);
-                //    System.out.println("number of bytes written: " + bytes.length);
+                    hasWritten = tpSocket.writeOut(bytes);
+                    // System.out.println("number of bytes written: " + bytes.length);
                     temp++;
-                    if ((temp % 100) == 0) {
+                    if ((temp % 10) == 0) {
                         System.out.println("trying to write to socket3");
                     }
-                } while (!suc);
+                } while (!hasWritten);
+                System.out.println(new String(bytes));
             //hasWritten = tpSocket.writeIn(bytes);
             //System.out.println("DATA: " + Frame.toBinaryString(writeData));
             }
@@ -124,16 +131,16 @@ public class FileSender {
         System.out.println("niet veel data");
     }
 
-    private void sendBytes(byte[] bytes) {
-    }
-
+    /**
+     * Creates a new file-tranfer header for the file
+     * @return the header as a byte array
+     */
     private byte[] createHeader() {
-        System.out.println("HEADER_TEST***");
+        System.out.println("***START HEADER_TEST***");
         byte fileNameLength = (byte) file.getName().length();
         byte[] fileName = file.getName().getBytes();
         byte[] fileLength = longToBytes(file.length());
         System.out.println("FILE_LENGTH: " + file.length());
-        System.out.println("Length: " + fileLength);
         System.out.println("FILE_NAME: " + Frame.toBinaryString(fileName));
 
         byte[] header = new byte[1 + fileNameLength + fileLength.length];
@@ -147,10 +154,15 @@ public class FileSender {
         }
         System.out.println("FILE_LENGTH_BINARY: " + Frame.toBinaryString(fileLength));
         System.out.println("HEADER: " + Frame.toBinaryString(header));
-        System.out.println("END OF HEADER_TEST***");
+        System.out.println("***END HEADER_TEST***");
         return header;
     }
 
+    /**
+     * Converts a long number to a byte array
+     * @param in the number to convert
+     * @return the number stored in a byte array
+     */
     public static byte[] longToBytes(long in) {
         byte[] result = new byte[8];
 
@@ -161,14 +173,18 @@ public class FileSender {
         result[4] = (byte) (in >>> 24);
         result[5] = (byte) (in >>> 16);
         result[6] = (byte) (in >>> 8);
-        result[7] = (byte) (in >>> 0);
+        result[7] = (byte) in;
 
-        System.out.println(Frame.toBinaryString(result) + " result");
         return result;
     }
 
+    /**
+     * Converts a byte array to a long
+     * @param bytes the byte array to convert
+     * @return the long value of bytes
+     */
     public static long bytesToLong(byte[] bytes) {
-        long result = 0;
+//        long result = 0;
 
 //        result += ((long) bytes[0] << 56);
 //        result += ((long) bytes[1] << 48);
@@ -178,14 +194,10 @@ public class FileSender {
 //        result += ((long) bytes[5] << 16);
 //        result += ((long) bytes[6] << 8);
 //        result += ((long) bytes[7] << 0);
-// Why doesn't this work???
+//        Why doesn't this work???
 
         BigInteger b = new BigInteger(bytes);
-        result = b.longValue();
-        System.out.println(Long.toBinaryString(result) + " result");
-
-
-        return result;
+        return b.longValue();
     }
 
     public static void main(String[] args) {
@@ -204,6 +216,7 @@ public class FileSender {
         } else {
         System.out.println("ERROR: Wrong arguments");
         }*/
+
         long test = 9603727748442390L;
         System.out.println(test + "--> original");
         System.out.println(FileSender.bytesToLong(FileSender.longToBytes(test)) + "--> should be the same");
