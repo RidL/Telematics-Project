@@ -25,6 +25,7 @@ public class FileSender {
     //private FakeSocket tpSocket;
     private File file;
     private FileInputStream fis;
+      // public  static boolean NOTIFY = true;
 
     /**
      * Creates a new FileSender
@@ -48,26 +49,32 @@ public class FileSender {
         try {
             byte[] writeData = new byte[MAX_SEGMENT_DATA];
             int i, j;   // write header to tpSocket
-            for (i = 0, j = 0; j < header.length; i++, j++) {
+            for (i = 0        , j = 0; j < header.length; i++, j++) {
                 writeData[i] = header[j];
                 if (i == MAX_SEGMENT_DATA - 1) {
                     int temp = 0;
-                    boolean hasWritten;
+                    boolean hasWritten = false;
                     do {
                         try {
                             Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        hasWritten = tpSocket.writeOut(writeData);
+                        synchronized (tpSocket.getOUTLOCK()) {
+                       //     if (NOTIFY) {
+                            hasWritten = tpSocket.writeOut(writeData);
+                     //       NOTIFY = false;
+                     //       }
+                        }
                         //System.out.println("number of bytes written: " + writeData.length);
                         temp++;
-                        if ((temp % 100) == 0) {
-                            System.out.println("trying to write to socket1");
-                        }
+//                        if ((temp % 100) == 0) {
+//                            System.out.println("trying to write to socket1");
+//                        }
                     } while (!hasWritten);
                     writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
-                    //System.out.println("DATA: " + Frame.toBinaryString(writeData));
+                    // System.out.println(Frame.toBinaryString(writeData) + "FIRST LOOP\n------------------------");
+                    Log.writeLog(" FileSender", Frame.toBinaryString(writeData) + "\n----------FIRST LOOP--------------", false);
                     i = 0;
                 }
             }
@@ -81,22 +88,33 @@ public class FileSender {
             for (j = 0; j < bytes.length; i++, j++) {
                 writeData[i] = bytes[j];
                 if (i == MAX_SEGMENT_DATA - 1) {
-                    boolean hasWritten;
+                    boolean hasWritten = false;
                     do {
                         try {
                             Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        hasWritten = tpSocket.writeOut(writeData);
-                        //System.out.println("number of bytes written: " + writeData.length)
-                        System.out.println("trying to write to socket2");
+                        synchronized (tpSocket.getOUTLOCK()) {
+                       //     if (NOTIFY) {
+                            hasWritten = tpSocket.writeOut(writeData);
+                      //      NOTIFY = false;
+                      //      }
+                        }
+                    //System.out.println("number of bytes written: " + writeData.length)
+                    // System.out.println("trying to write to socket2");
 
                     } while (!hasWritten);
-                    System.out.println("DATA SENT: " + new String(writeData));
+                    Log.writeLog(" FileSender", new String(bytes) + "\n--------SECOND LOOP----------------", false);
                     // System.out.println("DATA: " + Frame.toBinaryString(writeData));
                     break;
                 }
+            }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             bytes = new byte[MAX_SEGMENT_DATA];
@@ -104,22 +122,27 @@ public class FileSender {
                 int temp = 0;
                 dataRead = fis.read(bytes);
 
-              //  System.out.println("bytes read: " + dataRead);
-                boolean hasWritten;
+                //  System.out.println("bytes read: " + dataRead);
+                boolean hasWritten = false;
                 do {
                     try {
                         Thread.sleep(5);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    hasWritten = tpSocket.writeOut(bytes);
+                    synchronized (tpSocket.getOUTLOCK()) {
+                    //    if (NOTIFY) {
+                        hasWritten = tpSocket.writeOut(bytes);
+                    //    NOTIFY = false;
+                    //    }
+                    }
                     // System.out.println("number of bytes written: " + bytes.length);
                     temp++;
-                    if ((temp % 10) == 0) {
-                        System.out.println("trying to write to socket3");
-                    }
+//                    if ((temp % 10) == 0) {
+//                        System.out.println("trying to write to socket3");
+//                    }
                 } while (!hasWritten);
-                System.out.println(new String(bytes));
+                Log.writeLog(" FileSender", new String(bytes) + "\n--------THIRD LOOP----------------", false);
             //hasWritten = tpSocket.writeIn(bytes);
             //System.out.println("DATA: " + Frame.toBinaryString(writeData));
             }
@@ -136,12 +159,12 @@ public class FileSender {
      * @return the header as a byte array
      */
     private byte[] createHeader() {
-        System.out.println("***START HEADER_TEST***");
+        //  System.out.println("***START HEADER_TEST***");
         byte fileNameLength = (byte) file.getName().length();
         byte[] fileName = file.getName().getBytes();
         byte[] fileLength = longToBytes(file.length());
-        System.out.println("FILE_LENGTH: " + file.length());
-        System.out.println("FILE_NAME: " + Frame.toBinaryString(fileName));
+        //  System.out.println("FILE_LENGTH: " + file.length());
+        //  System.out.println("FILE_NAME: " + Frame.toBinaryString(fileName));
 
         byte[] header = new byte[1 + fileNameLength + fileLength.length];
         header[0] = fileNameLength;
@@ -152,9 +175,9 @@ public class FileSender {
         for (int i = fileNameLength + 1, j = 0; i < header.length && j < fileLength.length; i++, j++) {
             header[i] = fileLength[j];
         }
-        System.out.println("FILE_LENGTH_BINARY: " + Frame.toBinaryString(fileLength));
-        System.out.println("HEADER: " + Frame.toBinaryString(header));
-        System.out.println("***END HEADER_TEST***");
+        //    System.out.println("FILE_LENGTH_BINARY: " + Frame.toBinaryString(fileLength));
+        //    System.out.println("HEADER: " + Frame.toBinaryString(header));
+        //    System.out.println("***END HEADER_TEST***");
         return header;
     }
 
