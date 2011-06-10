@@ -56,7 +56,7 @@ public class Trans extends Thread {
                     do {
                         try {
 
-                            Thread.sleep(10);
+                            Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -69,7 +69,7 @@ public class Trans extends Thread {
                     
                     temp++;
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(5);
                         System.out.println("wakker geworre");
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
