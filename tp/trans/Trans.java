@@ -42,9 +42,9 @@ public class Trans extends Thread {
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                     temp = 0;
-                    System.out.println("Upcoming segment...");
+                 //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
-                    System.out.println("Segment aangemaakt");
+                    //System.out.println("Segment aangemaakt");
                     int o = 0;
                     for (int p = 0; p < seg.getBytes().length; p++) {
                         o++;
@@ -55,20 +55,21 @@ public class Trans extends Thread {
                     boolean suc = false;
                     do {
                         try {
-                            Thread.sleep(10);
+
+                            Thread.sleep(5);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         suc = sockList.get(i).writeIn(seg.getData());
                     //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
-                    System.out.println("segment weer teruggerost");
+                  //  System.out.println("segment weer teruggerost");
                 //route.rcvSegment(seg);
                 } else {
                     
                     temp++;
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(5);
                         System.out.println("wakker geworre");
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,7 +78,6 @@ public class Trans extends Thread {
                         System.out.println("null gelezen");
                     }
                 //  System.out.println("outdirty is false@" + i);
-
                 }
             }
 

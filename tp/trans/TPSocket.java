@@ -19,7 +19,7 @@ public class TPSocket {
     private byte[] outBuffer;
     private boolean inDirty;
     private boolean outDirty;
-    public static final Object OUTLOCK = 0, INLOCK = 1;
+    public Object OUTLOCK = 0, INLOCK = 1;
 
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
@@ -37,6 +37,7 @@ public class TPSocket {
         synchronized (INLOCK) {
             if (inDirty) {
                 temp = inBuffer;
+                inBuffer = null;
                 inDirty = false;
             }
         }
@@ -59,7 +60,7 @@ public class TPSocket {
                     outBuffer = bytes;
                     outDirty = true;
                     suc = true;
-                    System.out.println("Data verzonden");
+                 //   System.out.println("Data verzonden");
                 }
             }
         }
