@@ -60,13 +60,12 @@ public class Tunnel extends Thread implements Link {
 			e.printStackTrace();
 		}
 		while(true){
-			Segment s;
 			byte[] data = new byte[104];
 			
 			int in;
 			try {
 				in = read.read();
-				System.out.println("Read an int: "+in+" binary string: "+Frame.toBinaryString((byte)(in)));
+				System.out.println("int read: " + in);
 				for(int i=0; in>0; in = read.read(), i+=4){
 					for(int shift=0; shift<2; shift++){
 						System.out.println("Adding to buffer: "+Frame.toBinaryString((byte)(in>>((1-shift)*8))));
@@ -78,7 +77,7 @@ public class Tunnel extends Thread implements Link {
 				e.printStackTrace();
 			}
 			System.out.println(Frame.toBinaryString(data));
-			s = new Segment(data);
+			route.rcvSegment(new Segment(data));
 		}
 	}
 	

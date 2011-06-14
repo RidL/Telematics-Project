@@ -31,16 +31,16 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-            Iterator<Segment> it = routableSegs.iterator();
-            while(it.hasNext()) {
-                Segment s = it.next();
-                int addr = s.getDestinationAddress();
-                Link destLink = routingTable.get(addr);
-                if(destLink.readyToPushSegment()) {
-                    destLink.pushSegment(s);
-                    System.out.println("=====pushing=====\n" + s);
-                    synchronized(LOCK) {
-                        it.remove();
+			synchronized(LOCK){
+            	Iterator<Segment> it = routableSegs.iterator();
+            	while(it.hasNext()) {
+                    Segment s = it.next();
+                    int addr = s.getDestinationAddress();
+                    Link destLink = routingTable.get(addr);
+                    if(destLink.readyToPushSegment()) {
+                        destLink.pushSegment(s);
+                        System.out.println("ROUTE =====pushing=====\n" + s);
+                            it.remove();
                     }
                 }
             }
@@ -50,11 +50,14 @@ public class Route extends Thread {
 	}
 	
 	public void pushSegment(Segment s){
+		System.out.println("pushing");
 		routableSegs.add(s);
+		System.out.println("pushed");
 	}
 	
 	public void rcvSegment(Segment s){
 		if(s.getDestinationAddress()==trans.getAddress()){
+			System.out.println("ROUTE: received\n" + s);
 			trans.rcvSeg(s);
 		}else{
             synchronized(LOCK) {
