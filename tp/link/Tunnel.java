@@ -61,22 +61,26 @@ public class Tunnel extends Thread implements Link {
 		}
 		while(true){
 			byte[] data = new byte[104];
-			
+			int len = 7;
 			int in;
+			
 			try {
 				in = read.read();
 				System.out.println("int read: " + in);
-				for(int i=0; in>0; in = read.read(), i+=4){
-					for(int shift=0; shift<2; shift++){
-						System.out.println("Adding to buffer: "+Frame.toBinaryString((byte)(in>>((1-shift)*8))));
-						data[i+shift] = (byte)(in>>((1-shift)*8));
+				for(int i=0; (in!=-1)&&len>0; in=(byte)read.read(), i++, len--){
+					data[i] = (byte)in;
+					if(i==5){
+						len += data[i];
 					}
+					if(len==1)
+						break;
+					Log.writeLog("TUN", len + " " + Integer.toString((byte)in), true);
 				}
 			} catch (IOException e) {
 				System.err.println("Error whilst reading from the stream @ " + addr.getHostAddress() + ":" + port + "");
 				e.printStackTrace();
 			}
-			System.out.println(Frame.toBinaryString(data));
+			Log.writeLog("TUN", "-1 read, going on!", true);
 			route.rcvSegment(new Segment(data));
 		}
 	}
