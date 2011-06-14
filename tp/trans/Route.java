@@ -6,13 +6,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 
 import tp.link.Link;
 import tp.link.Tunnel;
+import tp.util.Log;
 
 public class Route extends Thread {
+
+    private final Object LOCK = new Object();
+    
 	private ArrayList<Segment> routableSegs;
 	private Map<Integer,Link> routingTable;
 	private Trans trans;
@@ -26,6 +31,19 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
+            Iterator it = routableSegs.iterator();
+            while(it.hasNext()) {
+                Segment s = (Segment) it.next();
+
+                int addr = s.getDestinationAddress();
+                Link destLink = routingTable.get(addr);
+                if(destLink.readyToPushSegment()) {
+                    destLink.pushSegment(s);
+                    synchronized(LOCK) {
+                        it.remove();
+                    }
+                }
+            }
 			//TODO:check routables
 			//TODO:check links
 		}
@@ -35,7 +53,9 @@ public class Route extends Thread {
 		if(s.getDestinationAddress()==trans.getAddress()){
 			trans.rcvSeg(s);
 		}else{
-			routableSegs.add(s);
+            synchronized(LOCK) {
+                routableSegs.add(s);
+            }
 		}
 	}
 	
@@ -69,4 +89,21 @@ public class Route extends Thread {
 			e.printStackTrace();
 		}
 	}
+
+    public Object getLock() {
+        return LOCK;
+    }
+
+    public static void main(String[] args) {
+        Log.getInstance("RT");
+        Trans t = Trans.getTrans();
+        Route r = new Route(t);
+        for(Segment s: r.routableSegs) {
+            System.out.println("Segment: " + s);
+        }
+        for(Integer i: r.routingTable.keySet()) {
+            System.out.println("rt " + i + "--" + r.routingTable.get(i));
+        }
+        System.out.println("");
+    }
 }
