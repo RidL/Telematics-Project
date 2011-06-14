@@ -2,8 +2,6 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Trans extends Thread {
 
@@ -30,63 +28,19 @@ public class Trans extends Thread {
 
     @Override
     public void run() {
-        System.out.println("nou, twetje is gestawt");
-        int temp = 0;
-        byte[] data = null;
-        while (true) {
-            // System.out.println(sockList.size());
-
-            for (int i = 0; i < sockList.size(); i++) {
-                synchronized (sockList.get(i).getOUTLOCK()) {
-                    data = sockList.get(i).readOut();
-                }
-
-                // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
-                if (data != null) {
-                    temp = 0;
-                    //   System.out.println("Upcoming segment...");
-                    Segment seg = createSegment(data, sockList.get(i), false);
-                    //System.out.println("Segment aangemaakt");
-                    int o = 0;
-                    for (int p = 0; p < seg.getBytes().length; p++) {
-                        o++;
-                    //  System.out.println(Frame.toBinaryString(seg.getBytes()[p]));
-                    }
-
-                    // System.out.println("Segment ended: length: " + o + " bytes");
-                    boolean suc = false;
-                    do {
-                        try {
-
-                            Thread.sleep(5);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        synchronized (sockList.get(i).getINLOCK()) {
-                            suc = sockList.get(i).writeIn(seg.getData());
-                        }
-                    //  System.out.println("returning data to fileReceiver");
-                    } while (!suc);
-                //  System.out.println("segment weer teruggerost");
-                //route.rcvSegment(seg);
-                } else {
-
-                    temp++;
-                    try {
-                        Thread.sleep(5);
-
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (temp % 100 == 0) {
-                        System.out.println("null gelezen");
-                    }
-                //  System.out.println("outdirty is false@" + i);
-                }
-            }
-
+    	byte[] data;
+    	TPSocket sock;
+    	while(true){
+    		for (int i = 0; i < sockList.size(); i++) {
+    			sock = sockList.get(i);
+    		    if(sock.isOutDirty()){
+    		    	//MAYBE SYNC?
+		    		data = sock.readOut();
+		    		route.pushSegment(createSegment(data, sock, false));
+    		    }
+    	    }
+    	}
         //TODO: handle incoming segs from rcvBuff
-        }
     }
 
     public int getAddress() {
@@ -115,7 +69,7 @@ public class Trans extends Thread {
                 if (seg.isValidSegment()) {
                     sockList.get(i).writeIn(seg.getData());
                 }
-            //else: wait for retransmit
+            //TODO: else: wait for retransmit
             }
         }
     }

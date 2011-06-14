@@ -17,8 +17,6 @@ public class TPSocket {
     private int dstPort;
     private byte[] inBuffer;
     private byte[] outBuffer;
-    private boolean inDirty;
-    private boolean outDirty;
     private final Object OUTLOCK = new Object();
     private final Object INLOCK = new Object();
 
@@ -28,17 +26,14 @@ public class TPSocket {
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
-        inDirty = false;
-        outDirty = false;
     }
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
         byte[] temp = null;
-        if (inDirty) {
+        if (inBuffer!=null) {
             temp = inBuffer;
             inBuffer = null;
-            inDirty = false;
         }
 
         return temp;
@@ -51,50 +46,38 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-        //System.out.println("ik probeer echt wel die shit op true te zette");
-
-        boolean suc = false;
-        if (!outDirty) {
-            if (bytes.length <= 96 && outBuffer == null) {
-                outBuffer = bytes;
-                outDirty = true;
-                suc = true;
-            //   System.out.println("Data verzonden");
+    	//TODO: blokkeer op outDirty vanaf applicatie
+    	boolean suc = false;
+    	synchronized(OUTLOCK){
+            if (outBuffer==null) {
+                if (bytes.length <= 96 && outBuffer == null) {
+                    outBuffer = bytes;
+                    suc = true;
+                }
             }
-        }
-
-
-        //while (outDirty){
-        //System.out.println("spinwait, wachten op !outdirty");
-        // }
-        // System.out.println("is !outdirty");
+    	}
         return suc;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-
-        byte[] temp = null;
-        if (outDirty) {
-            // System.out.println("new datas");
-            temp = outBuffer;
-            outBuffer = null;
-            // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
-            outDirty = false;
-        }
-
-        //   if(temp!=null)
-        //   System.out.println("Data gegeven aan trans");
+    	//TODO: spin op read?
+    	byte[] temp = null;
+    	synchronized(OUTLOCK){
+    		if (outBuffer!=null) {
+                temp = outBuffer;
+                outBuffer = null;
+            }
+    	}
         return temp;
     }
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
         boolean suc = false;
-        if (!inDirty) {
+        if (inBuffer==null) {
             if (bytes.length <= 96 && inBuffer == null) {
                 inBuffer = bytes;
-                inDirty = true;
                 suc = true;
             }
         } else {
@@ -134,14 +117,14 @@ public class TPSocket {
      * @return the outDirty
      */
     public boolean isOutDirty() {
-        return outDirty;
+        return outBuffer!=null;
     }
 
     /**
      * @return the inDirty
      */
     public boolean isInDirty() {
-        return inDirty;
+        return inBuffer!=null;
     }
 
     /**

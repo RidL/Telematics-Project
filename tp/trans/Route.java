@@ -1,7 +1,6 @@
 package tp.trans;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,16 +31,16 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-            Iterator it = routableSegs.iterator();
-            while(it.hasNext()) {
-                Segment s = (Segment) it.next();
-
-                int addr = s.getDestinationAddress();
-                Link destLink = routingTable.get(addr);
-                if(destLink.readyToPushSegment()) {
-                    destLink.pushSegment(s);
-                    synchronized(LOCK) {
-                        it.remove();
+			synchronized(LOCK){
+            	Iterator<Segment> it = routableSegs.iterator();
+            	while(it.hasNext()) {
+                    Segment s = it.next();
+                    int addr = s.getDestinationAddress();
+                    Link destLink = routingTable.get(addr);
+                    if(destLink.readyToPushSegment()) {
+                        destLink.pushSegment(s);
+                        System.out.println("ROUTE =====pushing=====\n" + s);
+                            it.remove();
                     }
                 }
             }
@@ -50,8 +49,15 @@ public class Route extends Thread {
 		}
 	}
 	
+	public void pushSegment(Segment s){
+		System.out.println("pushing");
+		routableSegs.add(s);
+		System.out.println("pushed");
+	}
+	
 	public void rcvSegment(Segment s){
 		if(s.getDestinationAddress()==trans.getAddress()){
+			System.out.println("ROUTE: received\n" + s);
 			trans.rcvSeg(s);
 		}else{
             synchronized(LOCK) {
@@ -77,10 +83,11 @@ public class Route extends Thread {
 				}else{
 					String IPAdd = scan.next();
 					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
-					l = t;
+					System.out.println("adding: " + addr + " " + t);
+					routingTable.put(addr, t);
 					t.start();
 				}
-				routingTable.put(addr, l);
+				
 				s = read.readLine();
 			}
 		} catch (FileNotFoundException e) {
