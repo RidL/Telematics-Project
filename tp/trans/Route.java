@@ -15,7 +15,7 @@ import tp.link.Tunnel;
 import tp.util.Log;
 
 public class Route extends Thread {
-
+	int calls;
     private final Object LOCK = new Object();
     
 	private ArrayList<Segment> routableSegs;
@@ -51,9 +51,8 @@ public class Route extends Thread {
 	}
 	
 	public void pushSegment(Segment s){
-		System.out.println("pushing");
+		System.out.println("push number" + (++calls) + "");
 		routableSegs.add(s);
-		System.out.println("pushed");
 	}
 	
 	public void rcvSegment(Segment s){
