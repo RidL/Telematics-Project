@@ -31,6 +31,7 @@ public class Trans extends Thread {
 
     @Override
     public void run() {
+
         Log.getInstance("dd00");
         byte[] data = null;
         while (true) {
@@ -39,25 +40,38 @@ public class Trans extends Thread {
                 if (data != null) {
                     Segment seg = createSegment(data, sockList.get(i), false);
                     boolean suc = false;
-                    do {
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+//                    do {
+//                        try {
+//                            Thread.sleep(5);
+//                        } catch (InterruptedException ex) {
+//                            Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
                         suc = sockList.get(i).writeIn(seg.getData());
-                    } while (!suc);
+//                    } while (!suc);
                 } else {
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+//                    try {
+//                        Thread.sleep(5);
+//                    } catch (InterruptedException ex) {
+//                        Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
                 }
             }
-        //TODO: handle incoming segs from rcvBuff
-        }
-    }
+
+//        byte[] data;
+//        TPSocket sock;
+//        while (true) {
+//            for (int i = 0; i < sockList.size(); i++) {
+//                sock = sockList.get(i);
+//                if (sock.isOutDirty()) {
+//                    //MAYBE SYNC?
+//                    data = sock.readOut();
+//                    route.pushSegment(createSegment(data, sock, false));
+//                }
+//            }
+//        }
+
+    //TODO: handle incoming segs from rcvBuff
+    }}
 
     public int getAddress() {
         return address;
@@ -85,7 +99,7 @@ public class Trans extends Thread {
                 if (seg.isValidSegment()) {
                     sockList.get(i).writeIn(seg.getData());
                 }
-            //else: wait for retransmit
+            //TODO: else: wait for retransmit
             }
         }
     }

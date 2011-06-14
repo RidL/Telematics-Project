@@ -69,12 +69,12 @@ public class FileReceiver extends Thread {
         for (i = 1  , j = 0; j < fileNameLength; i++, j++) {
             fileName[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
-                do {
-                    Thread.sleep(5);
+//                do {
+//                    Thread.sleep(5);
                     bytesIn = tpSocket.readIn();
-                    //  Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------SECOND DATA----------------", false);
-                    i = 0;
-                } while (bytesIn == null);
+//                    //  Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------SECOND DATA----------------", false);
+//                    i = 0;
+//                } while (bytesIn == null);
             }
         }
 
@@ -83,12 +83,12 @@ public class FileReceiver extends Thread {
         for (j = 0; j < 8; i++, j++) {
             fileLength[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
-                do {
-                    Thread.sleep(5);
+//                do {
+//                    Thread.sleep(5);
                     bytesIn = tpSocket.readIn();
-                    //Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------THIRD DATA----------------", false);
-                    i = 0;
-                } while (bytesIn == null);
+//                    //Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------THIRD DATA----------------", false);
+//                    i = 0;
+//                } while (bytesIn == null);
             }
         }
         System.out.println("Filelength received: " + bytesToLong(fileLength));
@@ -109,11 +109,11 @@ public class FileReceiver extends Thread {
         byte[] read = null;
         long length = bytesToLong(fileLength);
         while (dataPtr < length) {
-            read = null;
-            while (read == null) {
-                Thread.sleep(5);
+//            read = null;
+//            while (read == null) {
+//                Thread.sleep(5);
                 read = tpSocket.readIn();
-            }
+//            }
             fos.write(read);
             //Log.writeLog(" FileReceiver", new String(read) + "\n--------REMAINING DATA----------------", false);
             dataPtr += read.length;

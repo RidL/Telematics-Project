@@ -4,6 +4,9 @@
  */
 package tp.trans;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author STUDENT\s1012886
@@ -33,14 +36,20 @@ public class TPSocket {
     }
 
     // aangeroepen door app voor data van trans
-    public byte[] readIn() {
+    public synchronized byte[] readIn() {
         byte[] temp = null;
+        try {
+            wait();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+        }
         synchronized (INLOCK) {
-        if (inDirty) {
-            temp = inBuffer;
-            inBuffer = null;
-            inDirty = false;
-        }}
+            if (inDirty) {
+                temp = inBuffer;
+                inBuffer = null;
+                inDirty = false;
+            }
+        }
 
         return temp;
     }
@@ -51,19 +60,21 @@ public class TPSocket {
      * @require bytes.length <= 96
      */
     // door app aangeroepen om data aan trans te geven
-    public boolean writeOut(byte[] bytes) {
+    public synchronized boolean writeOut(byte[] bytes) {
         //System.out.println("ik probeer echt wel die shit op true te zette");
 
         boolean suc = false;
         synchronized (OUTLOCK) {
-        if (!outDirty) {
-            if (bytes.length <= 96 && outBuffer == null) {
-                outBuffer = bytes;
-                outDirty = true;
-                suc = true;
-            //   System.out.println("Data verzonden");
+            if (!outDirty) {
+                if (bytes.length <= 96 && outBuffer == null) {
+                    outBuffer = bytes;
+                    outDirty = true;
+                    suc = true;
+                    notifyAll();
+                //   System.out.println("Data verzonden");
+                }
             }
-        }}
+        }
 
 
         //while (outDirty){
@@ -74,17 +85,23 @@ public class TPSocket {
     }
 
     // door trans aangeroepen voor data van app
-    public byte[] readOut() {
+    public synchronized byte[] readOut() {
 
         byte[] temp = null;
+        try {
+            wait();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+        }
         synchronized (OUTLOCK) {
-        if (outDirty) {
-            // System.out.println("new datas");
-            temp = outBuffer;
-            outBuffer = null;
-            // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
-            outDirty = false;
-        }}
+            if (outDirty) {
+                // System.out.println("new datas");
+                temp = outBuffer;
+                outBuffer = null;
+                // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
+                outDirty = false;
+            }
+        }
 
         //   if(temp!=null)
         //   System.out.println("Data gegeven aan trans");
@@ -92,18 +109,20 @@ public class TPSocket {
     }
 
     // aangeroepen door trans voor data naar app
-    public boolean writeIn(byte[] bytes) {
+    public synchronized boolean writeIn(byte[] bytes) {
         boolean suc = false;
         synchronized (INLOCK) {
-        if (!inDirty) {
-            if (bytes.length <= 96 && inBuffer == null) {
-                inBuffer = bytes;
-                inDirty = true;
-                suc = true;
+            if (!inDirty) {
+                if (bytes.length <= 96 && inBuffer == null) {
+                    inBuffer = bytes;
+                    inDirty = true;
+                    suc = true;
+                    notifyAll();
+                }
+            } else {
+                suc = false;
             }
-        } else {
-            suc = false;
-        }}
+        }
 
         return suc;
     }
