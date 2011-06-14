@@ -37,12 +37,14 @@ public class Trans extends Thread {
             // System.out.println(sockList.size());
 
             for (int i = 0; i < sockList.size(); i++) {
-                data = sockList.get(i).readOut();
+                synchronized (sockList.get(i).getOUTLOCK()) {
+                    data = sockList.get(i).readOut();
+                }
 
                 // System.out.println(socksList.get(i).isOutDirty());//app heeft data die naar route moet
                 if (data != null) {
                     temp = 0;
-                 //   System.out.println("Upcoming segment...");
+                    //   System.out.println("Upcoming segment...");
                     Segment seg = createSegment(data, sockList.get(i), false);
                     //System.out.println("Segment aangemaakt");
                     int o = 0;
@@ -60,17 +62,19 @@ public class Trans extends Thread {
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        suc = sockList.get(i).writeIn(seg.getData());
+                        synchronized (sockList.get(i).getINLOCK()) {
+                            suc = sockList.get(i).writeIn(seg.getData());
+                        }
                     //  System.out.println("returning data to fileReceiver");
                     } while (!suc);
-                  //  System.out.println("segment weer teruggerost");
+                //  System.out.println("segment weer teruggerost");
                 //route.rcvSegment(seg);
                 } else {
-                    
+
                     temp++;
                     try {
                         Thread.sleep(5);
-                        System.out.println("wakker geworre");
+
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
                     }
