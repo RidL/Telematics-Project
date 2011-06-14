@@ -93,13 +93,11 @@ public class TPSocket {
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
         boolean suc;
-        System.out.println("in ze function");
     	synchronized(INLOCK){
-    		System.out.println("lock acquired ");
         	suc = false;
             if (inBuffer==null) {
                 if (bytes.length <= 96) {
-                	System.out.println("data put in sock");
+                	System.out.println("written shite");
                     inBuffer = bytes;
                     suc = true;
                 }
