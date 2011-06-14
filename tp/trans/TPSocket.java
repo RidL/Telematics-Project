@@ -29,13 +29,25 @@ public class TPSocket {
     }
 
     // aangeroepen door app voor data van trans
-    public byte[] readIn() {
-        byte[] temp = null;
-        if (inBuffer!=null) {
-            temp = inBuffer;
-            inBuffer = null;
-        }
-
+    public synchronized byte[] readIn() {
+    	byte[]temp = null;
+    	while(!isInDirty()){
+    		try{
+    			wait();
+    		}catch(InterruptedException e){
+    			
+    		}
+    	}
+		System.out.println("WAITING ON INLOCK");
+		synchronized(INLOCK){
+			//System.out.println("have lock!");
+			temp = null;
+			if (inBuffer!=null) {
+				temp = inBuffer;
+				inBuffer = null;
+   	     	}
+		}
+		System.out.println("LOCK DONE");
         return temp;
     }
 
@@ -56,6 +68,7 @@ public class TPSocket {
                 }
             }
     	}
+
         return suc;
     }
 
@@ -73,18 +86,24 @@ public class TPSocket {
     }
 
     // aangeroepen door trans voor data naar app
-    public boolean writeIn(byte[] bytes) {
-        boolean suc = false;
-        if (inBuffer==null) {
-            if (bytes.length <= 96 && inBuffer == null) {
-                inBuffer = bytes;
-                suc = true;
+    public synchronized boolean writeIn(byte[] bytes) {
+        boolean suc;
+        System.out.println("in ze function");
+    	synchronized(INLOCK){
+    		System.out.println("lock acquired ");
+        	suc = false;
+            if (inBuffer==null) {
+                if (bytes.length <= 96) {
+                	System.out.println("data put in sock");
+                    inBuffer = bytes;
+                    suc = true;
+                }
+            } else {
+                suc = false;
             }
-        } else {
-            suc = false;
         }
-
-        return suc;
+    	notifyAll();
+    	return suc;
     }
 
     /**

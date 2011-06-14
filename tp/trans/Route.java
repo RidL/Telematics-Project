@@ -57,7 +57,7 @@ public class Route extends Thread {
 	
 	public void rcvSegment(Segment s){
 		if(s.getDestinationAddress()==trans.getAddress()){
-			System.out.println("ROUTE: received\n" + s);
+			System.out.println("ROUTE =====received=====\n" + s);
 			trans.rcvSeg(s);
 		}else{
             synchronized(LOCK) {
