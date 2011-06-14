@@ -31,6 +31,10 @@ public class Route extends Thread {
 		}
 	}
 	
+	public void pushSegment(Segment s){
+		routableSegs.add(s);
+	}
+	
 	public void rcvSegment(Segment s){
 		if(s.getDestinationAddress()==trans.getAddress()){
 			trans.rcvSeg(s);

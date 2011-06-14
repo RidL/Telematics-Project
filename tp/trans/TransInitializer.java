@@ -12,7 +12,5 @@ public class TransInitializer {
 		String s = new String("robin doet helemaal niets");
 		boolean b = sock.writeOut(s.getBytes());
 		Log.writeLog("  TI", "succes in writing stuff to socket " + b, sysout);
-		
-
 	}
 }
