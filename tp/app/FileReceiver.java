@@ -93,6 +93,7 @@ public class FileReceiver extends Thread {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
                     }
+
                     synchronized (tpSocket.getINLOCK()) {
                         bytesIn = tpSocket.readIn();
                       //  FileSender.NOTIFY = true;
@@ -116,6 +117,7 @@ public class FileReceiver extends Thread {
             //file.createNewFile();
             fos = new FileOutputStream(file);
             fos.write(firstData);
+
             Log.writeLog(" FileReceiver", new String(firstData) + "\n--------FIRST DATA----------------", false);
             //System.out.println("DATA RECEIVED: " + new String(firstData));
 
@@ -153,7 +155,8 @@ public class FileReceiver extends Thread {
         }
         try {
             fos.close();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
 

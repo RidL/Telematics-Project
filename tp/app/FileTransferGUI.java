@@ -108,7 +108,7 @@ public class FileTransferGUI extends JFrame {
                 int sourcePort = Integer.parseInt(addressField.getText());
                 int destPort = Integer.parseInt(destPortField.getText());
                 fs = new FileSender(address, sourcePort, destPort);
-                fr = new FileReceiver(address, sourcePort, destPort, fs);
+                fr = new FileReceiver(address, sourcePort, destPort);
                 init = true;
             }
 
