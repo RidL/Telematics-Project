@@ -31,14 +31,14 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-            Iterator it = routableSegs.iterator();
+            Iterator<Segment> it = routableSegs.iterator();
             while(it.hasNext()) {
-                Segment s = (Segment) it.next();
-
+                Segment s = it.next();
                 int addr = s.getDestinationAddress();
                 Link destLink = routingTable.get(addr);
                 if(destLink.readyToPushSegment()) {
                     destLink.pushSegment(s);
+                    System.out.println("=====pushing=====\n" + s);
                     synchronized(LOCK) {
                         it.remove();
                     }
@@ -80,10 +80,11 @@ public class Route extends Thread {
 				}else{
 					String IPAdd = scan.next();
 					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
-					l = t;
+					System.out.println("adding: " + addr + " " + t);
+					routingTable.put(addr, t);
 					t.start();
 				}
-				routingTable.put(addr, l);
+				
 				s = read.readLine();
 			}
 		} catch (FileNotFoundException e) {

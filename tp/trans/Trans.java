@@ -22,7 +22,7 @@ public class Trans extends Thread {
 
     public static Trans getTrans() {
         if (ref == null) {
-            ref = new Trans(0);
+            ref = new Trans(1);
             ref.start();
         }
         return ref;
@@ -42,7 +42,7 @@ public class Trans extends Thread {
     		    }
     	    }
     	}
-//      //TODO: handle incoming segs from rcvBuff
+        //TODO: handle incoming segs from rcvBuff
     }
 
     public int getAddress() {

@@ -147,7 +147,17 @@ public class Segment {
     public int getSEQ() {
         return bytes[6];
     }
-
+    
+    public String toString(){
+    	String retString = "SRC: ";
+    	retString += this.getSourceAddress() + ":" + this.getSourcePort();
+    	retString += "\nDST: ";
+    	retString += this.getDestinationAddress() + ":" + this.getDestinationPort();
+    	retString += "\nHSH: ";
+    	retString += this.getHash();
+    	return retString;
+    }
+    
     public static void main(String[] args) {
         byte[] header = new byte[]{113, 67, 34, 88, 12, 12, 98};
         byte[] shitLoadAanData = new byte[]{9, 5, 34, 3, 1, 4, 6, 8, 5, 3, 6, 89};

@@ -9,7 +9,7 @@ public class TransInitializer {
 		Log.getInstance("RMS");
 		Log l = Log.getInstance("RMS");
 		System.out.println("starting");
-		TPSocket sock = Trans.getTrans().createSocket(1, 1, 1);
+		TPSocket sock = Trans.getTrans().createSocket(0, 1, 1);
 		System.out.println("started");
 		String s = new String("robin doet helemaal niets");
 		boolean b = sock.writeOut(s.getBytes());

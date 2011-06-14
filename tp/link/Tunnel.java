@@ -18,6 +18,7 @@ public class Tunnel extends Thread implements Link {
 	private Socket sock;
 	private BufferedReader read;
 	private BufferedWriter write;
+	private boolean isConnected;
 	
 	private InetAddress addr;
 	private int port;
@@ -28,6 +29,7 @@ public class Tunnel extends Thread implements Link {
 			Log.writeLog(" TUN", "trying new tunnel @ " + addr + ":" + port, true);
 			this.addr = InetAddress.getByName(addr);
 			sock = new Socket(addr, port);
+			isConnected = true;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -44,6 +46,7 @@ public class Tunnel extends Thread implements Link {
 				System.out.println("waiting on socket request;");
 				ServerSocket serv = new ServerSocket(port);
 				sock = serv.accept();
+				isConnected = true;
 				System.out.println("socket request accepted;");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -94,7 +97,7 @@ public class Tunnel extends Thread implements Link {
 
 	@Override
 	public boolean readyToPushSegment() {
-		return true;
+		return isConnected;
 	}
 
 }
