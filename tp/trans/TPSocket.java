@@ -10,6 +10,8 @@ package tp.trans;
  */
 public class TPSocket {
 
+    private final static int SEQ_NR_LIMIT = 256;
+
     private int seq_nr;
     private int ack_nr;
     private int dstAddress;
@@ -65,6 +67,10 @@ public class TPSocket {
                 if (bytes.length <= 96 && outBuffer == null) {
                     outBuffer = bytes;
                     suc = true;
+                    seq_nr++;
+                    if(seq_nr == SEQ_NR_LIMIT) {
+                        seq_nr = 0;
+                    }
                 }
             }
     	}
@@ -97,6 +103,10 @@ public class TPSocket {
                 	System.out.println("data put in sock");
                     inBuffer = bytes;
                     suc = true;
+                    ack_nr++;
+                    if(ack_nr == SEQ_NR_LIMIT) {
+                        ack_nr = 0;
+                    }
                 }
             } else {
                 suc = false;
