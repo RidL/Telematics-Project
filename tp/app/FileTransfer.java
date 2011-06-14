@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
+// DEPRECATED CLASS, MUST BE REMOVED
 package tp.app;
 
 import java.io.File;

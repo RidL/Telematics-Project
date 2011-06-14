@@ -1,14 +1,10 @@
 package tp.app;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tp.link.Frame;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 import tp.util.Log;
@@ -22,7 +18,6 @@ public class FileReceiver extends Thread {
     private static final int MAX_SEGMENT_DATA = 96;
     private Trans trans;
     private TPSocket tpSocket;
-    //private FakeSocket tpSocket;
     private File file;
     private FileOutputStream fos;
 
@@ -35,24 +30,18 @@ public class FileReceiver extends Thread {
      */
     public FileReceiver(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
-        //trans.start();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
-    //tpSocket = new FakeSocket(false);
     }
 
     public FileReceiver(int address, int srcPort, int dstPort, FileSender sender) {
         trans = Trans.getTrans();
-        //trans.start();
-        //tpSocket = trans.createSocket(address, srcPort, dstPort);
-        //tpSocket = new FakeSocket(false);
-
         tpSocket = sender.getSocket();
     }
 
     /**
      * Reads data from the socket and writes it to a file
      */
-    public void receive() {
+    public void receive() throws FileNotFoundException, IOException, InterruptedException {
         byte[] bytesIn = null;
         while (bytesIn == null) {    // wait until tpSocket returns data
             bytesIn = tpSocket.readIn();
@@ -66,14 +55,9 @@ public class FileReceiver extends Thread {
         int i, j;
         for (i = 1  , j = 0; j < fileNameLength; i++, j++) {
             fileName[j] = bytesIn[i];
-            //System.out.println("1st loop");
             if (i == MAX_SEGMENT_DATA - 1) {
                 do {
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    Thread.sleep(5);
                     bytesIn = tpSocket.readIn();
                     Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------SECOND DATA----------------", false);
                     i = 0;
@@ -85,15 +69,9 @@ public class FileReceiver extends Thread {
         byte[] fileLength = new byte[8];
         for (j = 0; j < 8; i++, j++) {
             fileLength[j] = bytesIn[i];
-            //System.out.println("2nd loop");
             if (i == MAX_SEGMENT_DATA - 1) {
                 do {
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+                    Thread.sleep(5);
                     synchronized (tpSocket.getINLOCK()) {
                         bytesIn = tpSocket.readIn();
                       //  FileSender.NOTIFY = true;
@@ -108,58 +86,33 @@ public class FileReceiver extends Thread {
         // read (first) data that is left from the segment containing header info
         byte[] firstData = new byte[MAX_SEGMENT_DATA - i];
         for (j = 0; i < MAX_SEGMENT_DATA; i++, j++) {
-            //  System.out.println("3rd loop");
             firstData[j] = bytesIn[i];
         }
+        file = new File(new String(fileName));
+        //file.createNewFile();
+        fos = new FileOutputStream(file);
+        fos.write(firstData);
 
-        try {
-            file = new File(new String(fileName));
-            //file.createNewFile();
-            fos = new FileOutputStream(file);
-            fos.write(firstData);
+        Log.writeLog(" FileReceiver", new String(firstData) + "\n--------FIRST DATA----------------", false);
 
-            Log.writeLog(" FileReceiver", new String(firstData) + "\n--------FIRST DATA----------------", false);
-            //System.out.println("DATA RECEIVED: " + new String(firstData));
-
-
-            // keep reading data from tpSocket
-            int dataPtr = firstData.length;
-            byte[] read = null;
-            long length = bytesToLong(fileLength);
-            while (dataPtr < length) {
-                read = null;
-                // System.out.println(dataPtr);
-
-                while (read == null) {
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    synchronized (tpSocket.getINLOCK()) {
-                        read = tpSocket.readIn();
-                        //FileSender.NOTIFY = true;
-                    }
+        // keep reading data from tpSocket
+        int dataPtr = firstData.length;
+        byte[] read = null;
+        long length = bytesToLong(fileLength);
+        while (dataPtr < length) {
+            read = null;
+            while (read == null) {
+                Thread.sleep(5);
+                synchronized (tpSocket.getINLOCK()) {
+                    read = tpSocket.readIn();
+                    //FileSender.NOTIFY = true;
                 }
-                fos.write(read);
-                Log.writeLog(" FileReceiver", new String(read) + "\n--------REMAINING DATA----------------", false);
-                //  System.out.println("DATA RECEIVED: " + new String(read));
-                dataPtr += read.length;
             }
-        } catch (FileNotFoundException ex) {
-            System.out.println("File not found");
-            ex.printStackTrace();
-        } catch (IOException ioe) {
-            System.out.println("IO GEZEIK");
-            ioe.printStackTrace();
+            fos.write(read);
+            Log.writeLog(" FileReceiver", new String(read) + "\n--------REMAINING DATA----------------", false);
+            dataPtr += read.length;
         }
-        try {
-            fos.close();
-        }
-        catch (IOException ex) {
-            Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        fos.close();
     }
 
     public static byte[] longToBytes(long in) {
@@ -196,8 +149,17 @@ public class FileReceiver extends Thread {
 
     @Override
     public void run() {
-        //  while(true) {
-        receive();
+        try {
+            //  while(true) {
+            receive();
+            // }
+        } catch (FileNotFoundException ex) {
+            System.out.println("ERROR: File not found");
+        } catch (IOException ex) {
+            System.out.println("Read error");
+        } catch (InterruptedException ex) {
+            System.out.println("Thread error");
+        }
     // }
     }
 
@@ -213,7 +175,18 @@ public class FileReceiver extends Thread {
                 System.out.println("ERROR: Wrong arguments");
                 System.out.println("Number format exception");
             }
-            f.receive();
+            try {
+                f.receive();
+            }
+            catch (FileNotFoundException ex) {
+                System.out.println("ERROR: File not found");
+            }
+            catch (IOException ex) {
+                System.out.println("Read error");
+            }
+            catch (InterruptedException ex) {
+                System.out.println("Thread error");
+            }
         } else {
             System.out.println("ERROR: Wrong arguments");
         }
