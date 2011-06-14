@@ -154,7 +154,7 @@ public class Segment {
     	retString += "\nDST: ";
     	retString += this.getDestinationAddress() + ":" + this.getDestinationPort();
     	retString += "\nHSH: ";
-    	retString += this.getHash();
+    	retString += new String(this.getHash());
     	return retString;
     }
     
