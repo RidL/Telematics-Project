@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -124,7 +126,16 @@ public class FileTransferGUI extends JFrame {
 //                int  address = Integer.parseInt(addressField.getText());
 //                int sourcePort = Integer.parseInt(addressField.getText());
 //                int destPort = Integer.parseInt(destPortField.getText());
-                fs.send(file.getAbsolutePath());
+                try {
+                    fs.send(file.getAbsolutePath());
+                } catch (FileNotFoundException ex) {
+                    System.out.println("ERROR: File not found ( " + file.getAbsolutePath() + ")");
+                } catch (IOException ex) {
+                    System.out.println("ERROR in reading data");
+                } catch (InterruptedException ex) {
+                    System.out.println("Thread error");
+                }
+
             } else if (e.getActionCommand().equals("receive")) {
 //                int  address = Integer.parseInt(addressField.getText());
 //                int sourcePort = Integer.parseInt(addressField.getText());
