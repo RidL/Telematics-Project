@@ -67,14 +67,9 @@ public class Trans extends Thread {
     	TPSocket sock;
         for (int i = 0; i < sockList.size(); i++) {
         	sock = sockList.get(i);
-        	System.out.println("searching for socket");
             if (sock.getSourcePort() == seg.getDestinationPort()) {
-            	System.out.println("correct port is here");
                 //if (seg.isValidSegment()) {
-                	System.out.println("validseg!");
                     System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
-                    
-                    System.out.println("done writing suc? " + sock.isInDirty());
                 //}
             //TODO: else: wait for retransmit
             }
