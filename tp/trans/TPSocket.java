@@ -29,25 +29,22 @@ public class TPSocket {
     }
 
     // aangeroepen door app voor data van trans
-    public synchronized byte[] readIn() {
+    public byte[] readIn() {
     	byte[]temp = null;
-    	while(!isInDirty()){
-    		try{
-    			wait();
-    		}catch(InterruptedException e){
-    			
-    		}
-    	}
-		System.out.println("WAITING ON INLOCK");
 		synchronized(INLOCK){
-			//System.out.println("have lock!");
+			while(!isInDirty()){
+	    		try{
+	    			INLOCK.wait();
+	    		}catch(InterruptedException e){
+	    			System.err.println("failed to wait on INLOCK");
+	    		}
+	    	}
 			temp = null;
 			if (inBuffer!=null) {
 				temp = inBuffer;
 				inBuffer = null;
    	     	}
 		}
-		System.out.println("LOCK DONE");
         return temp;
     }
 
@@ -61,6 +58,13 @@ public class TPSocket {
     	//TODO: blokkeer op outDirty vanaf applicatie
     	boolean suc = false;
     	synchronized(OUTLOCK){
+    		while(!isOutDirty()){
+	    		try{
+	    			OUTLOCK.wait();
+	    		}catch(InterruptedException e){
+	    			System.err.println("failed to wait on OUTLOCK");
+	    		}
+	    	}
             if (outBuffer==null) {
                 if (bytes.length <= 96 && outBuffer == null) {
                     outBuffer = bytes;
@@ -81,12 +85,13 @@ public class TPSocket {
                 temp = outBuffer;
                 outBuffer = null;
             }
+    		OUTLOCK.notifyAll();
     	}
         return temp;
     }
 
     // aangeroepen door trans voor data naar app
-    public synchronized boolean writeIn(byte[] bytes) {
+    public boolean writeIn(byte[] bytes) {
         boolean suc;
         System.out.println("in ze function");
     	synchronized(INLOCK){
@@ -101,8 +106,8 @@ public class TPSocket {
             } else {
                 suc = false;
             }
+            INLOCK.notifyAll();
         }
-    	notifyAll();
     	return suc;
     }
 
