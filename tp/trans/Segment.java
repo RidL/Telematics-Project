@@ -70,7 +70,7 @@ public class Segment {
         this.bytes = bytes;
         this.data = new byte[bytes.length-7];
         for(int i=0; i<bytes.length-7; i++){
-        	data[0] = bytes[7+i];
+        	data[i] = bytes[7+i];
         }
         System.out.println();
     }
