@@ -14,7 +14,8 @@ import javax.swing.JTextField;
 import tp.util.Log;
 
 /**
- *
+ * Graphic user-interface for file transfer. Can send a file into the socket or
+ * receive one.
  * @author jesse
  */
 public class FileTransferGUI extends JFrame {
@@ -26,6 +27,10 @@ public class FileTransferGUI extends JFrame {
     private ButtonHandler bHandler;
     private JTextField addressField,  sourcePortField,  destPortField,  fileField;
 
+    /**
+     * Creates a new FileTransferGUI. Builds and shows the GUI
+     * @param title
+     */
     public FileTransferGUI(String title) {
         super(title);
         bHandler = new ButtonHandler();
@@ -37,6 +42,9 @@ public class FileTransferGUI extends JFrame {
         new ButtonHandler();
     }
 
+    /**
+     * Builds the GUI
+     */
     private void buildGUI() {
         Container c = getContentPane();
         JPanel rootPanel = new JPanel();
@@ -98,10 +106,14 @@ public class FileTransferGUI extends JFrame {
         new FileTransferGUI("File Transfer");
     }
 
+    /**
+     * Class for handling all button actions in FileTransferGUI
+     */
     class ButtonHandler implements ActionListener {
 
         boolean init = false;
 
+        
         public void actionPerformed(ActionEvent e) {
             if (!init) {
                 int address = Integer.parseInt(addressField.getText());
