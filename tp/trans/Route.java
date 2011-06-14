@@ -32,17 +32,18 @@ public class Route extends Thread {
 	public void run(){
 		while(true){
 			synchronized(LOCK){
-            	Iterator<Segment> it = routableSegs.iterator();
-            	while(it.hasNext()) {
-                    Segment s = it.next();
+            	ArrayList<Segment> _routingTable = new ArrayList<Segment>(routableSegs);
+            	Segment s = null;
+            	for(Iterator<Segment> it = _routingTable.iterator(); it.hasNext();) {
+                    s = it.next();
                     int addr = s.getDestinationAddress();
                     Link destLink = routingTable.get(addr);
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
                         System.out.println("ROUTE =====pushing=====\n" + s);
-                            it.remove();
                     }
                 }
+            	routableSegs.remove(s);
             }
 			//TODO:check routables
 			//TODO:check links
