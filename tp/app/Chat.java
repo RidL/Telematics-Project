@@ -14,6 +14,7 @@ public class Chat {
     private Trans trans;
     private TPSocket socket;
     private String sender;
+    private int count;
 
     public Chat(int destAddr, int destPort, int scrPort, String sender) {
         trans = Trans.getTrans();
@@ -77,10 +78,19 @@ public class Chat {
                 suc = socket.writeOut(tempMssg);
             } while (!suc);
         }
+        count++;
         System.out.println("Verzonden: " + message);
+
     }
 
     public TPSocket getSocket() {
         return socket;
+    }
+
+    /**
+     * @return the count
+     */
+    public int getCount() {
+        return count;
     }
 }

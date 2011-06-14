@@ -230,7 +230,7 @@ public class HLReceiver extends Thread {
         }
         // Is dit het laatste frame van segment en geen retransmits meer?
         //TEMP CODE, TEMPFRAME ZOU NIET FIN MOGEN ZIJN NA TIMEOUT
-        if(tempFrame != null && tempFrame.isFin() && errCount==0) {
+        if(frameBuffer[recPtr] != null && frameBuffer[recPtr].isFin() && errCount==0) {
             recPtr = 0;
             windowPtr = 0;
             Log.writeLog(" HLR", "fin detected", sysoutLog);

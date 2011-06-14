@@ -15,6 +15,7 @@ import tp.trans.TPSocket;
 public class ChatReceiver implements Runnable {
 
     private TPSocket socket;
+    private int count;
 
     public ChatReceiver(Chat chat) {
         socket = chat.getSocket();
@@ -79,7 +80,14 @@ public class ChatReceiver implements Runnable {
                 }
             }
         }
-
+        count++;
         System.out.println("Ontvangen: " + String.valueOf(message));
+    }
+
+    /**
+     * @return the count
+     */
+    public int getCount() {
+        return count;
     }
 }
