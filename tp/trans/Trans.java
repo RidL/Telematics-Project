@@ -65,10 +65,13 @@ public class Trans extends Thread {
     public void rcvSeg(Segment seg) {
         // rcvBuff.add(seg);
         for (int i = 0; i < sockList.size(); i++) {
+        	System.out.println("searching for socket");
             if (sockList.get(i).getSourcePort() == seg.getDestinationPort()) {
-                if (seg.isValidSegment()) {
-                    sockList.get(i).writeIn(seg.getData());
-                }
+            	System.out.println("correct port is here");
+                //if (seg.isValidSegment()) {
+                	System.out.println("validseg!");
+                    System.out.println("write succeeded " + (sockList.get(i).writeIn(seg.getData())));
+                //}
             //TODO: else: wait for retransmit
             }
         }

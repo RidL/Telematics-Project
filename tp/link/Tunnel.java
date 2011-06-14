@@ -60,7 +60,7 @@ public class Tunnel extends Thread implements Link {
 			e.printStackTrace();
 		}
 		while(true){
-			byte[] data = new byte[104];
+			byte[] data = new byte[103];
 			int len = 7;
 			int in;
 			
@@ -80,8 +80,10 @@ public class Tunnel extends Thread implements Link {
 				System.err.println("Error whilst reading from the stream @ " + addr.getHostAddress() + ":" + port + "");
 				e.printStackTrace();
 			}
-			Log.writeLog("TUN", "-1 read, going on!", true);
-			route.rcvSegment(new Segment(data));
+			Log.writeLog("TUN", "end read, going on!", true);
+			Segment seg = new Segment(data);
+			System.out.println("null segment? " + (seg==null) + " ");
+			route.rcvSegment(seg);
 		}
 	}
 	
