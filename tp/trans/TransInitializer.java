@@ -6,7 +6,7 @@ public class TransInitializer {
 	public static boolean sysout = true;
 	
 	public static void main(String[] args){
-		Log.getInstance("RMS");
+		Log l = Log.getInstance("RMS");
 		System.out.println("starting");
 		TPSocket sock = Trans.getTrans().createSocket(1, 1, 1);
 		System.out.println("started");
