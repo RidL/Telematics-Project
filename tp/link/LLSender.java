@@ -30,6 +30,7 @@ public class LLSender {
    // private Frame[] frames;
     private int changeNr;
     private int lastNr = -1;
+    private boolean alt = false;
     private static final int LL_TIME_OUT = 200;
     
     private boolean sysoutLog = false;
@@ -66,13 +67,26 @@ public class LLSender {
      * first frame was send successfully and there trough the cable got claimed
      * for the entire TP package.
      */
-    public void pushFrame(Frame f, boolean flag) {
+    public boolean pushFrame(Frame f, boolean flag) {
+    	boolean ackIncoming = false;
+    	
     	int n = f.next();
     	if(flag){
     		getNextRead();
     		cable.writeLPT(31);
     		Log.writeLog(" LLS", "OUT: 31", sysoutLog);
+    		
+    		if (changeNr == Frame.ONES) {
+    			ackIncoming = true;
+    		}
     		getNextRead();
+    		if(changeNr == Frame.ONES){
+    			ackIncoming = true;
+    		}
+    		if(ackIncoming){
+    			cable.writeLPT(0);
+    			return ackIncoming;
+    		}
     	} else {
     		getNextRead();
     	}
@@ -97,6 +111,7 @@ public class LLSender {
     	Log.writeLog(" LLS", "OUT: 0", sysoutLog);
 		cable.writeLPT(0);
 		Log.writeLog(" LLS", "frame sent", sysoutLog);
+		return ackIncoming;
     }
 
     /**
@@ -116,8 +131,7 @@ public class LLSender {
     public boolean pushFirstFrame(Frame f) {
         boolean succes = false;
         long timeoutCount = System.currentTimeMillis();
-        changeNr = cable.readLPT();
-        Log.writeLog(" LLS", "pushFirst initial: "+(((((byte) changeNr) >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        getNextRead();
     	cable.writeLPT(31);
     	Log.writeLog(" LLS", "OUT: 31", sysoutLog);
      	
@@ -193,6 +207,15 @@ public class LLSender {
         return succes;
     }
 
+	
+    private void sendResponse() {
+        if (alt) {
+        	cable.writeLPT(4);
+        } else {
+        	cable.writeLPT(10);
+        }
+        alt=!alt;
+    }
     private static void microSleep() {
     	@SuppressWarnings("unused")
 		int i = (int) Math.random() * 9;
