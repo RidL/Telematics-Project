@@ -58,13 +58,15 @@ public class TPSocket {
     	//TODO: blokkeer op outDirty vanaf applicatie
     	boolean suc = false;
     	synchronized(OUTLOCK){
-    		while(!isOutDirty()){
+    		while(isOutDirty()){
 	    		try{
+	    			System.out.println("waiting on lock");
 	    			OUTLOCK.wait();
 	    		}catch(InterruptedException e){
 	    			System.err.println("failed to wait on OUTLOCK");
 	    		}
 	    	}
+    		System.out.println("lock done, writing");
             if (outBuffer==null) {
                 if (bytes.length <= 96 && outBuffer == null) {
                     outBuffer = bytes;
