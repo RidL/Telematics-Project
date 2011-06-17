@@ -16,8 +16,6 @@ public class TransInitializer {
 		Log.writeLog("  TI", "succes in writing stuff to socket " + b, sysout);
 		b = sock.writeOut(s.getBytes());
 		Log.writeLog("  TI", "succes in writing stuff to socket " + b, sysout);
-//		boolean b = sock.writeOut(s.getBytes());
-//		Log.writeLog("  TI", "succes in writing stuff to socket " + b, sysout);
 	}
 	public static void readLine(){
 		byte[] data = sock.readIn();

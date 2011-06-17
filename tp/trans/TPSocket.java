@@ -4,6 +4,9 @@
  */
 package tp.trans;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author STUDENT\s1012886
@@ -58,15 +61,17 @@ public class TPSocket {
     public boolean writeOut(byte[] bytes) {
     	//TODO: blokkeer op outDirty vanaf applicatie
     	boolean suc = false;
+    	
     	synchronized(OUTLOCK){
     		while(isOutDirty()){
-	    		try{
-	    			System.out.println("waiting on lock");
-	    			OUTLOCK.wait();
-	    		}catch(InterruptedException e){
-	    			System.err.println("failed to wait on OUTLOCK");
-	    		}
-	    	}
+        		try{
+        			synchronized(OUTLOCK){
+        				OUTLOCK.wait();
+        			}
+        		}catch(InterruptedException e){
+        			System.err.println("failed to wait on OUTLOCK");
+        		}
+        	}
     		System.out.println("lock done, writing");
             if (outBuffer==null) {
                 if (bytes.length <= 96 && outBuffer == null) {
@@ -84,10 +89,14 @@ public class TPSocket {
     	//TODO: spin op read?
     	byte[] temp = null;
     	synchronized(OUTLOCK){
-    		if (outBuffer!=null) {
-                temp = outBuffer;
-                outBuffer = null;
-            }
+    		try{
+    			while(!isOutDirty())
+    				OUTLOCK.wait();
+    		}catch(InterruptedException e){
+    			
+    		}
+            temp = outBuffer;
+            outBuffer = null;
     		OUTLOCK.notifyAll();
     	}
         return temp;
@@ -95,21 +104,20 @@ public class TPSocket {
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
-        boolean suc;
-    	synchronized(INLOCK){
-        	suc = false;
-            if (inBuffer==null) {
-                if (bytes.length <= 96) {
-                	System.out.println("written shite");
-                    inBuffer = bytes;
-                    suc = true;
+    	synchronized (INLOCK) {
+            while (isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
-                suc = false;
+            }
+            if (bytes.length <= 96) {
+                inBuffer = bytes;
             }
             INLOCK.notifyAll();
         }
-    	return suc;
+    	return true;
     }
 
     /**
