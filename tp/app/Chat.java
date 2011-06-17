@@ -1,7 +1,5 @@
 package tp.app;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -18,7 +16,6 @@ public class Chat {
 
     public Chat(int destAddr, int destPort, int scrPort, String sender) {
         trans = Trans.getTrans();
-      //  trans.start();
         socket = trans.createSocket(destAddr, scrPort, destPort);
         this.sender = sender;
     }
@@ -29,8 +26,6 @@ public class Chat {
         byte[] origBytes = message.getBytes();
         int messLength = origBytes.length;
 
-//        System.out.println(messLength);
-
         if (messLength >= (65536)) {
             System.out.println("message too long: size: " + messLength);
             return;
@@ -38,10 +33,6 @@ public class Chat {
 
         byte length1 = (byte) (messLength >>> 8);
         byte length2 = (byte) messLength;
-
-      //  System.out.println(Integer.toBinaryString(length1));
-      //  System.out.println(Integer.toBinaryString(length2));
-
 
         byte[] bytemessage = new byte[2 + messLength];
 
@@ -52,35 +43,25 @@ public class Chat {
             bytemessage[k] = origBytes[p];
         }
 
-
-
+        messLength = bytemessage.length;
 
         byte[] tempMssg;
         int end = 0;
-        for (int i = 0; i < bytemessage.length; i += 96) {
-            if (bytemessage.length > (i + 96)) {
+        for (int i = 0; i < messLength; i += 96) {
+            if (messLength > (i + 96)) {
                 end = 96;
             } else {
-                end = bytemessage.length - i;
+                end = messLength - i;
             }
 
             tempMssg = new byte[end];
             for (int j = 0; j < end; j++) {
                 tempMssg[j] = bytemessage[j + i];
             }
-            boolean suc;
-            do {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                suc = socket.writeOut(tempMssg);
-            } while (!suc);
+            socket.writeOut(tempMssg);
         }
         count++;
-        System.out.println("Verzonden: " + message);
-
+        ChatApp.addMessage("SND: " + message);
     }
 
     public TPSocket getSocket() {

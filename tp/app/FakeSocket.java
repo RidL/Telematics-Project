@@ -1,4 +1,3 @@
-// TEMPORARY CLASS
 package tp.app;
 
 /**

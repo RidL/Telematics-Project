@@ -1,4 +1,8 @@
-// DEPRECATED CLASS, MUST BE REMOVED
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package tp.app;
 
 import java.io.File;
@@ -184,7 +188,6 @@ public class FileTransfer {
 
         return result;
     }
-
     public static void main(String[] args) {
         FileTransfer f = null;
 

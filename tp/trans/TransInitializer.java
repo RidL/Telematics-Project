@@ -8,14 +8,11 @@ public class TransInitializer {
 	public static void main(String[] args){
 		Log.getInstance("RMS");
 		Log l = Log.getInstance("RMS");
-		sock = Trans.getTrans().createSocket(1, 1, 1);
-		System.out.println("started");
-		String s = new String("robin doet helemaal niets");
-		
-		boolean b = sock.writeOut(s.getBytes());
-		for(int i=0; i<1000; i++) {
-			sock.writeOut(s.getBytes());}
-		System.out.println("END");
+		sock = Trans.getTrans().createSocket(0, 1, 1);
+
+        while(true){
+            readLine();
+        }
 	}
 	public static void readLine(){
 		byte[] data = sock.readIn();

@@ -2,6 +2,9 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tp.util.Log;
 
 public class Trans extends Thread {
 
@@ -32,7 +35,7 @@ public class Trans extends Thread {
     
     public static Trans getTrans() {
 		if (ref == null ) {
-            ref = new Trans(0);
+            ref = new Trans(1);
             ref.start();
         }
         return ref;
@@ -57,6 +60,12 @@ public class Trans extends Thread {
                     route.pushSegment(s);
                  }
             }
+            try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
@@ -92,6 +101,7 @@ public class Trans extends Thread {
         for (int i = 0; i < sockList.size(); i++) {
         	sock = sockList.get(i);                System.out.println("Kom ik hierrr?");
             if (sock.getSourcePort() == seg.getDestinationPort()) {
+                System.out.println("booolean lollol");
                 //if (seg.isValidSegment()) {
 
                     if(seg.isACK()) {

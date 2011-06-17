@@ -31,6 +31,6 @@ public class FileTransferTest {
     }
 
     public static void main(String[] args) {
-        new FileTransferTest();
+         new FileTransferTest();
     }
 }

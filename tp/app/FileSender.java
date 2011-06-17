@@ -25,7 +25,7 @@ public class FileSender {
     //private FakeSocket tpSocket;
     private File file;
     private FileInputStream fis;
-      // public  static boolean NOTIFY = true;
+    // public  static boolean NOTIFY = true;
 
     /**
      * Creates a new FileSender
@@ -36,122 +36,50 @@ public class FileSender {
     public FileSender(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
-    //tpSocket = new FakeSocket(true);
+        //tpSocket = new FakeSocket(true);
     }
 
     /**
      * Sends a file identified by fileName through the socket
      * @param fileName the name of the file to be send
      */
-    public void send(String fileName) {
+    public void send(String fileName) throws FileNotFoundException, IOException, InterruptedException {
+        System.out.println("Sending file...");
+
         file = new File(fileName);
         byte[] header = createHeader();
-        try {
-            byte[] writeData = new byte[MAX_SEGMENT_DATA];
-            int i, j;   // write header to tpSocket
-            for (i = 0        , j = 0; j < header.length; i++, j++) {
-                writeData[i] = header[j];
-                if (i == MAX_SEGMENT_DATA - 1) {
-                    int temp = 0;
-                    boolean hasWritten = false;
-                    do {
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        synchronized (tpSocket.getOUTLOCK()) {
-                       //     if (NOTIFY) {
-                            hasWritten = tpSocket.writeOut(writeData);
-                     //       NOTIFY = false;
-                     //       }
-                        }
-                        //System.out.println("number of bytes written: " + writeData.length);
-                        temp++;
-//                        if ((temp % 100) == 0) {
-//                            System.out.println("trying to write to socket1");
-//                        }
-                    } while (!hasWritten);
-                    writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
-                    // System.out.println(Frame.toBinaryString(writeData) + "FIRST LOOP\n------------------------");
-                    Log.writeLog(" FileSender", Frame.toBinaryString(writeData) + "\n----------FIRST LOOP--------------", false);
-                    i = 0;
-                }
+
+        byte[] writeData = new byte[MAX_SEGMENT_DATA];
+        int i, j;   // write header to tpSocket
+        for (i = 0, j = 0; j < header.length; i++, j++) {
+            writeData[i] = header[j];
+            if (i == MAX_SEGMENT_DATA - 1) {
+                tpSocket.writeOut(writeData);
+                writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
+                i = 0;
             }
-
-            fis = new FileInputStream(file);
-            byte[] bytes = new byte[MAX_SEGMENT_DATA - i];
-            int dataRead = fis.read(bytes);
-            System.out.println("dataRead: " + dataRead);
-
-            // fill last segment containing header-data up with the first file data
-            for (j = 0; j < bytes.length; i++, j++) {
-                writeData[i] = bytes[j];
-                if (i == MAX_SEGMENT_DATA - 1) {
-                    boolean hasWritten = false;
-                    do {
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        synchronized (tpSocket.getOUTLOCK()) {
-                       //     if (NOTIFY) {
-                            hasWritten = tpSocket.writeOut(writeData);
-                      //      NOTIFY = false;
-                      //      }
-                        }
-                    //System.out.println("number of bytes written: " + writeData.length)
-                    // System.out.println("trying to write to socket2");
-
-                    } while (!hasWritten);
-                    Log.writeLog(" FileSender", new String(bytes) + "\n--------SECOND LOOP----------------", false);
-                    // System.out.println("DATA: " + Frame.toBinaryString(writeData));
-                    break;
-                }
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            bytes = new byte[MAX_SEGMENT_DATA];
-            while (dataRead != -1) {
-                int temp = 0;
-                dataRead = fis.read(bytes);
-
-                //  System.out.println("bytes read: " + dataRead);
-                boolean hasWritten = false;
-                do {
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    synchronized (tpSocket.getOUTLOCK()) {
-                    //    if (NOTIFY) {
-                        hasWritten = tpSocket.writeOut(bytes);
-                    //    NOTIFY = false;
-                    //    }
-                    }
-                    // System.out.println("number of bytes written: " + bytes.length);
-                    temp++;
-//                    if ((temp % 10) == 0) {
-//                        System.out.println("trying to write to socket3");
-//                    }
-                } while (!hasWritten);
-                Log.writeLog(" FileSender", new String(bytes) + "\n--------THIRD LOOP----------------", false);
-            //hasWritten = tpSocket.writeIn(bytes);
-            //System.out.println("DATA: " + Frame.toBinaryString(writeData));
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("ERROR: File not found ( " + fileName + ")");
-        } catch (IOException ex) {
-            System.out.println("ERROR in reading data");
         }
-        System.out.println("niet veel data");
+
+        fis = new FileInputStream(file);
+        byte[] bytes = new byte[MAX_SEGMENT_DATA - i];
+        int dataRead = fis.read(bytes);
+
+        // fill last segment containing header-data up with the first file data
+        for (j = 0; j < bytes.length; i++, j++) {
+            writeData[i] = bytes[j];
+            if (i == MAX_SEGMENT_DATA - 1) {
+                tpSocket.writeOut(writeData);
+                break;
+            }
+        }
+
+        bytes = new byte[MAX_SEGMENT_DATA];
+        while (dataRead != -1) {
+            dataRead = fis.read(bytes);
+            tpSocket.writeOut(bytes);
+            bytes = new byte[MAX_SEGMENT_DATA];
+        }
+        System.out.println("End of file");
     }
 
     /**

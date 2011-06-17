@@ -1,6 +1,7 @@
 package tp.trans;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-			synchronized(LOCK){
+		//	synchronized(LOCK){
             	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
@@ -41,10 +42,11 @@ public class Route extends Thread {
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
                         System.out.println("ROUTE =====pushing=====\n" + s);
+                        break;
                     }
                 }
             	routableSegs.remove(s);
-            }
+         //   }
 			//TODO:check routables
 			//TODO:check links
 		}
@@ -60,9 +62,9 @@ public class Route extends Thread {
 			System.out.println("ROUTE =====received=====\n" + s);
 			trans.rcvSeg(s);
 		}else{
-            synchronized(LOCK) {
+      //      synchronized(LOCK) {
                 routableSegs.add(s);
-            }
+       //     }
 		}
 	}
 	
