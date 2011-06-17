@@ -4,9 +4,6 @@
  */
 package tp.trans;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author STUDENT\s1012886
@@ -33,20 +30,28 @@ public class TPSocket {
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
-    	byte[] temp = null;
         synchronized (INLOCK) {
+            byte[] temp = null;
             if (!isInDirty()) {
                 try {
+                //    System.out.println("READ - INBUFFER - WAITING FOR INLOCK");
                     INLOCK.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                //   System.out.println("READ - INBUFFER - INLOCK ACQUIRED");
+                    temp = inBuffer;
+                    inBuffer = null;
+                //    System.out.println("READ - INBUFFER - BUFFER READ");
+                    INLOCK.notify();
+                } catch (InterruptedException e) {
                 }
+            } else {
+              //  System.out.println("READ - INBUFFER - INLOCK ACQUIRED");
+                temp = inBuffer;
+                inBuffer = null;
+              //  System.out.println("READ - INBUFFER - BUFFER READ");
+                INLOCK.notify();
             }
-            temp = inBuffer;
-            inBuffer = null;
-            INLOCK.notify();
+            return temp;
         }
-        return temp;
     }
 
     /**
@@ -56,56 +61,89 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-    	synchronized (OUTLOCK) {
+        synchronized (OUTLOCK) {
+            boolean suc = false;
             if (isOutDirty()) {
                 try {
+                 //   System.out.println("WRITE - OUTBUFFER - WAITING FOR OUTLOCK");
                     OUTLOCK.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                 //   System.out.println("WRITE - OUTBUFFER - OUTLOCK ACQUIRED");
+                    if (bytes.length <= 96) {
+                 //       System.out.println("WRITE - OUTBUFFER - OUTBUFFER WRITTEN");
+                        outBuffer = bytes;
+                        suc = true;
+                    }
+                    OUTLOCK.notify();
+
+                } catch (InterruptedException e) {
                 }
+            } else {
+               // System.out.println("WRITE - OUTBUFFER - OUTLOCK ACQUIRED");
+                if (bytes.length <= 96) {
+                //    System.out.println("WRITE - OUTBUFFER - OUTBUFFER WRITTEN");
+                    outBuffer = bytes;
+                    suc = true;
+                }
+                OUTLOCK.notify();
             }
-            if (bytes.length <= 96) {
-                outBuffer = bytes;
-            }
-            OUTLOCK.notify();
+            return suc;
         }
-    	return true;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-    	byte[] temp = null;
         synchronized (OUTLOCK) {
+            byte[] temp = null;
             if (!isOutDirty()) {
                 try {
+                //    System.out.println("READ - OUTBUFFER - WAITING FOR OUTLOCK");
                     OUTLOCK.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                //    System.out.println("READ - OUTBUFFER - OUTLOCK ACQUIRED");
+                    temp = outBuffer;
+                    outBuffer = null;
+                //    System.out.println("READ - OUTBUFFER - BUFFER READ");
+                    OUTLOCK.notify();
+                } catch (InterruptedException e) {
                 }
+            } else {
+              //  System.out.println("READ - OUTBUFFER - OUTLOCK ACQUIRED");
+                temp = outBuffer;
+                outBuffer = null;
+              //  System.out.println("READ - OUTBUFFER - BUFFER READ");
+                OUTLOCK.notify();
             }
-            temp = outBuffer;
-            outBuffer = null;
-            OUTLOCK.notify();
+            return temp;
         }
-        return temp;
     }
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
-    	synchronized (INLOCK) {
+        synchronized (INLOCK) {
+            boolean suc = false;
             if (isInDirty()) {
                 try {
+                //    System.out.println("WRITE - INBUFFER - WAITING FOR INLOCK");
                     INLOCK.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                //    System.out.println("WRITE - INBUFFER - INLOCK ACQUIRED");
+                    if (bytes.length <= 96) {
+                        inBuffer = bytes;
+                //        System.out.println("WRITE - INBUFFER - BUFFER WRITTEN");
+                        suc = true;
+                    }
+                    INLOCK.notify();
+                } catch (InterruptedException e) {
                 }
+            } else {
+             //   System.out.println("WRITE - INBUFFER - INLOCK ACQUIRED");
+                if (bytes.length <= 96) {
+                    inBuffer = bytes;
+             //       System.out.println("WRITE - INBUFFER - BUFFER WRITTEN");
+                    suc = true;
+                }
+                INLOCK.notify();
             }
-            if (bytes.length <= 96) {
-                inBuffer = bytes;
-            }
-            INLOCK.notify();
+            return suc;
         }
-    	return true;
     }
 
     /**
@@ -138,14 +176,14 @@ public class TPSocket {
      * @return the outDirty
      */
     public boolean isOutDirty() {
-        return outBuffer!=null;
+        return outBuffer != null;
     }
 
     /**
      * @return the inDirty
      */
     public boolean isInDirty() {
-        return inBuffer!=null;
+        return inBuffer != null;
     }
 
     /**

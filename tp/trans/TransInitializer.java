@@ -12,7 +12,7 @@ public class TransInitializer {
 		System.out.println("started");
 		String s = new String("robin doet helemaal niets");
 		
-		boolean b = sock.writeOut(s.getBytes());
+		//boolean b = sock.writeOut(s.getBytes());
 		for(int i=0; i<1000; i++) {
 			sock.writeOut(s.getBytes());}
 		System.out.println("END");
