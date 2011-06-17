@@ -71,7 +71,7 @@ public class Segment {
         for(int i=0; i<tmp.length; i++){
             tmp[i] = bytes[i];
         }
-        this.bytes = tmp;
+        this.data = tmp;
     }
 
     public int getSourcePort() {
