@@ -39,11 +39,12 @@ public class Trans extends Thread {
     	byte[] data;
         TPSocket sock;
         while (true) {
+        //	synchronized (sockList) {
             for (int i = 0; i < sockList.size(); i++) {
                 sock = sockList.get(i);
                 data = sock.readOut();
                 route.pushSegment(createSegment(data, sock, false));
-            }
+            }// }            
             try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
@@ -58,10 +59,11 @@ public class Trans extends Thread {
     }
 
     public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) {
+    //	synchronized (sockList) {
         //TODO:IS PORT TAKEN?
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
-        sockList.add(sock);
-        return sock;
+        sockList.add(sock); 
+        return sock;//}
     }
 
     public void closeSocket(TPSocket sock) {

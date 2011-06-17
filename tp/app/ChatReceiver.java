@@ -35,8 +35,8 @@ public class ChatReceiver implements Runnable {
         messLength |= (int) (data[1] & 0x000000ff);
 
         char[] message = new char[messLength];
-        for (int i = 0, j = 0; i < messLength; i++, j++) {
-            message[j] = (char) (data[i+2]);
+        for (int i = 2, j = 0; i < data.length; i++, j++) {
+            message[j] = (char) (data[i]);
         }
 
         if (messLength > 94) {
