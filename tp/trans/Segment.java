@@ -172,6 +172,10 @@ public class Segment {
     	retString += this.getDestinationAddress() + ":" + this.getDestinationPort();
     	retString += "\nHSH: ";
     	retString += new String(this.getHash());
+    	retString += "\nACK: ";
+    	retString += new String(Boolean.toString(this.isACK()));
+    	retString += "\nSEQ: ";
+    	retString += new String(Integer.toString(this.getSEQ()));
     	return retString;
     }
     
