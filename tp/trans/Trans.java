@@ -14,13 +14,13 @@ public class Trans extends Thread {
     private int address;
     private List<TPSocket> sockList;
     private ArrayList<Segment> rcvBuff;
-    private ArrayList<ArrayList<Segment>> sendBuffer;
+    //private ArrayList<ArrayList<Segment>> sendBuffer;
 
     private Trans(int address) {
         route = new Route(this);
         this.address = address;
         sockList = new ArrayList<TPSocket>();
-        sendBuffer = new ArrayList<ArrayList<Segment>>();
+        //sendBuffer = new ArrayList<ArrayList<Segment>>();
         route.start();
     }
 
@@ -57,7 +57,7 @@ public class Trans extends Thread {
                         Segment s = createSegment(data, sock, false);
 
                         System.out.println("TP-SENDING DATA: " + s.getSEQ());
-                        sendBuffer.get(i).add(s);
+                        sock.addSegmentToSNDBuffer(s);
                         route.pushSegment(s);
                      }
                  }
@@ -80,14 +80,14 @@ public class Trans extends Thread {
         //TODO:IS PORT TAKEN?
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
         sockList.add(sock);
-        sendBuffer.add(new ArrayList<Segment>(WINDOW_SIZE));
+        //sendBuffer.add(new ArrayList<Segment>(WINDOW_SIZE));
         return sock;
     }
 
     public void closeSocket(TPSocket sock) {
         int index = sockList.indexOf(sock);
         sockList.remove(sock);
-        sendBuffer.remove(index);
+        //sendBuffer.remove(index);
     }
     
     public Route getRoute(){
@@ -110,20 +110,23 @@ public class Trans extends Thread {
                         System.out.println("lastAck" + sock.getLastAcked());
                         System.out.println("currSeq" + seg.getSEQ());
                         if(sock.getLastAcked() == seg.getSEQ()-1 ||
-                            (sock.getLastAcked() + WINDOW_SIZE) == seg.getSEQ()-1 ) {
+                            sock.getLastAcked() == (seg.getSEQ() + WINDOW_SIZE)-1 ) {
                             System.out.println("TP-ACK RECEIVED: " +  seg.getSEQ());
-                            sock.incrLastAcked();
-                            sendBuffer.get(i).remove(0);
+                            //sock.incrLastAcked();
+                            //sendBuffer.get(i).remove(0);
                         }
                         else {
                             // retransmit
-                            route.pushSegment(sendBuffer.get(i).get(sock.getCurrentSeq()-sock.getLastAcked()));
+                            route.pushSegment(sock.getSegmentFromSNDBuffer());
                         }
+                        sock.updateBuffer(seg.getSEQ());
+                        
                     }
                     else {
                         System.out.println("TP-DATA RECEIVED: " + seg.getSEQ());
                         System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                         
+                        sock.fillrcvBuffer(seg, seg.getSEQ());
                         // send ACK
                         Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck());
                         route.pushSegment(s);
