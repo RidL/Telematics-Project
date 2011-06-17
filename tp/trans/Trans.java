@@ -6,20 +6,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tp.util.Log;
 
-import tp.util.Log;
-
 public class Trans extends Thread {
+
+    private static final int WINDOW_SIZE = 128;
 
     private static Trans ref;
     private static Route route;
     private int address;
     private List<TPSocket> sockList;
     private ArrayList<Segment> rcvBuff;
+    private ArrayList<ArrayList<Segment>> sendBuffer;
 
     private Trans(int address) {
         route = new Route(this);
         this.address = address;
         sockList = new ArrayList<TPSocket>();
+        sendBuffer = new ArrayList<ArrayList<Segment>>();
         route.start();
     }
 
@@ -45,12 +47,20 @@ public class Trans extends Thread {
         TPSocket sock = null;
         while (true) {
             for (int i = 0; i < sockList.size(); i++) {
-                sock = sockList.get(i);
-                if(sock.isOutDirty()){
-                data = sock.readOut();
-                route.pushSegment(createSegment(data, sock, false));
-                }
-                
+                 sock = sockList.get(i);
+                 //TODO: checken of er wel data is ?
+                 //TODO: robin en martijn kloten in deze methode
+                 if(sock.isOutDirty()){
+                     if((sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE) ||
+                         (sock.getCurrentSeq() + WINDOW_SIZE) - sock.getLastAcked() < WINDOW_SIZE) {
+                        data = sock.readOut();
+                        Segment s = createSegment(data, sock, false);
+
+                        System.out.println("TP-SENDING DATA: " + s.getSEQ());
+                        sendBuffer.get(i).add(s);
+                        route.pushSegment(s);
+                     }
+                 }
             }
             try {
 				Thread.sleep(5);
@@ -69,11 +79,14 @@ public class Trans extends Thread {
         //TODO:IS PORT TAKEN?
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
         sockList.add(sock);
+        sendBuffer.add(new ArrayList<Segment>(WINDOW_SIZE));
         return sock;
     }
 
     public void closeSocket(TPSocket sock) {
+        int index = sockList.indexOf(sock);
         sockList.remove(sock);
+        sendBuffer.remove(index);
     }
     
     public Route getRoute(){
@@ -88,10 +101,30 @@ public class Trans extends Thread {
         // rcvBuff.add(seg);
     	TPSocket sock;
         for (int i = 0; i < sockList.size(); i++) {
-        	sock = sockList.get(i);
+        	sock = sockList.get(i);                System.out.println("Kom ik hierrr?");
             if (sock.getSourcePort() == seg.getDestinationPort()) {
                 //if (seg.isValidSegment()) {
-                    System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
+
+                    if(seg.isACK()) {
+                        if(sock.getLastAcked() == seg.getSEQ()-1 ||
+                            (sock.getLastAcked() + WINDOW_SIZE) == seg.getSEQ()-1 ) {
+                            System.out.println("TP-ACK RECEIVED: " +  seg.getSEQ());
+                            sock.incrLastAcked();
+                            sendBuffer.remove(0);
+                        }
+                        else {
+                            // retransmit
+                            route.pushSegment(sendBuffer.get(i).get(sock.getCurrentSeq()-sock.getLastAcked()));
+                        }
+                    }
+                    else {
+                        System.out.println("TP-DATA RECEIVED: " + seg.getSEQ());
+                        System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
+                        
+                        // send ACK
+                        Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck());
+                        route.pushSegment(s);
+                    }
                 //}
             //TODO: else: wait for retransmit
             }
