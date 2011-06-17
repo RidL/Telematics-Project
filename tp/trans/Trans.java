@@ -124,11 +124,12 @@ public class Trans extends Thread {
                     }
                     else {
                         System.out.println("TP-DATA RECEIVED: " + seg.getSEQ());
+                        System.out.println("seg bytes length" + seg.getBytes().length);
                         System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                         
                         sock.fillrcvBuffer(seg, seg.getSEQ());
                         // send ACK
-                        Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck());
+                        Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck() - 1);
                         route.pushSegment(s);
                     }
                 //}

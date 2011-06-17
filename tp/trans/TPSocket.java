@@ -36,9 +36,9 @@ public class TPSocket {
     private int rcvWindowPtr;
 
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
-        seq_nr = 0;
+        seq_nr = -1;
         ack_nr = 0;
-        lastAcked = 0;
+        lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
@@ -57,11 +57,13 @@ public class TPSocket {
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
+                    System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+             System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();

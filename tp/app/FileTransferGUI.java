@@ -95,18 +95,20 @@ public class FileTransferGUI extends JFrame {
         c.add(rootPanel);
     }
 
-
     class ButtonHandler implements ActionListener {
 
         boolean init = false;
+        int address;
+        int sourcePort;
+        int destPort;
 
         public void actionPerformed(ActionEvent e) {
             if (!init) {
-                int address = Integer.parseInt(addressField.getText());
-                int sourcePort = Integer.parseInt(addressField.getText());
-                int destPort = Integer.parseInt(destPortField.getText());
-                fs = new FileSender(address, sourcePort, destPort);
-                fr = new FileReceiver(address, sourcePort, destPort);
+                address = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
+                destPort = Integer.parseInt(destPortField.getText());
+                // fs = new FileSender(address, sourcePort, destPort);
+                // fr = new FileReceiver(address, sourcePort, destPort);
                 init = true;
             }
 
@@ -119,10 +121,11 @@ public class FileTransferGUI extends JFrame {
                 }
 
             } else if (e.getActionCommand().equals("send")) {
-//                int  address = Integer.parseInt(addressField.getText());
-//                int sourcePort = Integer.parseInt(addressField.getText());
-//                int destPort = Integer.parseInt(destPortField.getText());
+                address = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
+                destPort = Integer.parseInt(destPortField.getText());
                 try {
+                    fs = new FileSender(address, sourcePort, destPort);
                     fs.send(file.getAbsolutePath());
                 } catch (FileNotFoundException ex) {
                     System.out.println("ERROR: File not found ( " + file.getAbsolutePath() + ")");
@@ -133,16 +136,17 @@ public class FileTransferGUI extends JFrame {
                 }
 
             } else if (e.getActionCommand().equals("receive")) {
-//                int  address = Integer.parseInt(addressField.getText());
-//                int sourcePort = Integer.parseInt(addressField.getText());
-//                int destPort = Integer.parseInt(destPortField.getText());
+                address = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
+                destPort = Integer.parseInt(destPortField.getText());
+                fr = new FileReceiver(address, sourcePort, destPort);
                 fr.start();
             }
         }
     }
 
     public static void main(String[] args) {
-                Log.getInstance("FileTransfer");
+        Log.getInstance("FileTransfer");
         new FileTransferGUI("File Transfer");
     }
 }

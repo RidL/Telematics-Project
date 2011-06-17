@@ -33,6 +33,11 @@ public class Route extends Thread {
 	public void run(){
 		while(true){
 			synchronized(LOCK){
+				try{
+					LOCK.wait();
+				}catch(InterruptedException e){
+					
+				}
             	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
@@ -56,6 +61,7 @@ public class Route extends Thread {
 		System.out.println("ROUT push number " + (++calls) + "");
         synchronized(LOCK){
             routableSegs.add(s);
+            LOCK.notifyAll();
         }
 	}
 	
@@ -66,6 +72,7 @@ public class Route extends Thread {
 		}else{
             synchronized(LOCK) {
                 routableSegs.add(s);
+                LOCK.notifyAll();
             }
 		}
 	}

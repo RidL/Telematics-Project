@@ -155,7 +155,14 @@ public class Segment {
     }
 
     public int getSEQ() {
-        return bytes[6];
+    	int ret;
+    	if (bytes[6] < 0) {
+    		ret = bytes[6] + 256;
+    	}
+    	else {
+    		ret = bytes[6];
+        }
+    	return ret;
     }
     
     public String toString(){
@@ -165,6 +172,10 @@ public class Segment {
     	retString += this.getDestinationAddress() + ":" + this.getDestinationPort();
     	retString += "\nHSH: ";
     	retString += new String(this.getHash());
+    	retString += "\nACK: ";
+    	retString += new String(Boolean.toString(this.isACK()));
+    	retString += "\nSEQ: ";
+    	retString += new String(Integer.toString(this.getSEQ()));
     	return retString;
     }
     
