@@ -107,11 +107,13 @@ public class Trans extends Thread {
                 //if (seg.isValidSegment()) {
 
                     if(seg.isACK()) {
+                        System.out.println("lastAck" + sock.getLastAcked());
+                        System.out.println("currSeq" + seg.getSEQ());
                         if(sock.getLastAcked() == seg.getSEQ()-1 ||
                             (sock.getLastAcked() + WINDOW_SIZE) == seg.getSEQ()-1 ) {
                             System.out.println("TP-ACK RECEIVED: " +  seg.getSEQ());
                             sock.incrLastAcked();
-                            sendBuffer.remove(0);
+                            sendBuffer.get(i).remove(0);
                         }
                         else {
                             // retransmit

@@ -29,7 +29,7 @@ public class TPSocket {
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
         ack_nr = 0;
-        lastAcked = -1;
+        lastAcked = 0;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
