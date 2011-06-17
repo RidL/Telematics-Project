@@ -41,10 +41,8 @@ public class Trans extends Thread {
     	byte[] data;
         TPSocket sock;
         while (true) {
-        	Log.writeLog("TRA", "list size" + Integer.toString(sockList.size()),false);
             for (int i = 0; i < sockList.size(); i++) {
                 sock = sockList.get(i);
-            	System.out.println("Found dirty socket");
                 data = sock.readOut();
                 route.pushSegment(createSegment(data, sock, false));
             }
