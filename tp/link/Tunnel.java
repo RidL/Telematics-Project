@@ -61,10 +61,9 @@ public class Tunnel extends Thread implements Link {
         }
         while (true) {
             byte[] data = new byte[103];
-            int in;
+            int in = 0;
 
             try {
-                in = read.read();
                 for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
                     data[i] = (byte) in;
                 }
