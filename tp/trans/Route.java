@@ -71,34 +71,36 @@ public class Route extends Thread {
 	}
 	
 	public void initRoutingTable(){
-		//ADDRESS LNK_TYPE(LPT|TUNNEL) TUN_ADD TUN_PRT
-		BufferedReader read;
-		routingTable = new HashMap<Integer, Link>();
-		try {
-			read = new BufferedReader(new FileReader("routing.conf"));
-			String s = read.readLine();
-			while(s != null){
-				Scanner scan = new Scanner(s);
-				int addr;
-				Link l = null;
-				addr = Integer.parseInt(scan.next());
-				if(scan.next().equals("LPT")){
-					//TODO: INIT RCV, INIT SENDER
-				}else{
-					String IPAdd = scan.next();
-					Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
-					System.out.println("adding: " + addr + " " + t);
-					routingTable.put(addr, t);
-					t.start();
+		synchronized(LOCK){
+			//ADDRESS LNK_TYPE(LPT|TUNNEL) TUN_ADD TUN_PRT
+			BufferedReader read;
+			routingTable = new HashMap<Integer, Link>();
+			try {
+				read = new BufferedReader(new FileReader("routing.conf"));
+				String s = read.readLine();
+				while(s != null){
+					Scanner scan = new Scanner(s);
+					int addr;
+					Link l = null;
+					addr = Integer.parseInt(scan.next());
+					if(scan.next().equals("LPT")){
+						//TODO: INIT RCV, INIT SENDER
+					}else{
+						String IPAdd = scan.next();
+						Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
+						System.out.println("adding: " + addr + " " + t);
+						routingTable.put(addr, t);
+						t.start();
+					}
+					
+					s = read.readLine();
 				}
-				
-				s = read.readLine();
+			} catch (FileNotFoundException e) {
+				System.out.println("Could not open routing file");
+				//e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
-			System.out.println("Could not open routing file");
-			//e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
