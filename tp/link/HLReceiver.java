@@ -240,6 +240,16 @@ public class HLReceiver extends Thread {
         }
     }
 
+    public void resetSegment(){
+    	  frameBuffer = new Frame[BUFFER_SIZE];
+          senderActive = false;
+          expectingAck = false;
+          frameBroken = false;
+          errCount = 0;
+          recPtr = 0;
+          windowPtr = 0;
+    }
+    
 	public void windowBroken() {
 		frameBroken = true;	
 	}

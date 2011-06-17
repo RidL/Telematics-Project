@@ -4,43 +4,52 @@
  */
 package tp.trans;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author STUDENT\s1012886
  */
 public class TPSocket {
 
+    private final static int SEQ_NR_LIMIT = 256;
+
     private int seq_nr;
     private int ack_nr;
+    private int lastAcked;
     private int dstAddress;
     private int srcPort;
     private int dstPort;
     private byte[] inBuffer;
     private byte[] outBuffer;
-    private boolean inDirty;
-    private boolean outDirty;
     private final Object OUTLOCK = new Object();
     private final Object INLOCK = new Object();
 
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
         ack_nr = 0;
+        lastAcked = 0;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
-        inDirty = false;
-        outDirty = false;
     }
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
-        byte[] temp = null;
-        if (inDirty) {
+    	byte[] temp = null;
+        synchronized (INLOCK) {
+            if (!isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             temp = inBuffer;
             inBuffer = null;
-            inDirty = false;
+            INLOCK.notify();
         }
-
         return temp;
     }
 
@@ -51,57 +60,64 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-        //System.out.println("ik probeer echt wel die shit op true te zette");
-
-        boolean suc = false;
-        if (!outDirty) {
-            if (bytes.length <= 96 && outBuffer == null) {
-                outBuffer = bytes;
-                outDirty = true;
-                suc = true;
-            //   System.out.println("Data verzonden");
+    	synchronized (OUTLOCK) {
+            if (isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            if (bytes.length <= 96) {
+                outBuffer = bytes;
+                seq_nr++;
+                if(seq_nr == SEQ_NR_LIMIT) {
+                    seq_nr = 0;
+                }
+            }
+            OUTLOCK.notify();
         }
-
-
-        //while (outDirty){
-        //System.out.println("spinwait, wachten op !outdirty");
-        // }
-        // System.out.println("is !outdirty");
-        return suc;
+    	return true;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-
-        byte[] temp = null;
-        if (outDirty) {
-            // System.out.println("new datas");
+    	byte[] temp = null;
+        synchronized (OUTLOCK) {
+            if (!isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             temp = outBuffer;
             outBuffer = null;
-            // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
-            outDirty = false;
+            OUTLOCK.notify();
         }
-
-        //   if(temp!=null)
-        //   System.out.println("Data gegeven aan trans");
         return temp;
     }
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
-        boolean suc = false;
-        if (!inDirty) {
-            if (bytes.length <= 96 && inBuffer == null) {
-                inBuffer = bytes;
-                inDirty = true;
-                suc = true;
+    	synchronized (INLOCK) {
+            if (isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        } else {
-            suc = false;
+            if (bytes.length <= 96) {
+                inBuffer = bytes;
+                ack_nr++;
+                if(ack_nr == SEQ_NR_LIMIT) {
+                    ack_nr = 0;
+                }
+            }
+            INLOCK.notify();
         }
-
-        return suc;
+    	return true;
     }
 
     /**
@@ -134,14 +150,14 @@ public class TPSocket {
      * @return the outDirty
      */
     public boolean isOutDirty() {
-        return outDirty;
+        return outBuffer!=null;
     }
 
     /**
      * @return the inDirty
      */
     public boolean isInDirty() {
-        return inDirty;
+        return inBuffer!=null;
     }
 
     /**
@@ -156,5 +172,13 @@ public class TPSocket {
      */
     public Object getINLOCK() {
         return INLOCK;
+    }
+
+    public void incrLastAcked() {
+        lastAcked++;
+    }
+
+    public int getLastAcked() {
+        return lastAcked;
     }
 }

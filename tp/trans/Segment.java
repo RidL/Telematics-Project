@@ -67,7 +67,17 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
-        this.bytes = bytes;
+        byte[] tmp = new byte[(bytes[5]+7)];
+        byte[] dat = new byte[(bytes[5])];
+        
+        for(int i=0; i<tmp.length; i++){
+            tmp[i] = bytes[i];
+        }
+        for(int i=0; i<bytes[5]; i++){
+            dat[i] = bytes[i+7];
+        }
+        this.bytes = tmp;
+        this.data = dat;
     }
 
     public int getSourcePort() {
@@ -147,7 +157,17 @@ public class Segment {
     public int getSEQ() {
         return bytes[6];
     }
-
+    
+    public String toString(){
+    	String retString = "SRC: ";
+    	retString += this.getSourceAddress() + ":" + this.getSourcePort();
+    	retString += "\nDST: ";
+    	retString += this.getDestinationAddress() + ":" + this.getDestinationPort();
+    	retString += "\nHSH: ";
+    	retString += new String(this.getHash());
+    	return retString;
+    }
+    
     public static void main(String[] args) {
         byte[] header = new byte[]{113, 67, 34, 88, 12, 12, 98};
         byte[] shitLoadAanData = new byte[]{9, 5, 34, 3, 1, 4, 6, 8, 5, 3, 6, 89};

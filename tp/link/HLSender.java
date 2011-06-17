@@ -3,6 +3,7 @@ package tp.link;
 import tp.trans.Segment;
 import tp.util.Log;
 
+//TODO: testen of resetSegment correct is
 public class HLSender extends Thread implements Link{
 
     final int WINDOW_SIZE = 8;
@@ -234,7 +235,11 @@ public class HLSender extends Thread implements Link{
         // pushing the rest of the WINDOW_SIZE frames
         
         do {
-        	 lls.pushFrame(frameBuffer[i], true);
+        	boolean fail = lls.pushFrame(frameBuffer[i], true);
+        	if(fail){
+        		resetSegment();
+            	return;
+        	}
             i++;
         }
         while(i%WINDOW_SIZE != 0 && i<framesInBuffer);
@@ -310,7 +315,11 @@ public class HLSender extends Thread implements Link{
             	Log.writeLog(" HLS", "frame that was detected to be false: " + i, sysoutLog);
                 retrans = true;
                 frameBuffer[sendPointer+i].reset();
-                lls.pushFrame(frameBuffer[sendPointer+i], true);
+                boolean fail = lls.pushFrame(frameBuffer[sendPointer+i], true);
+                if(fail){
+                	resetSegment();
+                	return;
+                }
             }
             if(frameBuffer[(sendPointer+i)].isFin()) {
                 break;
@@ -359,6 +368,20 @@ public class HLSender extends Thread implements Link{
          */
     }
     
+    /**
+     * This method resets this class to the beginning of the current segment
+     */
+    public void resetSegment(){
+    	
+    	  sendPointer = 0;
+          ack = 0;
+          
+          expectAck = false;
+          ackReceived = false;
+
+          receiverActive = false;
+          ackToSend = false;
+    }
     public void pushFrame(Frame f){
     	lls.pushFirstFrame(f);
     }
@@ -390,7 +413,8 @@ public class HLSender extends Thread implements Link{
         Frame ackFrame = new Frame(ackData, true, false);
         boolean succ = lls.pushFirstFrame(ackFrame);
         if(!succ) {
-        	Log.writeLog(" HLS", "Flag of ack broken, returning method to try again", sysoutLog);
+        	Log.writeLog(" HLS", "Flag of ack broken or collision, returning method to try again", sysoutLog);
+        	hlr.resetSegment();
             return;
         }
         ackToSend = false;
