@@ -55,10 +55,10 @@ public class FileSender {
             writeData[i] = header[j];
             if (i == MAX_SEGMENT_DATA - 1) {
                 boolean hasWritten = false;
-                do {
-                    Thread.sleep(5);
+//                do {
+//                    Thread.sleep(5);
                     hasWritten = tpSocket.writeOut(writeData);
-                } while (!hasWritten);
+//                } while (!hasWritten);
                 writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
                 //    Log.writeLog(" FileSender", Frame.toBinaryString(writeData) + "\n----------FIRST LOOP--------------", false);
                 i = 0;
@@ -74,10 +74,10 @@ public class FileSender {
             writeData[i] = bytes[j];
             if (i == MAX_SEGMENT_DATA - 1) {
                 boolean hasWritten = false;
-                do {
-                    Thread.sleep(5);
-                    hasWritten = tpSocket.writeOut(writeData);
-                } while (!hasWritten);
+//                do {
+//                    Thread.sleep(5);
+                   hasWritten = tpSocket.writeOut(writeData);
+//                } while (!hasWritten);
                 //   Log.writeLog(" FileSender", new String(writeData) + "\n--------SECOND LOOP----------------", false);
                 break;
             }
@@ -87,10 +87,10 @@ public class FileSender {
         while (dataRead != -1) {
             dataRead = fis.read(bytes);
             boolean hasWritten = false;
-            do {
-                Thread.sleep(5);
+//            do {
+//                Thread.sleep(5);
                 hasWritten = tpSocket.writeOut(bytes);
-            } while (!hasWritten);
+//            } while (!hasWritten);
             //  Log.writeLog(" FileSender", new String(bytes) + "\n--------THIRD LOOP----------------", false);
             bytes = new byte[MAX_SEGMENT_DATA];
         }

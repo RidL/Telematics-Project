@@ -4,9 +4,6 @@
  */
 package tp.trans;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author STUDENT\s1012886
@@ -20,8 +17,6 @@ public class TPSocket {
     private int dstPort;
     private byte[] inBuffer;
     private byte[] outBuffer;
-    private boolean inDirty;
-    private boolean outDirty;
     private final Object OUTLOCK = new Object();
     private final Object INLOCK = new Object();
 
@@ -31,27 +26,32 @@ public class TPSocket {
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
-        inDirty = false;
-        outDirty = false;
     }
 
     // aangeroepen door app voor data van trans
-    public synchronized byte[] readIn() {
-        byte[] temp = null;
-        try {
-            wait();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public byte[] readIn() {
         synchronized (INLOCK) {
-            if (inDirty) {
+            byte[] temp = null;
+            if (!isInDirty()) {
+                try {
+                //    System.out.println("READ - INBUFFER - WAITING FOR INLOCK");
+                    INLOCK.wait();
+                //   System.out.println("READ - INBUFFER - INLOCK ACQUIRED");
+                    temp = inBuffer;
+                    inBuffer = null;
+                //    System.out.println("READ - INBUFFER - BUFFER READ");
+                    INLOCK.notify();
+                } catch (InterruptedException e) {
+                }
+            } else {
+              //  System.out.println("READ - INBUFFER - INLOCK ACQUIRED");
                 temp = inBuffer;
                 inBuffer = null;
-                inDirty = false;
+              //  System.out.println("READ - INBUFFER - BUFFER READ");
+                INLOCK.notify();
             }
+            return temp;
         }
-
-        return temp;
     }
 
     /**
@@ -60,71 +60,90 @@ public class TPSocket {
      * @require bytes.length <= 96
      */
     // door app aangeroepen om data aan trans te geven
-    public synchronized boolean writeOut(byte[] bytes) {
-        //System.out.println("ik probeer echt wel die shit op true te zette");
-
-        boolean suc = false;
+    public boolean writeOut(byte[] bytes) {
         synchronized (OUTLOCK) {
-            if (!outDirty) {
-                if (bytes.length <= 96 && outBuffer == null) {
-                    outBuffer = bytes;
-                    outDirty = true;
-                    suc = true;
-                    notifyAll();
-                //   System.out.println("Data verzonden");
+            boolean suc = false;
+            if (isOutDirty()) {
+                try {
+                 //   System.out.println("WRITE - OUTBUFFER - WAITING FOR OUTLOCK");
+                    OUTLOCK.wait();
+                 //   System.out.println("WRITE - OUTBUFFER - OUTLOCK ACQUIRED");
+                    if (bytes.length <= 96) {
+                 //       System.out.println("WRITE - OUTBUFFER - OUTBUFFER WRITTEN");
+                        outBuffer = bytes;
+                        suc = true;
+                    }
+                    OUTLOCK.notify();
+
+                } catch (InterruptedException e) {
                 }
+            } else {
+               // System.out.println("WRITE - OUTBUFFER - OUTLOCK ACQUIRED");
+                if (bytes.length <= 96) {
+                //    System.out.println("WRITE - OUTBUFFER - OUTBUFFER WRITTEN");
+                    outBuffer = bytes;
+                    suc = true;
+                }
+                OUTLOCK.notify();
             }
+            return suc;
         }
-
-
-        //while (outDirty){
-        //System.out.println("spinwait, wachten op !outdirty");
-        // }
-        // System.out.println("is !outdirty");
-        return suc;
     }
 
     // door trans aangeroepen voor data van app
-    public synchronized byte[] readOut() {
-
-        byte[] temp = null;
-        try {
-            wait();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public byte[] readOut() {
         synchronized (OUTLOCK) {
-            if (outDirty) {
-                // System.out.println("new datas");
+            byte[] temp = null;
+            if (!isOutDirty()) {
+                try {
+                //    System.out.println("READ - OUTBUFFER - WAITING FOR OUTLOCK");
+                    OUTLOCK.wait();
+                //    System.out.println("READ - OUTBUFFER - OUTLOCK ACQUIRED");
+                    temp = outBuffer;
+                    outBuffer = null;
+                //    System.out.println("READ - OUTBUFFER - BUFFER READ");
+                    OUTLOCK.notify();
+                } catch (InterruptedException e) {
+                }
+            } else {
+              //  System.out.println("READ - OUTBUFFER - OUTLOCK ACQUIRED");
                 temp = outBuffer;
                 outBuffer = null;
-                // System.out.println(Frame.toBinaryString(temp) + "gelezen van outbuf");
-                outDirty = false;
+              //  System.out.println("READ - OUTBUFFER - BUFFER READ");
+                OUTLOCK.notify();
             }
+            return temp;
         }
-
-        //   if(temp!=null)
-        //   System.out.println("Data gegeven aan trans");
-        return temp;
     }
 
     // aangeroepen door trans voor data naar app
-    public synchronized boolean writeIn(byte[] bytes) {
-        boolean suc = false;
+    public boolean writeIn(byte[] bytes) {
         synchronized (INLOCK) {
-            if (!inDirty) {
-                if (bytes.length <= 96 && inBuffer == null) {
-                    inBuffer = bytes;
-                    inDirty = true;
-                    suc = true;
-                    notifyAll();
+            boolean suc = false;
+            if (isInDirty()) {
+                try {
+                //    System.out.println("WRITE - INBUFFER - WAITING FOR INLOCK");
+                    INLOCK.wait();
+                //    System.out.println("WRITE - INBUFFER - INLOCK ACQUIRED");
+                    if (bytes.length <= 96) {
+                        inBuffer = bytes;
+                //        System.out.println("WRITE - INBUFFER - BUFFER WRITTEN");
+                        suc = true;
+                    }
+                    INLOCK.notify();
+                } catch (InterruptedException e) {
                 }
             } else {
-                suc = false;
+             //   System.out.println("WRITE - INBUFFER - INLOCK ACQUIRED");
+                if (bytes.length <= 96) {
+                    inBuffer = bytes;
+             //       System.out.println("WRITE - INBUFFER - BUFFER WRITTEN");
+                    suc = true;
+                }
+                INLOCK.notify();
             }
+            return suc;
         }
-
-        return suc;
     }
 
     /**
@@ -157,14 +176,14 @@ public class TPSocket {
      * @return the outDirty
      */
     public boolean isOutDirty() {
-        return outDirty;
+        return outBuffer != null;
     }
 
     /**
      * @return the inDirty
      */
     public boolean isInDirty() {
-        return inDirty;
+        return inBuffer != null;
     }
 
     /**
