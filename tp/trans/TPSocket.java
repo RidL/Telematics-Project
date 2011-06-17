@@ -4,6 +4,9 @@
  */
 package tp.trans;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author STUDENT\s1012886
@@ -34,21 +37,19 @@ public class TPSocket {
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
-    	byte[]temp = null;
-		synchronized(INLOCK){
-			while(!isInDirty()){
-	    		try{
-	    			INLOCK.wait();
-	    		}catch(InterruptedException e){
-	    			System.err.println("failed to wait on INLOCK");
-	    		}
-	    	}
-			temp = null;
-			if (inBuffer!=null) {
-				temp = inBuffer;
-				inBuffer = null;
-   	     	}
-		}
+    	byte[] temp = null;
+        synchronized (INLOCK) {
+            if (!isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            temp = inBuffer;
+            inBuffer = null;
+            INLOCK.notify();
+        }
         return temp;
     }
 
@@ -59,66 +60,64 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-    	//TODO: blokkeer op outDirty vanaf applicatie
-    	boolean suc = false;
-    	synchronized(OUTLOCK){
-    		while(!isOutDirty()){
-	    		try{
-	    			OUTLOCK.wait();
-	    		}catch(InterruptedException e){
-	    			System.err.println("failed to wait on OUTLOCK");
-	    		}
-	    	}
-            if (outBuffer==null) {
-                if (bytes.length <= 96 && outBuffer == null) {
-                    outBuffer = bytes;
-                    suc = true;
-                    seq_nr++;
-                    if(seq_nr == SEQ_NR_LIMIT) {
-                        seq_nr = 0;
-                    }
+    	synchronized (OUTLOCK) {
+            if (isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-    	}
-
-        return suc;
+            if (bytes.length <= 96) {
+                outBuffer = bytes;
+                seq_nr++;
+                if(seq_nr == SEQ_NR_LIMIT) {
+                    seq_nr = 0;
+                }
+            }
+            OUTLOCK.notify();
+        }
+    	return true;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-    	//TODO: spin op read?
     	byte[] temp = null;
-    	synchronized(OUTLOCK){
-    		if (outBuffer!=null) {
-                temp = outBuffer;
-                outBuffer = null;
+        synchronized (OUTLOCK) {
+            if (!isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-    		OUTLOCK.notifyAll();
-    	}
+            temp = outBuffer;
+            outBuffer = null;
+            OUTLOCK.notify();
+        }
         return temp;
     }
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
-        boolean suc;
-    	synchronized(INLOCK){
-        	suc = false;
-            if (inBuffer==null) {
-                if (bytes.length <= 96) {
-                	System.out.println("written shite");
-                    inBuffer = bytes;
-                    suc = true;
-                    ack_nr++;
-                    if(ack_nr == SEQ_NR_LIMIT) {
-                        ack_nr = 0;
-                    }
+    	synchronized (INLOCK) {
+            if (isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
-                suc = false;
             }
-            INLOCK.notifyAll();
+            if (bytes.length <= 96) {
+                inBuffer = bytes;
+                ack_nr++;
+                if(ack_nr == SEQ_NR_LIMIT) {
+                    ack_nr = 0;
+                }
+            }
+            INLOCK.notify();
         }
-    	return suc;
+    	return true;
     }
 
     /**

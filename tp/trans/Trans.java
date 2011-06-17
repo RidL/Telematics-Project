@@ -3,6 +3,8 @@ package tp.trans;
 import java.util.ArrayList;
 import java.util.List;
 
+import tp.util.Log;
+
 public class Trans extends Thread {
 
     private static final int WINDOW_SIZE = 128;
@@ -20,33 +22,39 @@ public class Trans extends Thread {
         route.start();
     }
 
-    public static Trans getTrans() {
-        if (ref == null) {
-            ref = new Trans(0);
+    public static Trans getTrans(int addr) {
+        if (ref == null || ref.getAddress()!=addr) {
+            ref = new Trans(addr);
             ref.start();
         }
         return ref;
     }
-
+    
+    public static Trans getTrans() {
+		if (ref == null ) {
+            ref = new Trans(0);
+            ref.start();
+        }
+        return ref;
+	}
+    
     @Override
     public void run() {
     	byte[] data;
-    	TPSocket sock;
-    	while(true){
-    		for (int i = 0; i < sockList.size(); i++) {
-    			sock = sockList.get(i);
-    		    if(sock.isOutDirty()){
-                /*
+        TPSocket sock;
+        while (true) {
+        	Log.writeLog("TRA", "list size" + Integer.toString(sockList.size()),false);
+            for (int i = 0; i < sockList.size(); i++) {
+                                /*
                  * REPLACE WITH WHEN ACK IS IMPLEMENTED
                  * if(sock.isOutDirty() && sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE){
                  */
-    		    	//MAYBE SYNC?
-		    		data = sock.readOut();
-		    		route.pushSegment(createSegment(data, sock, false));
-    		    }
-    	    }
-    	}
-        //TODO: handle incoming segs from rcvBuff
+                sock = sockList.get(i);
+            	System.out.println("Found dirty socket");
+                data = sock.readOut();
+                route.pushSegment(createSegment(data, sock, false));
+            }
+        }
     }
 
     public int getAddress() {
@@ -63,7 +71,11 @@ public class Trans extends Thread {
     public void closeSocket(TPSocket sock) {
         sockList.remove(sock);
     }
-
+    
+    public Route getRoute(){
+    	return route;
+    }
+    
     /**
      * Voor ontvangen data shit van Route
      * @param seg

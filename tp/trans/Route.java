@@ -32,9 +32,9 @@ public class Route extends Thread {
 	public void run(){
 		while(true){
 			synchronized(LOCK){
-            	ArrayList<Segment> _routingTable = new ArrayList<Segment>(routableSegs);
+            	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
-            	for(Iterator<Segment> it = _routingTable.iterator(); it.hasNext();) {
+            	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
                     s = it.next();
                     int addr = s.getDestinationAddress();
                     Link destLink = routingTable.get(addr);
@@ -100,18 +100,5 @@ public class Route extends Thread {
 
     public Object getLock() {
         return LOCK;
-    }
-
-    public static void main(String[] args) {
-        Log.getInstance("RT");
-        Trans t = Trans.getTrans();
-        Route r = new Route(t);
-        for(Segment s: r.routableSegs) {
-            System.out.println("Segment: " + s);
-        }
-        for(Integer i: r.routingTable.keySet()) {
-            System.out.println("rt " + i + "--" + r.routingTable.get(i));
-        }
-        System.out.println("");
     }
 }

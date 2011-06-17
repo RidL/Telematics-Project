@@ -9,10 +9,12 @@ public class TransInitializer {
 		Log.getInstance("RMS");
 		Log l = Log.getInstance("RMS");
 		sock = Trans.getTrans().createSocket(1, 1, 1);
-		readLine();
-		readLine();
-//		boolean b = sock.writeOut(s.getBytes());
-//		Log.writeLog("  TI", "succes in writing stuff to socket " + b, sysout);
+		System.out.println("started");
+		String s = new String("robin doet helemaal niets");
+		
+		boolean b = sock.writeOut(s.getBytes());
+		for(int i=0; i<1000; i++)
+			sock.writeOut(s.getBytes());
 	}
 	public static void readLine(){
 		byte[] data = sock.readIn();
