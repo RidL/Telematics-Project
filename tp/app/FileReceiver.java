@@ -53,6 +53,7 @@ public class FileReceiver extends Thread {
      */
     public void receive() throws FileNotFoundException, IOException, InterruptedException {
         byte[] bytesIn = null;
+        System.out.println("poepje");
         bytesIn = tpSocket.readIn();
         System.out.println("bytesIN: " + bytesIn);
         Log log = Log.getInstance("dd");

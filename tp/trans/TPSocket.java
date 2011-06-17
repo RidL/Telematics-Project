@@ -41,11 +41,13 @@ public class TPSocket {
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
+                    System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+             System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();
