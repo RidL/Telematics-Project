@@ -13,8 +13,9 @@ public class TransInitializer {
 		String s = new String("robin doet helemaal niets");
 		
 		boolean b = sock.writeOut(s.getBytes());
-		for(int i=0; i<1000; i++)
-			sock.writeOut(s.getBytes());
+		for(int i=0; i<1000; i++) {
+			sock.writeOut(s.getBytes());}
+		System.out.println("END");
 	}
 	public static void readLine(){
 		byte[] data = sock.readIn();
