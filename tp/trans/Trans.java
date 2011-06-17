@@ -34,7 +34,7 @@ public class Trans extends Thread {
     
     public static Trans getTrans() {
 		if (ref == null ) {
-            ref = new Trans(0);
+            ref = new Trans(1);
             ref.start();
         }
         return ref;

@@ -67,7 +67,6 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
-    	System.out.println(bytes[5] + "ddddddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaavid");
         byte[] tmp = new byte[(bytes[5]+7)];
         byte[] dat = new byte[(bytes[5])];
         
