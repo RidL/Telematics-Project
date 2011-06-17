@@ -2,11 +2,6 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tp.util.Log;
-
-import tp.util.Log;
 
 public class Trans extends Thread {
 
@@ -33,7 +28,7 @@ public class Trans extends Thread {
     
     public static Trans getTrans() {
 		if (ref == null ) {
-            ref = new Trans(1);
+            ref = new Trans(0);
             ref.start();
         }
         return ref;
