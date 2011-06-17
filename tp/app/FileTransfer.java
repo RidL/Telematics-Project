@@ -188,7 +188,6 @@ public class FileTransfer {
 
         return result;
     }
-
     public static void main(String[] args) {
         FileTransfer f = null;
 

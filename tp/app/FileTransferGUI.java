@@ -95,10 +95,6 @@ public class FileTransferGUI extends JFrame {
         c.add(rootPanel);
     }
 
-    public static void main(String[] args) {
-        Log.getInstance("FileTransfer");
-        new FileTransferGUI("File Transfer");
-    }
 
     class ButtonHandler implements ActionListener {
 
@@ -143,5 +139,10 @@ public class FileTransferGUI extends JFrame {
                 fr.start();
             }
         }
+    }
+
+    public static void main(String[] args) {
+                Log.getInstance("FileTransfer");
+        new FileTransferGUI("File Transfer");
     }
 }

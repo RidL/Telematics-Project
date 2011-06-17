@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tp.util.Log;
 
+import tp.util.Log;
+
 public class Trans extends Thread {
 
     private static Trans ref;
@@ -21,57 +23,34 @@ public class Trans extends Thread {
         route.start();
     }
 
-    public static Trans getTrans() {
-        if (ref == null) {
-            ref = new Trans(0);
+    public static Trans getTrans(int addr) {
+        if (ref == null || ref.getAddress()!=addr) {
+            ref = new Trans(addr);
             ref.start();
         }
         return ref;
     }
-
+    
+    public static Trans getTrans() {
+		if (ref == null ) {
+            ref = new Trans(1);
+            ref.start();
+        }
+        return ref;
+	}
+    
     @Override
     public void run() {
-
-        Log.getInstance("dd00");
-        byte[] data = null;
+    	byte[] data;
+        TPSocket sock;
         while (true) {
             for (int i = 0; i < sockList.size(); i++) {
-                data = sockList.get(i).readOut();
-               // if (data != null) {
-                    Segment seg = createSegment(data, sockList.get(i), false);
-                    boolean suc = false;
-//                    do {
-//                        try {
-//                            Thread.sleep(5);
-//                        } catch (InterruptedException ex) {
-//                            Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-                        suc = sockList.get(i).writeIn(seg.getData());
-//                    } while (!suc);
-                //} else {
-//                    try {
-//                        Thread.sleep(5);
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(Trans.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-                //}
+                sock = sockList.get(i);
+                data = sock.readOut();
+                route.pushSegment(createSegment(data, sock, false));
             }
-
-//        byte[] data;
-//        TPSocket sock;
-//        while (true) {
-//            for (int i = 0; i < sockList.size(); i++) {
-//                sock = sockList.get(i);
-//                if (sock.isOutDirty()) {
-//                    //MAYBE SYNC?
-//                    data = sock.readOut();
-//                    route.pushSegment(createSegment(data, sock, false));
-//                }
-//            }
-//        }
-
-    //TODO: handle incoming segs from rcvBuff
-    }}
+        }
+    }
 
     public int getAddress() {
         return address;
@@ -87,7 +66,11 @@ public class Trans extends Thread {
     public void closeSocket(TPSocket sock) {
         sockList.remove(sock);
     }
-
+    
+    public Route getRoute(){
+    	return route;
+    }
+    
     /**
      * Voor ontvangen data shit van Route
      * @param seg
@@ -97,14 +80,9 @@ public class Trans extends Thread {
     	TPSocket sock;
         for (int i = 0; i < sockList.size(); i++) {
         	sock = sockList.get(i);
-        	System.out.println("searching for socket");
             if (sock.getSourcePort() == seg.getDestinationPort()) {
-            	System.out.println("correct port is here");
                 //if (seg.isValidSegment()) {
-                	System.out.println("validseg!");
                     System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
-                    
-                    System.out.println("done writing suc? " + sock.isInDirty());
                 //}
             //TODO: else: wait for retransmit
             }

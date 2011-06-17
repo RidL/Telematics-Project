@@ -79,6 +79,7 @@ public class Tunnel extends Thread implements Link {
 			} catch (IOException e) {
 				System.err.println("Error whilst reading from the stream @ " + addr.getHostAddress() + ":" + port + "");
 				e.printStackTrace();
+				break;
 			}
 			Log.writeLog("TUN", "end read, going on!", true);
 			Segment seg = new Segment(data);

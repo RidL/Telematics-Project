@@ -36,7 +36,7 @@ public class FileSender {
     public FileSender(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
-    //tpSocket = new FakeSocket(true);
+        //tpSocket = new FakeSocket(true);
     }
 
     /**
@@ -51,16 +51,11 @@ public class FileSender {
 
         byte[] writeData = new byte[MAX_SEGMENT_DATA];
         int i, j;   // write header to tpSocket
-        for (i = 0        , j = 0; j < header.length; i++, j++) {
+        for (i = 0, j = 0; j < header.length; i++, j++) {
             writeData[i] = header[j];
             if (i == MAX_SEGMENT_DATA - 1) {
-                boolean hasWritten = false;
-//                do {
-//                    Thread.sleep(5);
-                    hasWritten = tpSocket.writeOut(writeData);
-//                } while (!hasWritten);
+                tpSocket.writeOut(writeData);
                 writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
-                //    Log.writeLog(" FileSender", Frame.toBinaryString(writeData) + "\n----------FIRST LOOP--------------", false);
                 i = 0;
             }
         }
@@ -73,12 +68,7 @@ public class FileSender {
         for (j = 0; j < bytes.length; i++, j++) {
             writeData[i] = bytes[j];
             if (i == MAX_SEGMENT_DATA - 1) {
-                boolean hasWritten = false;
-//                do {
-//                    Thread.sleep(5);
-                   hasWritten = tpSocket.writeOut(writeData);
-//                } while (!hasWritten);
-                //   Log.writeLog(" FileSender", new String(writeData) + "\n--------SECOND LOOP----------------", false);
+                tpSocket.writeOut(writeData);
                 break;
             }
         }
@@ -86,12 +76,7 @@ public class FileSender {
         bytes = new byte[MAX_SEGMENT_DATA];
         while (dataRead != -1) {
             dataRead = fis.read(bytes);
-            boolean hasWritten = false;
-//            do {
-//                Thread.sleep(5);
-                hasWritten = tpSocket.writeOut(bytes);
-//            } while (!hasWritten);
-            //  Log.writeLog(" FileSender", new String(bytes) + "\n--------THIRD LOOP----------------", false);
+            tpSocket.writeOut(bytes);
             bytes = new byte[MAX_SEGMENT_DATA];
         }
         System.out.println("End of file");

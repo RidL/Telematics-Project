@@ -1,6 +1,7 @@
 package tp.trans;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import tp.link.Tunnel;
 import tp.util.Log;
 
 public class Route extends Thread {
-
+	int calls;
     private final Object LOCK = new Object();
     
 	private ArrayList<Segment> routableSegs;
@@ -31,28 +32,29 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-			synchronized(LOCK){
-            	Iterator<Segment> it = routableSegs.iterator();
-            	while(it.hasNext()) {
-                    Segment s = it.next();
+		//	synchronized(LOCK){
+            	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
+            	Segment s = null;
+            	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
+                    s = it.next();
                     int addr = s.getDestinationAddress();
                     Link destLink = routingTable.get(addr);
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
                         System.out.println("ROUTE =====pushing=====\n" + s);
-                            it.remove();
+                        break;
                     }
                 }
-            }
+            	routableSegs.remove(s);
+         //   }
 			//TODO:check routables
 			//TODO:check links
 		}
 	}
 	
 	public void pushSegment(Segment s){
-		System.out.println("pushing");
+		System.out.println("push number" + (++calls) + "");
 		routableSegs.add(s);
-		System.out.println("pushed");
 	}
 	
 	public void rcvSegment(Segment s){
@@ -60,9 +62,9 @@ public class Route extends Thread {
 			System.out.println("ROUTE =====received=====\n" + s);
 			trans.rcvSeg(s);
 		}else{
-            synchronized(LOCK) {
+      //      synchronized(LOCK) {
                 routableSegs.add(s);
-            }
+       //     }
 		}
 	}
 	
@@ -100,18 +102,5 @@ public class Route extends Thread {
 
     public Object getLock() {
         return LOCK;
-    }
-
-    public static void main(String[] args) {
-        Log.getInstance("RT");
-        Trans t = Trans.getTrans();
-        Route r = new Route(t);
-        for(Segment s: r.routableSegs) {
-            System.out.println("Segment: " + s);
-        }
-        for(Integer i: r.routingTable.keySet()) {
-            System.out.println("rt " + i + "--" + r.routingTable.get(i));
-        }
-        System.out.println("");
     }
 }

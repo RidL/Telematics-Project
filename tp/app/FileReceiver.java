@@ -36,7 +36,7 @@ public class FileReceiver extends Thread {
         trans = Trans.getTrans();
         //trans.start();
         tpSocket = trans.createSocket(address, srcPort, dstPort);
-    //tpSocket = new FakeSocket(false);
+        //tpSocket = new FakeSocket(false);
     }
 
     public FileReceiver(int address, int srcPort, int dstPort, FileSender sender) {
@@ -53,11 +53,8 @@ public class FileReceiver extends Thread {
      */
     public void receive() throws FileNotFoundException, IOException, InterruptedException {
         byte[] bytesIn = null;
-        while (bytesIn == null) {
-            bytesIn = tpSocket.readIn();
-        }
+        bytesIn = tpSocket.readIn();
         System.out.println("bytesIN: " + bytesIn);
-
         Log log = Log.getInstance("dd");
 
         int fileNameLength = (int) bytesIn[0];
@@ -66,15 +63,10 @@ public class FileReceiver extends Thread {
         // read fileName from tpSocket
         // fileName might be longer than 1 tl-segment
         int i, j;
-        for (i = 1  , j = 0; j < fileNameLength; i++, j++) {
+        for (i = 1, j = 0; j < fileNameLength; i++, j++) {
             fileName[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
-//                do {
-//                    Thread.sleep(5);
-                    bytesIn = tpSocket.readIn();
-//                    //  Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------SECOND DATA----------------", false);
-//                    i = 0;
-//                } while (bytesIn == null);
+                bytesIn = tpSocket.readIn();
             }
         }
 
@@ -83,12 +75,7 @@ public class FileReceiver extends Thread {
         for (j = 0; j < 8; i++, j++) {
             fileLength[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
-//                do {
-//                    Thread.sleep(5);
-                    bytesIn = tpSocket.readIn();
-//                    //Log.writeLog(" FileReceiver", new String(bytesIn) + "\n--------THIRD DATA----------------", false);
-//                    i = 0;
-//                } while (bytesIn == null);
+                bytesIn = tpSocket.readIn();
             }
         }
         System.out.println("Filelength received: " + bytesToLong(fileLength));
@@ -102,20 +89,14 @@ public class FileReceiver extends Thread {
         file = new File(new String(fileName));
         fos = new FileOutputStream(file);
         fos.write(firstData);
-        //Log.writeLog(" FileReceiver", new String(firstData) + "\n--------FIRST DATA----------------", false);
 
         // keep reading data from tpSocket
         int dataPtr = firstData.length;
         byte[] read = null;
         long length = bytesToLong(fileLength);
         while (dataPtr < length) {
-//            read = null;
-//            while (read == null) {
-//                Thread.sleep(5);
-                read = tpSocket.readIn();
-//            }
+            read = tpSocket.readIn();
             fos.write(read);
-            //Log.writeLog(" FileReceiver", new String(read) + "\n--------REMAINING DATA----------------", false);
             dataPtr += read.length;
         }
         fos.close();
@@ -158,7 +139,7 @@ public class FileReceiver extends Thread {
         try {
             //  while(true) {
             receive();
-        // }
+            // }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -166,7 +147,7 @@ public class FileReceiver extends Thread {
         } catch (InterruptedException ex) {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
-    // }
+        // }
     }
 
     public static void main(String[] args) {
@@ -181,7 +162,7 @@ public class FileReceiver extends Thread {
                 System.out.println("ERROR: Wrong arguments");
                 System.out.println("Number format exception");
             }
-        //f.receive();
+            //f.receive();
         } else {
             System.out.println("ERROR: Wrong arguments");
         }
