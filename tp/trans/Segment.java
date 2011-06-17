@@ -67,12 +67,11 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
-        this.bytes = bytes;
-        this.data = new byte[bytes.length-7];
-        for(int i=0; i<bytes.length-7; i++){
-        	data[i] = bytes[7+i];
+        byte[] tmp = new byte[(bytes[5]+7)];
+        for(int i=0; i<tmp.length; i++){
+            tmp[i] = bytes[i];
         }
-        System.out.println();
+        this.bytes = tmp;
     }
 
     public int getSourcePort() {

@@ -53,10 +53,10 @@ public class Route extends Thread {
 	}
 	
 	public void pushSegment(Segment s){
-		System.out.println("push number" + (++calls) + "");
-		synchronized(LOCK) {
-			routableSegs.add(s); 
-		}
+		System.out.println("ROUT push number " + (++calls) + "");
+        synchronized(LOCK){
+            routableSegs.add(s);
+        }
 	}
 	
 	public void rcvSegment(Segment s){

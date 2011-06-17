@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
+// TEMPORARY CLASS
 package tp.app;
 
 import java.io.IOException;

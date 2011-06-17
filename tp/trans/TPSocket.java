@@ -13,8 +13,11 @@ import java.util.logging.Logger;
  */
 public class TPSocket {
 
+    private final static int SEQ_NR_LIMIT = 256;
+
     private int seq_nr;
     private int ack_nr;
+    private int lastAcked;
     private int dstAddress;
     private int srcPort;
     private int dstPort;
@@ -26,6 +29,7 @@ public class TPSocket {
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
         ack_nr = 0;
+        lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
@@ -66,6 +70,10 @@ public class TPSocket {
             }
             if (bytes.length <= 96) {
                 outBuffer = bytes;
+                seq_nr++;
+                if(seq_nr == SEQ_NR_LIMIT) {
+                    seq_nr = 0;
+                }
             }
             OUTLOCK.notify();
         }
@@ -102,6 +110,10 @@ public class TPSocket {
             }
             if (bytes.length <= 96) {
                 inBuffer = bytes;
+                ack_nr++;
+                if(ack_nr == SEQ_NR_LIMIT) {
+                    ack_nr = 0;
+                }
             }
             INLOCK.notify();
         }
@@ -160,5 +172,13 @@ public class TPSocket {
      */
     public Object getINLOCK() {
         return INLOCK;
+    }
+
+    public void incrLastAcked() {
+        lastAcked++;
+    }
+
+    public int getLastAcked() {
+        return lastAcked;
     }
 }
