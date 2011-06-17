@@ -76,7 +76,7 @@ public class HLReceiver extends Thread {
                 	frameBuffer[i] = null;
                 }
             	sendAck();
-            	errCount = recPtr%WINDOW_SIZE;
+            	recPtr = recPtr-(recPtr%WINDOW_SIZE);
             	frameBroken = false;
             }else{
             	Log.writeLog(" HLR", "frame read", sysoutLog);
