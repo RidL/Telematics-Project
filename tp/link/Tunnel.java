@@ -62,6 +62,7 @@ public class Tunnel extends Thread implements Link {
         while (true) {
             byte[] data = new byte[103];
             int in;
+            int length;
 
             try {
                 in = read.read();
@@ -69,8 +70,10 @@ public class Tunnel extends Thread implements Link {
                     data[i] = (byte) in;
                     Log.writeLog("TUN", "read " + data[i], false);
                 }
-                data[5] = (byte) read.read();
+                length = read.read();
+                data[5] = (byte)length;
                 data[6] = (byte) read.read();
+                System.out.println("TUN data[5]" + data[5]);
                 for (int i = 0; i < data[5]; i++) {
                     data[7 + i] = (byte) read.read();
                 }
