@@ -87,6 +87,7 @@ public class Trans extends Thread {
         for (int i = 0; i < sockList.size(); i++) {
         	sock = sockList.get(i);
             if (sock.getSourcePort() == seg.getDestinationPort()) {
+                System.out.println("booolean lollol");
                 //if (seg.isValidSegment()) {
                     System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                 //}

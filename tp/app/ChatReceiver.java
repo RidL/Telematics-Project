@@ -23,6 +23,11 @@ public class ChatReceiver implements Runnable {
     }
 
     private void processMessage(byte[] data) {
+        String s = "";
+        for(int i=0; i<data.length; i++){
+            s += (char)data[i];
+        }
+        System.out.println(s);
         int messLength = 0;
         messLength |= data[0];
         messLength <<= 24;
@@ -30,8 +35,8 @@ public class ChatReceiver implements Runnable {
         messLength |= (int) (data[1] & 0x000000ff);
 
         char[] message = new char[messLength];
-        for (int i = 2, j = 0; i < data.length; i++, j++) {
-            message[j] = (char) (data[i]);
+        for (int i = 0, j = 0; i < messLength; i++, j++) {
+            message[j] = (char) (data[i+2]);
         }
 
         if (messLength > 94) {
