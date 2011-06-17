@@ -25,7 +25,15 @@ public class Trans extends Thread {
         }
         return ref;
     }
-
+    
+    public static Trans getTrans() {
+		if (ref == null ) {
+            ref = new Trans(0);
+            ref.start();
+        }
+        return ref;
+	}
+    
     @Override
     public void run() {
     	byte[] data;
