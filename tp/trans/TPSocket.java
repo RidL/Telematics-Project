@@ -33,22 +33,19 @@ public class TPSocket {
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
-    	byte[]temp = null;
-		synchronized(INLOCK){
-			while(!isInDirty()){
-	    		try{
-	    			INLOCK.wait();
-	    		}catch(InterruptedException e){
-	    			System.err.println("failed to wait on INLOCK");
-	    		}
-	    	}
-			temp = null;
-			if (inBuffer!=null) {
-				temp = inBuffer;
-				inBuffer = null;
-   	     	}
-			INLOCK.notifyAll();
-		}
+    	byte[] temp = null;
+        synchronized (INLOCK) {
+            if (!isInDirty()) {
+                try {
+                    INLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            temp = inBuffer;
+            inBuffer = null;
+            INLOCK.notify();
+        }
         return temp;
     }
 
@@ -59,53 +56,44 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-    	//TODO: blokkeer op outDirty vanaf applicatie
-    	boolean suc = false;
-    	
-    	synchronized(OUTLOCK){
-    		while(isOutDirty()){
-        		try{
-        			synchronized(OUTLOCK){
-        				OUTLOCK.wait();
-        			}
-        		}catch(InterruptedException e){
-        			System.err.println("failed to wait on OUTLOCK");
-        		}
-        	}
-    		System.out.println("lock done, writing");
-            if (outBuffer==null) {
-                if (bytes.length <= 96 && outBuffer == null) {
-                    outBuffer = bytes;
-                    suc = true;
+    	synchronized (OUTLOCK) {
+            if (isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            OUTLOCK.notifyAll();
-    	}
-        return suc;
+            if (bytes.length <= 96) {
+                outBuffer = bytes;
+            }
+            OUTLOCK.notify();
+        }
+    	return true;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-    	//TODO: spin op read?
     	byte[] temp = null;
-    	synchronized(OUTLOCK){
-    		try{
-    			while(!isOutDirty())
-    				OUTLOCK.wait();
-    		}catch(InterruptedException e){
-    			
-    		}
+        synchronized (OUTLOCK) {
+            if (!isOutDirty()) {
+                try {
+                    OUTLOCK.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             temp = outBuffer;
             outBuffer = null;
-    		OUTLOCK.notifyAll();
-    	}
+            OUTLOCK.notify();
+        }
         return temp;
     }
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
     	synchronized (INLOCK) {
-            while (isInDirty()) {
+            if (isInDirty()) {
                 try {
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
@@ -115,7 +103,7 @@ public class TPSocket {
             if (bytes.length <= 96) {
                 inBuffer = bytes;
             }
-            INLOCK.notifyAll();
+            INLOCK.notify();
         }
     	return true;
     }

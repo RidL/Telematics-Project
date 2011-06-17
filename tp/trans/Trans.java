@@ -3,6 +3,8 @@ package tp.trans;
 import java.util.ArrayList;
 import java.util.List;
 
+import tp.util.Log;
+
 public class Trans extends Thread {
 
     private static Trans ref;
@@ -37,18 +39,16 @@ public class Trans extends Thread {
     @Override
     public void run() {
     	byte[] data;
-    	TPSocket sock;
-    	while(true){
-    		for (int i = 0; i < sockList.size(); i++) {
-    			sock = sockList.get(i);
-    		    if(sock.isOutDirty()){
-    		    	//MAYBE SYNC?
-		    		data = sock.readOut();
-		    		route.pushSegment(createSegment(data, sock, false));
-    		    }
-    	    }
-    	}
-        //TODO: handle incoming segs from rcvBuff
+        TPSocket sock;
+        while (true) {
+        	Log.writeLog("TRA", "list size" + Integer.toString(sockList.size()),false);
+            for (int i = 0; i < sockList.size(); i++) {
+                sock = sockList.get(i);
+            	System.out.println("Found dirty socket");
+                data = sock.readOut();
+                route.pushSegment(createSegment(data, sock, false));
+            }
+        }
     }
 
     public int getAddress() {

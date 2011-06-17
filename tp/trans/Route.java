@@ -31,9 +31,7 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-			Log.writeLog("ROUT", "waiting on lock @ run()", false);
 			synchronized(LOCK){
-				Log.writeLog("ROUT", "acquired lock @ run()", false);
             	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
