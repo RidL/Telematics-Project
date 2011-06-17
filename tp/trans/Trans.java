@@ -34,7 +34,7 @@ public class Trans extends Thread {
     
     public static Trans getTrans() {
 		if (ref == null ) {
-            ref = new Trans(1);
+            ref = new Trans(0);
             ref.start();
         }
         return ref;
@@ -125,7 +125,7 @@ public class Trans extends Thread {
                         System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                         
                         // send ACK
-                        Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck());
+                        Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck() - 1);
                         route.pushSegment(s);
                     }
                 //}
