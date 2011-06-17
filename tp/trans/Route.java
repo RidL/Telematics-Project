@@ -32,9 +32,9 @@ public class Route extends Thread {
 	public void run(){
 		while(true){
 			synchronized(LOCK){
-            	ArrayList<Segment> _routingTable = new ArrayList<Segment>(routableSegs);
+            	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
-            	for(Iterator<Segment> it = _routingTable.iterator(); it.hasNext();) {
+            	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
                     s = it.next();
                     int addr = s.getDestinationAddress();
                     Link destLink = routingTable.get(addr);

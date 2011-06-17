@@ -44,6 +44,7 @@ public class TPSocket {
 				temp = inBuffer;
 				inBuffer = null;
    	     	}
+			INLOCK.notifyAll();
 		}
         return temp;
     }
@@ -73,8 +74,8 @@ public class TPSocket {
                     suc = true;
                 }
             }
+            OUTLOCK.notifyAll();
     	}
-
         return suc;
     }
 
