@@ -27,7 +27,7 @@ public class TPSocket {
     private final Object INLOCK = new Object();
 
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
-        seq_nr = 0;
+        seq_nr = -1;
         ack_nr = 0;
         lastAcked = -1;
         this.dstAddress = dstAddress;
