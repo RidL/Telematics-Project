@@ -66,10 +66,12 @@ public class Tunnel extends Thread implements Link {
 			
 			try {
 				in = read.read();
-				System.out.println("int read: " + in);
 				for(int i=0; (in!=-1)&&len>0; in=(byte)read.read(), i++, len--){
 					data[i] = (byte)in;
+					System.out.println( "bsbbsdbsdbsd" + len);
 					if(i==5){
+						System.out.println( "asdasdasdasd" + data[i]);
+						
 						len += data[i];
 					}
 					if(len==1)

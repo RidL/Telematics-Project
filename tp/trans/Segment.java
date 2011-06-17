@@ -67,6 +67,7 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
+    	System.out.println(bytes[5] + "ddddddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaavid");
         byte[] tmp = new byte[(bytes[5]+7)];
         byte[] dat = new byte[(bytes[5])];
         
@@ -155,7 +156,14 @@ public class Segment {
     }
 
     public int getSEQ() {
-        return bytes[6];
+    	int ret;
+    	if (bytes[6] < 0) {
+    		ret = bytes[6] + 256;
+    	}
+    	else {
+    		ret = bytes[6];
+        }
+    	return ret;
     }
     
     public String toString(){
