@@ -122,6 +122,7 @@ public class Trans extends Thread {
                     }
                     else {
                         System.out.println("TP-DATA RECEIVED: " + seg.getSEQ());
+                        System.out.println("seg bytes length" + seg.getBytes().length);
                         System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                         
                         // send ACK
