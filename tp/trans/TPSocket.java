@@ -14,6 +14,7 @@ public class TPSocket {
 
     private int seq_nr;
     private int ack_nr;
+    private int lastAcked;
     private int dstAddress;
     private int srcPort;
     private int dstPort;
@@ -25,6 +26,7 @@ public class TPSocket {
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seq_nr = 0;
         ack_nr = 0;
+        lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
@@ -171,5 +173,13 @@ public class TPSocket {
      */
     public Object getINLOCK() {
         return INLOCK;
+    }
+
+    public void incrLastAcked() {
+        lastAcked++;
+    }
+
+    public int getLastAcked() {
+        return lastAcked;
     }
 }

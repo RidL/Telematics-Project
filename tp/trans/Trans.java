@@ -5,6 +5,8 @@ import java.util.List;
 
 public class Trans extends Thread {
 
+    private static final int WINDOW_SIZE = 128;
+
     private static Trans ref;
     private static Route route;
     private int address;
@@ -34,6 +36,10 @@ public class Trans extends Thread {
     		for (int i = 0; i < sockList.size(); i++) {
     			sock = sockList.get(i);
     		    if(sock.isOutDirty()){
+                /*
+                 * REPLACE WITH WHEN ACK IS IMPLEMENTED
+                 * if(sock.isOutDirty() && sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE){
+                 */
     		    	//MAYBE SYNC?
 		    		data = sock.readOut();
 		    		route.pushSegment(createSegment(data, sock, false));
@@ -70,6 +76,13 @@ public class Trans extends Thread {
             if (sock.getSourcePort() == seg.getDestinationPort()) {
                 //if (seg.isValidSegment()) {
                     System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
+
+                    /*
+                     * ENABLE THIS FOR ACK
+                     * if(seg.isACK() && sock.getLastAcked() == seg.getSEQ()-1) {
+                     *      sock.incrLastAcked();
+                     * }
+                     */
                 //}
             //TODO: else: wait for retransmit
             }
