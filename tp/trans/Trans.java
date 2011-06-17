@@ -46,6 +46,12 @@ public class Trans extends Thread {
                 data = sock.readOut();
                 route.pushSegment(createSegment(data, sock, false));
             }
+            try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
