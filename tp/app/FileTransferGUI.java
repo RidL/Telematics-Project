@@ -105,7 +105,7 @@ public class FileTransferGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if (!init) {
                 address = Integer.parseInt(addressField.getText());
-                sourcePort = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
                 // fs = new FileSender(address, sourcePort, destPort);
                 // fr = new FileReceiver(address, sourcePort, destPort);
@@ -122,7 +122,7 @@ public class FileTransferGUI extends JFrame {
 
             } else if (e.getActionCommand().equals("send")) {
                 address = Integer.parseInt(addressField.getText());
-                sourcePort = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
                 try {
                     fs = new FileSender(address, sourcePort, destPort);
@@ -137,7 +137,7 @@ public class FileTransferGUI extends JFrame {
 
             } else if (e.getActionCommand().equals("receive")) {
                 address = Integer.parseInt(addressField.getText());
-                sourcePort = Integer.parseInt(addressField.getText());
+                sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
                 fr = new FileReceiver(address, sourcePort, destPort);
                 fr.start();
