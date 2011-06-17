@@ -13,3 +13,4 @@ public class ChatAppInit {
         Log.getInstance("RMS");
     }
 }
+
