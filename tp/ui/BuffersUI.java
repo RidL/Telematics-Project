@@ -23,12 +23,11 @@ public class BuffersUI extends JPanel{
 		transTitles = new BufferComponent();
 		routes = new ArrayList<BufferComponent>();
 		socks = new ArrayList<BufferComponent>();
+		
+		setLayout(new BorderLayout());
 		buildRouteBuffer();
 		buildTransBuffer();
 		
-		setLayout(new BorderLayout());
-		add(routePanel, BorderLayout.CENTER);
-		add(transPanel, BorderLayout.SOUTH);
 	}
 	
 	public void buildRouteBuffer(){
@@ -37,6 +36,7 @@ public class BuffersUI extends JPanel{
 		routePanel = new JPanel();
 		routePanel.setBorder(routeBorder);
 		routePanel.add(routeTitles);
+		add(routePanel, BorderLayout.CENTER);
 	}
 	
 	public void buildTransBuffer(){
@@ -45,5 +45,6 @@ public class BuffersUI extends JPanel{
 		transPanel = new JPanel();
 		transPanel.setBorder(transBorder);
 		transPanel.add(transTitles);
+		add(transPanel, BorderLayout.SOUTH);
 	}
 }

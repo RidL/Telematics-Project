@@ -18,9 +18,9 @@ public class Trans extends Thread {
         route.start();
     }
 
-    public static Trans getTrans() {
-        if (ref == null) {
-            ref = new Trans(1);
+    public static Trans getTrans(int addr) {
+        if (ref == null || ref.getAddress()!=addr) {
+            ref = new Trans(addr);
             ref.start();
         }
         return ref;
@@ -57,7 +57,11 @@ public class Trans extends Thread {
     public void closeSocket(TPSocket sock) {
         sockList.remove(sock);
     }
-
+    
+    public Route getRoute(){
+    	return route;
+    }
+    
     /**
      * Voor ontvangen data shit van Route
      * @param seg

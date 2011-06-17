@@ -101,17 +101,4 @@ public class Route extends Thread {
     public Object getLock() {
         return LOCK;
     }
-
-    public static void main(String[] args) {
-        Log.getInstance("RT");
-        Trans t = Trans.getTrans();
-        Route r = new Route(t);
-        for(Segment s: r.routableSegs) {
-            System.out.println("Segment: " + s);
-        }
-        for(Integer i: r.routingTable.keySet()) {
-            System.out.println("rt " + i + "--" + r.routingTable.get(i));
-        }
-        System.out.println("");
-    }
 }

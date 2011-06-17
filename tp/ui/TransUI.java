@@ -11,8 +11,9 @@ public class TransUI extends JFrame{
 		tabs = new JTabbedPane();
 		tabs.addTab("Connections", new ConnectionsUI());
 		tabs.addTab("Local Buffers", new BuffersUI());
-		
+		tabs.addTab("Stats", new StatsUI());
 		setContentPane(tabs);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("TP Monitoring");
 		pack();
