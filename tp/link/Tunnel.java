@@ -73,8 +73,8 @@ public class Tunnel extends Thread implements Link {
                 length = read.read();
                 data[5] = (byte)length;
                 data[6] = (byte) read.read();
-                System.out.println("TUN data[5]" + data[5]);
-                for (int i = 0; i < data[5]; i++) {
+                System.out.println("TUN length" + length);
+                for (int i = 0; i < length; i++) {
                     data[7 + i] = (byte) read.read();
                 }
 
