@@ -32,7 +32,7 @@ public class Route extends Thread {
 	@Override
 	public void run(){
 		while(true){
-		//	synchronized(LOCK){
+			synchronized(LOCK){
             	ArrayList<Segment> _routableSegs = new ArrayList<Segment>(routableSegs);
             	Segment s = null;
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
@@ -46,15 +46,17 @@ public class Route extends Thread {
                     }
                 }
             	routableSegs.remove(s);
-         //   }
+            }
 			//TODO:check routables
 			//TODO:check links
 		}
 	}
 	
 	public void pushSegment(Segment s){
-		System.out.println("push number" + (++calls) + "");
-		routableSegs.add(s);
+		System.out.println("ROUT push number " + (++calls) + "");
+        synchronized(LOCK){
+            routableSegs.add(s);
+        }
 	}
 	
 	public void rcvSegment(Segment s){
@@ -62,9 +64,9 @@ public class Route extends Thread {
 			System.out.println("ROUTE =====received=====\n" + s);
 			trans.rcvSeg(s);
 		}else{
-      //      synchronized(LOCK) {
+            synchronized(LOCK) {
                 routableSegs.add(s);
-       //     }
+            }
 		}
 	}
 	

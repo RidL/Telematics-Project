@@ -42,12 +42,15 @@ public class Trans extends Thread {
     @Override
     public void run() {
     	byte[] data;
-        TPSocket sock;
+        TPSocket sock = null;
         while (true) {
             for (int i = 0; i < sockList.size(); i++) {
                 sock = sockList.get(i);
+                if(sock.isOutDirty()){
                 data = sock.readOut();
                 route.pushSegment(createSegment(data, sock, false));
+                }
+                
             }
             try {
 				Thread.sleep(5);
@@ -87,7 +90,6 @@ public class Trans extends Thread {
         for (int i = 0; i < sockList.size(); i++) {
         	sock = sockList.get(i);
             if (sock.getSourcePort() == seg.getDestinationPort()) {
-                System.out.println("booolean lollol");
                 //if (seg.isValidSegment()) {
                     System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                 //}

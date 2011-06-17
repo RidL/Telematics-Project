@@ -90,6 +90,7 @@ public class Tunnel extends Thread implements Link {
 	
 	@Override
 	public void pushSegment(Segment s) {
+        System.out.println("TUN PUSHED");
 		byte[] bytes = s.getBytes();
 		try {
 			for(int i=0; i<bytes.length; i++){

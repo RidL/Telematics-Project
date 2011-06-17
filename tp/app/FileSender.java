@@ -55,6 +55,7 @@ public class FileSender {
             writeData[i] = header[j];
             if (i == MAX_SEGMENT_DATA - 1) {
                 tpSocket.writeOut(writeData);
+                System.out.println("writeshite1");
                 writeData = new byte[MAX_SEGMENT_DATA]; // not neccesary but assures no duplicate header data
                 i = 0;
             }
@@ -69,6 +70,7 @@ public class FileSender {
             writeData[i] = bytes[j];
             if (i == MAX_SEGMENT_DATA - 1) {
                 tpSocket.writeOut(writeData);
+                System.out.println("writeshite2");
                 break;
             }
         }
@@ -77,6 +79,7 @@ public class FileSender {
         while (dataRead != -1) {
             dataRead = fis.read(bytes);
             tpSocket.writeOut(bytes);
+            System.out.println("writeshite3");
             bytes = new byte[MAX_SEGMENT_DATA];
         }
         System.out.println("End of file");
