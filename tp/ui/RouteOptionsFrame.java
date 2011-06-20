@@ -121,7 +121,7 @@ public class RouteOptionsFrame extends JFrame{
 					tte.printStackTrace();
 				}
 			}
-			Trans.getTrans().getRoute().addRoute(Integer.parseInt(labels[1].getText()), l);
+			Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), l);
 			dispose();
 		}
 		
