@@ -114,6 +114,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 				ro.setIP("LPT");
 				ro.setPort("LPT");
 			}
+			opts.add(ro);
 		}
 		System.out.println(opts.size());
 		routeData = new JTable(new MyTableModel(opts));
