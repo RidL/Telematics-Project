@@ -97,6 +97,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
+		System.out.println("update");
 		Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
 		ArrayList<RouteOptions> opts = new ArrayList<RouteOptions>();
 		for(Map.Entry<Integer, Link> e: routes){
