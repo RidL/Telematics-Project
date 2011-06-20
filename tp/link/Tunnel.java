@@ -33,12 +33,13 @@ public class Tunnel extends Thread implements Link {
     		InetAddress ia = InetAddress.getByName(addr);
     		this.addr = ia;
         	if(listen){
+        		ServerSocket serv = new ServerSocket(port);
         		do{
-        			sock = new ServerSocket(port).accept();
+        			sock = serv.accept();
         			//TODO: remove
         			System.out.println(ia.toString());
-        			System.out.println(sock.getRemoteSocketAddress().toString());
-        		}while(!sock.getRemoteSocketAddress().toString().equals(ia.toString()));
+        			System.out.println(sock.getRemoteSocketAddress().toString().split(":")[0]);
+        		}while(!sock.getRemoteSocketAddress().toString().split(":")[0].equals(ia.toString()));
         		
         	}else{
         		long startTime = System.currentTimeMillis(); 
@@ -52,7 +53,7 @@ public class Tunnel extends Thread implements Link {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Could not connect, host might not be looking for tunnel.");
+            e.printStackTrace();
         }
     }
 
