@@ -57,7 +57,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		TitledBorder routeTitle;
 		routeTitle = BorderFactory.createTitledBorder("Tunnels");
-		routeData = new JTable(new MyTableModel());
+		routeData = new JTable(new MyTableModel(new ArrayList<RouteOptions>()));
 		tablePanel = new JScrollPane(routeData);
 		routePanel = new JPanel();
 		routePanel.setLayout(new BorderLayout());
@@ -112,9 +112,9 @@ public class ConnectionsUI extends JPanel implements Observer{
 			}else{
 				ro.setIP("LPT");
 				ro.setPort("LPT");
-				ro.setConnected(true);
 			}
 		}
+		routeData = new JTable(new MyTableModel(opts));
 	}
 	
 	private class MyTableModel extends AbstractTableModel{
@@ -123,6 +123,10 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		private final String[] COLUMN_NAMES = 
 			{"name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
+		
+		public MyTableModel(ArrayList<RouteOptions> opts){
+			routes = opts;
+		}
 		
 		@Override
 		public String getColumnName(int col){
