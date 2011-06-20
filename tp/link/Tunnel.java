@@ -43,7 +43,7 @@ public class Tunnel extends Thread implements Link {
 	    			sock = serv.accept();
 	    			System.out.println(addr.toString());
 	    			System.out.println(sock.getRemoteSocketAddress().toString().split("/")[0].split(":")[0]);
-	    		}while(!sock.getRemoteSocketAddress().toString().split(":")[0].equals(addr.toString()));
+	    		}while(!sock.getRemoteSocketAddress().toString().split("/")[0].split(":")[0].equals(addr.toString()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
