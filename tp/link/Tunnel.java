@@ -30,12 +30,20 @@ public class Tunnel extends Thread implements Link {
         this.port = port;
         this.listening = listen;
     	try {
+    		InetAddress ia = InetAddress.getByName(addr);
+    		this.addr = ia;
         	if(listen){
-        		sock = new ServerSocket(port).accept();
+        		do{
+        			sock = new ServerSocket(port).accept();
+        			//TODO: remove
+        			System.out.println(ia.toString());
+        			System.out.println(sock.getRemoteSocketAddress().toString());
+        		}while(!sock.getRemoteSocketAddress().toString().equals(ia.toString()));
+        		
         	}else{
         		long startTime = System.currentTimeMillis(); 
         		while(System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT)){
-        			sock = new Socket(addr,port);
+        			sock = new Socket(ia,port);
         		}
         		throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
         	}
