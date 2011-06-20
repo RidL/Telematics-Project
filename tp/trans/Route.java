@@ -58,7 +58,7 @@ public class Route extends Observable implements Runnable{
 	public void addRoute(int addr, Link l){
 		routingTable.put(addr, l);
 		setChanged();
-		notifyAll();
+		notifyObservers();
 	}
 	
 	public void pushSegment(Segment s){

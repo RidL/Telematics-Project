@@ -21,7 +21,6 @@ import javax.swing.table.AbstractTableModel;
 
 import tp.link.Link;
 import tp.link.Tunnel;
-import tp.trans.Route;
 import tp.trans.Trans;
 
 public class ConnectionsUI extends JPanel implements Observer{
@@ -44,6 +43,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	public ConnectionsUI(){
 		ctrl = new ConnControl();
+		Trans.getTrans().getRoute().addObserver(this);
 		
 		TitledBorder networkBorder;
 		networkBorder = BorderFactory.createTitledBorder("Local");

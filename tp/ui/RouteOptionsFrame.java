@@ -23,7 +23,6 @@ public class RouteOptionsFrame extends JFrame{
 	
 	ConnectionsUI parent;
 	private Control conn = new Control();
-	private boolean isConnected;
 	
 	private JLabel[] labels;
 	private JTextField[] texts;
@@ -32,28 +31,25 @@ public class RouteOptionsFrame extends JFrame{
 	
 	public RouteOptionsFrame(ConnectionsUI parent){
 		this.parent = parent;
-		isConnected = false;
-		
 		buildUI();
 	}
 	
-	public RouteOptionsFrame(ConnectionsUI parent, RouteOptions opt){
-		this.parent = parent;
-		isConnected = opt.isConnected();
-		
-		buildUI();
-		texts[0].setText(opt.getName());
-		texts[1].setText(opt.getTP());
-		texts[2].setText(opt.getIP());
-		texts[3].setText(opt.getPort());
-		listeningCheck.setSelected(opt.isListen());
-		if(opt.isConnected()){
-			for(JTextField t: texts)
-				t.setEditable(false);
-			listeningCheck.setEnabled(false);
-			confirm.setEnabled(false);
-		}
-	}
+//	public RouteOptionsFrame(ConnectionsUI parent, RouteOptions opt){
+//		this.parent = parent;
+//		
+//		buildUI();
+//		texts[0].setText(opt.getName());
+//		texts[1].setText(opt.getTP());
+//		texts[2].setText(opt.getIP());
+//		texts[3].setText(opt.getPort());
+//		listeningCheck.setSelected(opt.isListen());
+//		if(opt.isConnected()){
+//			for(JTextField t: texts)
+//				t.setEditable(false);
+//			listeningCheck.setEnabled(false);
+//			confirm.setEnabled(false);
+//		}
+//	}
 	
 	public void buildUI(){
 		setTitle("Route Options");
@@ -96,14 +92,6 @@ public class RouteOptionsFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			RouteOptions r = new RouteOptions(
-					texts[0].getText(),
-					texts[1].getText(),
-					texts[2].getText(),
-					texts[3].getText(),
-					listeningCheck.isSelected(),
-					isConnected
-					);
 			Link l = null;
 			if(texts[3].getText().equalsIgnoreCase("LPT")){
 				HLSender snd;
