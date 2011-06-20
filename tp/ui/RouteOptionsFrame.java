@@ -21,7 +21,6 @@ import tp.trans.Trans;
 public class RouteOptionsFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
-	ConnectionsUI parent;
 	private Control conn = new Control();
 	
 	private JLabel[] labels;
@@ -29,8 +28,7 @@ public class RouteOptionsFrame extends JFrame{
 	private JCheckBox listeningCheck;
 	private JButton confirm;
 	
-	public RouteOptionsFrame(ConnectionsUI parent){
-		this.parent = parent;
+	public RouteOptionsFrame(){
 		buildUI();
 	}
 	
