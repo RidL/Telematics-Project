@@ -13,21 +13,21 @@ public class Trans extends Thread {
     private static Route route;
     private int address;
     private List<TPSocket> sockList;
-    private ArrayList<Segment> rcvBuff;
-    //private ArrayList<ArrayList<Segment>> sendBuffer;
 
     private Trans(int address) {
         route = new Route(this);
         this.address = address;
         sockList = new ArrayList<TPSocket>();
-        //sendBuffer = new ArrayList<ArrayList<Segment>>();
-        route.start();
+        new Thread(route).start();
     }
 
     public static Trans getTrans(int addr) {
-        if (ref == null || ref.getAddress()!=addr) {
+        if (ref == null) {
             ref = new Trans(addr);
             ref.start();
+        }else{
+        	System.out.println("Warning: Trans already exists, did not create " +
+        			"a new Trans with address: " + addr + "");
         }
         return ref;
     }
@@ -36,6 +36,7 @@ public class Trans extends Thread {
 		if (ref == null ) {
             ref = new Trans(0);
             ref.start();
+            System.out.println("Warning: trans address wasn't set, picking 1");
         }
         return ref;
 	}

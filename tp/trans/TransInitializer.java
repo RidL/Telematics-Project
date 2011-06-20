@@ -8,7 +8,7 @@ public class TransInitializer {
 	public static void main(String[] args){
 		Log.getInstance("RMS");
 		Log l = Log.getInstance("RMS");
-		sock = Trans.getTrans().createSocket(0, 1, 1);
+		sock = Trans.getTrans(1).createSocket(0, 1, 1);
 
         while(true){
             readLine();
