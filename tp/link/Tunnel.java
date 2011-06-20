@@ -46,7 +46,8 @@ public class Tunnel extends Thread implements Link {
         		while((System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT) && sock==null)){
         			sock = new Socket(ia,port);
         		}
-        		throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
+        		if(sock == null)
+        			throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
         	}
         	read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
         	write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
