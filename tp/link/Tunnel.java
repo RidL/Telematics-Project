@@ -26,7 +26,7 @@ public class Tunnel extends Thread implements Link {
     private Route route = Trans.getTrans().getRoute();
 
     public Tunnel(String addr, int port, boolean listen) throws TunnelTimeoutException {
-        Socket sock;
+        Socket sock = null;
         this.port = port;
         this.listening = listen;
     	try {
@@ -43,7 +43,7 @@ public class Tunnel extends Thread implements Link {
         		
         	}else{
         		long startTime = System.currentTimeMillis(); 
-        		while(System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT)){
+        		while((System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT) && sock==null)){
         			sock = new Socket(ia,port);
         		}
         		throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
