@@ -43,7 +43,6 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	public ConnectionsUI(){
 		ctrl = new ConnControl();
-		Trans.getTrans().getRoute().addObserver(this);
 		
 		TitledBorder networkBorder;
 		networkBorder = BorderFactory.createTitledBorder("Local");
@@ -85,12 +84,13 @@ public class ConnectionsUI extends JPanel implements Observer{
 		public void actionPerformed(ActionEvent ae) {
 			JButton src = (JButton)ae.getSource();
 			if(src==networkConfirm){
-				Trans.getTrans(Integer.parseInt(networkAddress.getText()));
+				Trans t = Trans.getTrans(Integer.parseInt(networkAddress.getText()));
+				t.getRoute().addObserver(getOuter());
 				networkConfirm.setEnabled(false);
 				networkAddress.setEditable(false);
 				newRoute.setEnabled(true);
 			}else if(src==newRoute){
-				new RouteOptionsFrame(getOuter());
+				new RouteOptionsFrame();
 			}
 		}
 	}
