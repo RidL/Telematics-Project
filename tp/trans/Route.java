@@ -57,7 +57,7 @@ public class Route extends Observable implements Runnable{
 	
 	public void addRoute(int addr, Link l){
 		routingTable.put(addr, l);
-		System.out.println("Route added");
+		System.out.println("Route added - " + routingTable.size());
 		setChanged();
 		notifyObservers();
 	}
