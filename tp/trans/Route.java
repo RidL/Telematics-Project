@@ -1,21 +1,15 @@
 package tp.trans;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.Observable;
+import java.util.Set;
 
 import tp.link.Link;
-import tp.link.Tunnel;
-import tp.util.Log;
 
-public class Route extends Thread {
+public class Route extends Observable implements Runnable{
 	int calls;
     private final Object LOCK = new Object();
     
@@ -24,8 +18,8 @@ public class Route extends Thread {
 	private Trans trans;
 	
 	public Route(Trans trans){
-		initRoutingTable();
 		routableSegs = new ArrayList<Segment>();
+		routingTable = new HashMap<Integer, Link>();
 		this.trans = trans;
 	}
 	
@@ -57,6 +51,16 @@ public class Route extends Thread {
 		}
 	}
 	
+	public Set<Map.Entry<Integer, Link>> getRoutes(){
+		return routingTable.entrySet();
+	}
+	
+	public void addRoute(int addr, Link l){
+		routingTable.put(addr, l);
+		setChanged();
+		notifyAll();
+	}
+	
 	public void pushSegment(Segment s){
 		System.out.println("ROUT push number " + (++calls) + "");
         synchronized(LOCK){
@@ -76,41 +80,6 @@ public class Route extends Thread {
             }
 		}
 	}
-	
-	public void initRoutingTable(){
-		synchronized(LOCK){
-			//ADDRESS LNK_TYPE(LPT|TUNNEL) TUN_ADD TUN_PRT
-			BufferedReader read;
-			routingTable = new HashMap<Integer, Link>();
-			try {
-				read = new BufferedReader(new FileReader("routing.conf"));
-				String s = read.readLine();
-				while(s != null){
-					Scanner scan = new Scanner(s);
-					int addr;
-					Link l = null;
-					addr = Integer.parseInt(scan.next());
-					if(scan.next().equals("LPT")){
-						//TODO: INIT RCV, INIT SENDER
-					}else{
-						String IPAdd = scan.next();
-						Tunnel t = new Tunnel(IPAdd, Integer.parseInt(scan.next()),this);
-						System.out.println("adding: " + addr + " " + t);
-						routingTable.put(addr, t);
-						t.start();
-					}
-					
-					s = read.readLine();
-				}
-			} catch (FileNotFoundException e) {
-				System.out.println("Could not open routing file");
-				//e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
     public Object getLock() {
         return LOCK;
     }

@@ -12,58 +12,48 @@ import java.net.UnknownHostException;
 
 import tp.trans.Route;
 import tp.trans.Segment;
+import tp.trans.Trans;
 import tp.util.Log;
 
 public class Tunnel extends Thread implements Link {
-
-    private Socket sock;
+	public static final long CONNECTION_TIMEOUT = 120000;//2min
     private BufferedReader read;
     private BufferedWriter write;
     private boolean isConnected;
+    private boolean listening;
     private InetAddress addr;
     private int port;
-    private Route route;
+    private Route route = Trans.getTrans().getRoute();
 
-    public Tunnel(String addr, int port, Route route) {
-        try {
-            Log.writeLog(" TUN", "trying new tunnel @ " + addr + ":" + port, true);
-            this.addr = InetAddress.getByName(addr);
-            sock = new Socket(addr, port);
-            isConnected = true;
+    public Tunnel(String addr, int port, boolean listen) throws TunnelTimeoutException {
+        Socket sock;
+        this.port = port;
+        this.listening = listen;
+    	try {
+        	if(listen){
+        		sock = new ServerSocket(port).accept();
+        	}else{
+        		long startTime = System.currentTimeMillis(); 
+        		while(System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT)){
+        			sock = new Socket(addr,port);
+        		}
+        		throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
+        	}
+        	read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        	write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println("Could not connect, host might not be looking for tunnel.");
         }
-        this.port = port;
-        this.route = route;
     }
 
     @Override
     public void run() {
-        if (sock == null) {
-            try {
-                System.out.println("waiting on socket request;");
-                ServerSocket serv = new ServerSocket(port);
-                sock = serv.accept();
-                isConnected = true;
-                System.out.println("socket request accepted;");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-        } catch (IOException e) {
-            System.err.println("Could not construct socket I/O @ " + addr.getHostAddress() + ":" + port + "");
-            e.printStackTrace();
-        }
         while (true) {
             byte[] data = new byte[103];
             int in;
             int length;
-
             try {
                 in = read.read();
                 for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
@@ -88,7 +78,23 @@ public class Tunnel extends Thread implements Link {
             route.rcvSegment(seg);
         }
     }
-
+    
+    public String getAddress(){
+    	return this.addr.toString();
+    }
+    
+    public String getPort(){
+    	return Integer.toString(port);
+    }
+    
+    public boolean isListening() {
+		return listening;
+	}
+    
+    public boolean isConnected(){
+    	return isConnected;
+    }
+    
     @Override
     public void pushSegment(Segment s) {
         System.out.println("TUN PUSHED");
@@ -109,4 +115,6 @@ public class Tunnel extends Thread implements Link {
     public boolean readyToPushSegment() {
         return isConnected;
     }
+
+	
 }
