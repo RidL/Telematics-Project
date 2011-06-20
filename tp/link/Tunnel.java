@@ -29,33 +29,48 @@ public class Tunnel extends Thread implements Link {
         Socket sock = null;
         this.port = port;
         this.listening = listen;
-    	try {
+        try {
     		InetAddress ia = InetAddress.getByName(addr);
     		this.addr = ia;
-        	if(listen){
-        		ServerSocket serv = new ServerSocket(port);
-        		do{
-        			sock = serv.accept();
-        			//TODO: remove
-        			System.out.println(ia.toString());
-        			System.out.println(sock.getRemoteSocketAddress().toString().split(":")[0]);
-        		}while(!sock.getRemoteSocketAddress().toString().split(":")[0].equals(ia.toString()));
-        		
-        	}else{
-        		long startTime = System.currentTimeMillis(); 
-        		while((System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT) && sock==null)){
-        			sock = new Socket(ia,port);
-        		}
-        		if(sock == null)
-        			throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
-        	}
-        	read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-        	write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+		if(listen){
+			ServerSocket serv;
+			try {
+				serv = new ServerSocket(port);
+				do{
+	    			sock = serv.accept();
+	    			System.out.println(addr.toString());
+	    			System.out.println(sock.getRemoteSocketAddress().toString().split(":")[0]);
+	    		}while(!sock.getRemoteSocketAddress().toString().split(":")[0].equals(addr.toString()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}else{
+    		long startTime = System.currentTimeMillis(); 
+    		while((System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT) && sock==null)){
+    			try {
+					sock = new Socket(addr,port);
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					try{
+						Thread.sleep(100);
+					}catch(InterruptedException ie){
+						e.printStackTrace();
+					}
+				}
+    		}
+    		if(sock == null)
+    			throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
+    	}
+    	try {
+			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override
