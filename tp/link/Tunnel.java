@@ -46,6 +46,7 @@ public class Tunnel extends Thread implements Link {
 	    			System.out.println(addr.toString());
 	    			System.out.println(servAddr);
 	    		}while(!servAddr.equals(addr.toString()));
+				isConnected = true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -54,6 +55,7 @@ public class Tunnel extends Thread implements Link {
     		while((System.currentTimeMillis()<(startTime+CONNECTION_TIMEOUT) && sock==null)){
     			try {
 					sock = new Socket(addr,port);
+					isConnected = true;
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
