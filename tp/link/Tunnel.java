@@ -1,10 +1,9 @@
 package tp.link;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,17 +12,16 @@ import java.net.UnknownHostException;
 import tp.trans.Route;
 import tp.trans.Segment;
 import tp.trans.Trans;
-import tp.util.Log;
 
 public class Tunnel extends Thread implements Link {
 	public static final long CONNECTION_TIMEOUT = 120000;//2min
     private BufferedReader read;
-    private BufferedWriter write;
     private boolean isConnected;
     private boolean listening;
     private InetAddress addr;
     private int port;
     private Route route = Trans.getTrans().getRoute();
+    OutputStream os;
 
     public Tunnel(String addr, int port, boolean listen) throws TunnelTimeoutException {
         Socket sock = null;
@@ -71,7 +69,7 @@ public class Tunnel extends Thread implements Link {
     	}
     	try {
 			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			write = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+			os = sock.getOutputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -121,16 +119,12 @@ public class Tunnel extends Thread implements Link {
     
     @Override
     public void pushSegment(Segment s) {
-        byte[] bytes = s.getBytes();
-        try {
-            for (int i = 0; i < bytes.length; i++) {
-            	System.out.println(i + ": " + Frame.toBinaryString(bytes[i]));
-                write.write(bytes[i]);
-            }
-            write.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	try {
+			os.write(s.getBytes());
+		} catch (IOException e) {
+			System.err.println("Error writing data @ TUN " + addr.toString());
+			e.printStackTrace();
+		}
     }
 
     @Override

@@ -43,7 +43,6 @@ public class Route extends Observable implements Runnable{
                     Link destLink = routingTable.get(addr);
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
-                        System.out.println("ROUTE =====pushing=====\n" + s);
                         break;
                     }
                 }
