@@ -5,11 +5,12 @@ import javax.swing.JTabbedPane;
 
 import tp.trans.Route;
 import tp.trans.Trans;
+import tp.util.Log;
 
 public class TransUI extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private JTabbedPane tabs;
-	
+	Log l = Log.getInstance("TP");
 	private ConnectionsUI conui;
 	private BuffersUI bufui;
 	private StatsUI statui;
@@ -33,8 +34,8 @@ public class TransUI extends JFrame{
 	public void addObservers(){
 		Route r = Trans.getTrans().getRoute();
 		r.addObserver(conui);
-		r.addObserver(bufui);
-		r.addObserver(statui);
+		//r.addObserver(bufui);
+		//r.addObserver(statui);
 	}
 	
 	public static void main(String[] args){
