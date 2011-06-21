@@ -89,7 +89,6 @@ public class Tunnel extends Thread implements Link {
                 }
                 data[5] = (byte)in;
                 data[6] = (byte) read.read();
-                System.out.println("TUN length" + in);
                 for (int i = 0; i < in; i++) {
                     data[7 + i] = (byte) read.read();
                 }
@@ -122,12 +121,10 @@ public class Tunnel extends Thread implements Link {
     
     @Override
     public void pushSegment(Segment s) {
-        System.out.println("TUN PUSHED");
         byte[] bytes = s.getBytes();
         try {
             for (int i = 0; i < bytes.length; i++) {
             	//TODO test dis shite
-            	System.out.println(Frame.toBinaryString(bytes[i]));
                 write.write(bytes[i]);
             }
             write.flush();
