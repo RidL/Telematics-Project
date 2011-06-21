@@ -68,10 +68,10 @@ public class RouteOptionsFrame extends JFrame{
 		contentPane.add(new JLabel()); //one empty for the button
 		
 		texts = new JTextField[4];
-		texts[0] = new JTextField();
-		texts[1] = new JTextField();
-		texts[2] = new JTextField();
-		texts[3] = new JTextField();
+		texts[0] = new JTextField(10);
+		texts[1] = new JTextField(5);
+		texts[2] = new JTextField(10);
+		texts[3] = new JTextField(5);
 		for(JTextField t: texts)
 			contentPane.add(t);
 		
@@ -105,7 +105,7 @@ public class RouteOptionsFrame extends JFrame{
 				} catch (NumberFormatException nfe) {
 					nfe.printStackTrace();
 				} catch (TunnelTimeoutException tte) {
-					tte.printStackTrace();
+					System.err.println("Timeout while connecting to " + texts[2].getText());
 				}
 			}
 			dispose();
