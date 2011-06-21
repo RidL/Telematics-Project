@@ -12,6 +12,8 @@ public class TransInitializer {
 			sock = Trans.getTrans(1).createSocket(0, 1, 1);
 		} catch (SocketTakenException e) {
 			e.printStackTrace();
+		} catch (UnkownTPHostException e) {
+			e.printStackTrace();
 		}
 
         while(true){

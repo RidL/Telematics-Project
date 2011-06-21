@@ -7,6 +7,7 @@ package tp.app;
 import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
+import tp.trans.UnkownTPHostException;
 
 /**
  *
@@ -23,6 +24,8 @@ public class FileTransferTest {
         try {
 			tpsocket = trans.createSocket(12, 5, 7);
 		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		} catch (UnkownTPHostException e) {
 			e.printStackTrace();
 		}
         while (true) {

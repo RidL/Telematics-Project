@@ -3,6 +3,7 @@ package tp.app;
 import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
+import tp.trans.UnkownTPHostException;
 
 /**
  *
@@ -20,6 +21,8 @@ public class Chat {
         try {
 			socket = trans.createSocket(destAddr, scrPort, destPort);
 		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		} catch (UnkownTPHostException e) {
 			e.printStackTrace();
 		}
         this.sender = sender;

@@ -14,6 +14,7 @@ import tp.link.Frame;
 import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
+import tp.trans.UnkownTPHostException;
 
 /**
  *
@@ -35,6 +36,8 @@ public class FileTransfer {
         try {
 			tpSocket = trans.createSocket(address, srcPort, dstPort);
 		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		} catch (UnkownTPHostException e) {
 			e.printStackTrace();
 		}
 

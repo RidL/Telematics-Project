@@ -38,6 +38,7 @@ public class Route extends Observable implements Runnable{
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
                     s = it.next();
                     int addr = s.getDestinationAddress();
+                    System.out.println("Should be addr: " + addr);
                     Link destLink = routingTable.get(addr);
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
@@ -50,6 +51,10 @@ public class Route extends Observable implements Runnable{
         		notifyObservers();
             }
 		}
+	}
+	
+	public boolean hasDst(int dst){
+		return routingTable.get(dst)!=null;
 	}
 	
 	public ArrayList<Segment> getRoutableSegments(){

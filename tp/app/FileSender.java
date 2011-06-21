@@ -12,6 +12,7 @@ import tp.link.Frame;
 import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
+import tp.trans.UnkownTPHostException;
 import tp.util.Log;
 
 /**
@@ -40,8 +41,9 @@ public class FileSender {
 			tpSocket = trans.createSocket(address, srcPort, dstPort);
 		} catch (SocketTakenException e) {
 			e.printStackTrace();
+		} catch (UnkownTPHostException e) {
+			e.printStackTrace();
 		}
-        //tpSocket = new FakeSocket(true);
     }
 
     /**
