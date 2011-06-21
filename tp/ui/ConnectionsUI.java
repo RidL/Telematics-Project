@@ -27,6 +27,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	private static final long serialVersionUID = 1L;
 	
 	private ConnControl ctrl;
+	private TransUI tui;
 	
 	//network UI stuff
 	private JPanel networkPanel;
@@ -43,9 +44,10 @@ public class ConnectionsUI extends JPanel implements Observer{
 	private JButton newRoute;
 	private JButton startChat;
 	
-	public ConnectionsUI(){
+	public ConnectionsUI(TransUI tui){
 		ctrl = new ConnControl();
 		opts = new ArrayList<RouteOptions>();
+		this.tui = tui;
 		
 		TitledBorder networkBorder;
 		networkBorder = BorderFactory.createTitledBorder("Local");
@@ -92,7 +94,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 			JButton src = (JButton)ae.getSource();
 			if(src==networkConfirm){
 				Trans t = Trans.getTrans(Integer.parseInt(networkAddress.getText()));
-				t.getRoute().addObserver(getOuter());
+				tui.addObservers();
 				networkConfirm.setEnabled(false);
 				networkAddress.setEditable(false);
 				newRoute.setEnabled(true);
