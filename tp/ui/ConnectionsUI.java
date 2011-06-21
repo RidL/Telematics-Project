@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -160,13 +159,5 @@ public class ConnectionsUI extends JPanel implements Observer{
 			return ret;
 		}
 		
-	}
-	
-	public static void main(String[] args){
-		JFrame f = new JFrame();
-		f.setContentPane(new ConnectionsUI());
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.pack();
-		f.setVisible(true);
 	}
 }

@@ -3,8 +3,6 @@ package tp.trans;
 import java.util.ArrayList;
 import java.util.List;
 
-import tp.util.Log;
-
 public class Trans extends Thread {
 
     private static final int WINDOW_SIZE = 128;
@@ -86,7 +84,6 @@ public class Trans extends Thread {
     }
 
     public void closeSocket(TPSocket sock) {
-        int index = sockList.indexOf(sock);
         sockList.remove(sock);
         //sendBuffer.remove(index);
     }
