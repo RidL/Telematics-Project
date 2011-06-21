@@ -9,12 +9,12 @@ public class Trans extends Thread {
 
     private static Trans ref;
     private static Route route;
-    private int address;
+    private static int address;
     private List<TPSocket> sockList;
 
     private Trans(int address) {
         route = new Route(this);
-        this.address = address;
+        Trans.address = address;
         sockList = new ArrayList<TPSocket>();
         new Thread(route).start();
     }
@@ -25,7 +25,7 @@ public class Trans extends Thread {
             ref.start();
         }else{
         	System.out.println("Warning: Trans already exists, did not create " +
-        			"a new Trans with address: " + addr + "");
+        			"a new Trans with address: " + addr + " current address still is " + address + "");
         }
         return ref;
     }
@@ -34,7 +34,7 @@ public class Trans extends Thread {
 		if (ref == null ) {
             ref = new Trans(0);
             ref.start();
-            System.out.println("Warning: trans address wasn't set, picking 1");
+            System.out.println("Warning: trans address wasn't set, picking 0");
         }
         return ref;
 	}
