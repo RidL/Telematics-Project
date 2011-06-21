@@ -32,7 +32,7 @@ public class Trans extends Thread {
     
     public static Trans getTrans() {
 		if (ref == null ) {
-            ref = new Trans(1);
+            ref = new Trans(0);
             ref.start();
             System.out.println("Warning: trans address wasn't set, picking 1");
         }
