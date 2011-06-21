@@ -1,5 +1,6 @@
 package tp.app;
 
+import tp.trans.Trans;
 import tp.util.Log;
 
 /**
@@ -9,7 +10,7 @@ import tp.util.Log;
 public class ChatAppInit {
 
     public static void main(String[] args) {
-        ChatApp app = new ChatApp("Chat");
+        ChatApp app = new ChatApp("Chat", Trans.getTrans().getAddress());
         Log.getInstance("RMS");
     }
 }
