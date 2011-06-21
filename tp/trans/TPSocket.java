@@ -210,7 +210,7 @@ public class TPSocket {
     }
     
     public void updateBuffer(int seq_nr){
-    	sndBuffer.set(seq_nr-lastAcked, null);
+    	sndBuffer.set((seq_nr-lastAcked)-1, null);
     	Iterator<Segment> it = sndBuffer.listIterator();
     	while(it.hasNext()) {
     		if(it.next() == null) {
