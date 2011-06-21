@@ -86,7 +86,6 @@ public class Tunnel extends Thread implements Link {
                 in = read.read();
                 for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
                     data[i] = (byte) in;
-                    Log.writeLog("TUN", "read " + data[i], false);
                 }
                 data[5] = (byte)in;
                 data[6] = (byte) read.read();
@@ -100,9 +99,7 @@ public class Tunnel extends Thread implements Link {
                 e.printStackTrace();
                 break;
             }
-            Log.writeLog("TUN", "end read, going on!", true);
             Segment seg = new Segment(data);
-            System.out.println("null segment? " + (seg == null) + " ");
             route.rcvSegment(seg);
         }
     }

@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Set;
 
 import tp.link.Link;
+import tp.util.Log;
 
 public class Route extends Observable implements Runnable{
 	int calls;
@@ -77,6 +78,8 @@ public class Route extends Observable implements Runnable{
 	}
 	
 	public void pushSegment(Segment s){
+		Log.writeLog("ROUT", "===== Pushing =====", true);
+		Log.writeLog("ROUT", s.toString(), true);
         synchronized(LOCK){
             routableSegs.add(s);
             stats.addOut(s);
@@ -87,6 +90,9 @@ public class Route extends Observable implements Runnable{
 	}
 	
 	public void rcvSegment(Segment s){
+		Log.writeLog("ROUT", "===== Received =====", true);
+		Log.writeLog("ROUT", s.toString(), true);
+		
 		if(s.getDestinationAddress()==trans.getAddress()){
 			trans.rcvSeg(s);
 			stats.addIn(s);
