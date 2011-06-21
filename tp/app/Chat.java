@@ -1,5 +1,6 @@
 package tp.app;
 
+import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -16,7 +17,11 @@ public class Chat {
 
     public Chat(int destAddr, int destPort, int scrPort, String sender) {
         trans = Trans.getTrans();
-        socket = trans.createSocket(destAddr, scrPort, destPort);
+        try {
+			socket = trans.createSocket(destAddr, scrPort, destPort);
+		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		}
         this.sender = sender;
     }
 

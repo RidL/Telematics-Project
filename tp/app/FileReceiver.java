@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tp.link.Frame;
+import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 import tp.util.Log;
@@ -35,7 +36,11 @@ public class FileReceiver extends Thread {
     public FileReceiver(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
         //trans.start();
-        tpSocket = trans.createSocket(address, srcPort, dstPort);
+        try {
+			tpSocket = trans.createSocket(address, srcPort, dstPort);
+		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		}
         //tpSocket = new FakeSocket(false);
     }
 

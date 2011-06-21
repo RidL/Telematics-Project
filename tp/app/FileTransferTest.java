@@ -4,6 +4,7 @@
  */
 package tp.app;
 
+import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -19,7 +20,11 @@ public class FileTransferTest {
     public FileTransferTest() {
         trans = Trans.getTrans();
         trans.start();
-        tpsocket = trans.createSocket(12, 5, 7);
+        try {
+			tpsocket = trans.createSocket(12, 5, 7);
+		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		}
         while (true) {
             byte[] data = new byte[96];
             for (int i = 0; i < 95; i++) {

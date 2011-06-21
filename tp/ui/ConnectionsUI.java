@@ -158,6 +158,5 @@ public class ConnectionsUI extends JPanel implements Observer{
 			}
 			return ret;
 		}
-		
 	}
 }

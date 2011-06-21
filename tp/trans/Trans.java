@@ -39,6 +39,10 @@ public class Trans extends Thread {
         return ref;
 	}
     
+    public static boolean isInited(){
+    	return ref!=null;
+    }
+    
     @Override
     public void run() {
     	byte[] data;
@@ -48,7 +52,6 @@ public class Trans extends Thread {
             for (int i = 0; i < sockList.size(); i++) {
                  sock = sockList.get(i);
                  //TODO: checken of er wel data is ?
-                 //TODO: robin en martijn kloten in deze methode
                  if(sock.isOutDirty()){
                      if((sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE) ||
                          (sock.getCurrentSeq() + WINDOW_SIZE) - sock.getLastAcked() < WINDOW_SIZE) {
@@ -64,7 +67,6 @@ public class Trans extends Thread {
             try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
@@ -74,9 +76,11 @@ public class Trans extends Thread {
         return address;
     }
 
-    public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) {
-    //	synchronized (sockList) {
-        //TODO:IS PORT TAKEN?
+    public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) throws SocketTakenException {
+    	for(TPSocket s: sockList){
+    		if(s.getSourcePort()==srcPort)
+    			throw new SocketTakenException("Port: " + srcPort + " is taken, connection to " + dstAddress);
+    	}
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
         sockList.add(sock);
         //sendBuffer.add(new ArrayList<Segment>(WINDOW_SIZE));

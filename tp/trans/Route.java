@@ -12,7 +12,7 @@ import tp.link.Link;
 public class Route extends Observable implements Runnable{
 	int calls;
     private final Object LOCK = new Object();
-    
+    private RouteStats stats;
 	private ArrayList<Segment> routableSegs;
 	private Map<Integer,Link> routingTable;
 	private Trans trans;
@@ -20,6 +20,7 @@ public class Route extends Observable implements Runnable{
 	public Route(Trans trans){
 		routableSegs = new ArrayList<Segment>();
 		routingTable = new HashMap<Integer, Link>();
+		stats = new RouteStats(routableSegs);
 		this.trans = trans;
 	}
 	
@@ -45,10 +46,18 @@ public class Route extends Observable implements Runnable{
                     }
                 }
             	routableSegs.remove(s);
+            	setChanged();
+        		notifyObservers();
             }
-			//TODO:check routables
-			//TODO:check links
 		}
+	}
+	
+	public ArrayList<Segment> getRoutableSegments(){
+		return routableSegs;
+	}
+	
+	public RouteStats getRouteStats(){
+		return stats;
 	}
 	
 	public Set<Map.Entry<Integer, Link>> getRoutes(){
@@ -63,25 +72,27 @@ public class Route extends Observable implements Runnable{
 	}
 	
 	public void pushSegment(Segment s){
-		System.out.println("ROUT push number " + (++calls) + "");
         synchronized(LOCK){
             routableSegs.add(s);
+            stats.addOut(s);
+            setChanged();
+    		notifyObservers();
             LOCK.notifyAll();
         }
 	}
 	
 	public void rcvSegment(Segment s){
 		if(s.getDestinationAddress()==trans.getAddress()){
-			System.out.println("ROUTE =====received=====\n" + s);
 			trans.rcvSeg(s);
+			stats.addIn(s);
 		}else{
             synchronized(LOCK) {
                 routableSegs.add(s);
+                stats.addRouted(s);
                 LOCK.notifyAll();
             }
 		}
+		setChanged();
+		notifyObservers();
 	}
-    public Object getLock() {
-        return LOCK;
-    }
 }

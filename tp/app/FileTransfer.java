@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import tp.link.Frame;
+import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 
@@ -31,7 +32,11 @@ public class FileTransfer {
     public FileTransfer(int address, int srcPort, int dstPort) {
         trans = Trans.getTrans();
         trans.start();
-        tpSocket = trans.createSocket(address, srcPort, dstPort);
+        try {
+			tpSocket = trans.createSocket(address, srcPort, dstPort);
+		} catch (SocketTakenException e) {
+			e.printStackTrace();
+		}
 
     }
 
