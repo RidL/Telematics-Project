@@ -124,7 +124,7 @@ public class Tunnel extends Thread implements Link {
         byte[] bytes = s.getBytes();
         try {
             for (int i = 0; i < bytes.length; i++) {
-            	//TODO test dis shite
+            	System.out.println(i + ": " + Frame.toBinaryString(bytes[i]));
                 write.write(bytes[i]);
             }
             write.flush();
