@@ -101,9 +101,8 @@ public class RouteOptionsFrame extends JFrame{
 			}else{
 				try {
 					Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
-					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), l);
+					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), t);
 					t.start();
-					l = t;
 				} catch (NumberFormatException nfe) {
 					nfe.printStackTrace();
 				} catch (TunnelTimeoutException tte) {
