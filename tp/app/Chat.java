@@ -11,15 +11,13 @@ import tp.trans.UnkownTPHostException;
  */
 public class Chat {
 
-    private Trans trans;
     private TPSocket socket;
     private String sender;
     private int count;
 
     public Chat(int destAddr, int destPort, int scrPort, String sender) {
-        trans = Trans.getTrans();
         try {
-			socket = trans.createSocket(destAddr, scrPort, destPort);
+			socket = Trans.getTrans().createSocket(destAddr, scrPort, destPort);
 		} catch (SocketTakenException e) {
 			e.printStackTrace();
 		} catch (UnkownTPHostException e) {

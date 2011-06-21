@@ -35,7 +35,7 @@ public class ChatApp extends JFrame implements ActionListener {
     private ChatReceiver chatReceiver;
     private static JButton NOTIFY;
 
-    public ChatApp(String title) {
+    public ChatApp(String title, int addr) {
         super(title);
 
         JPanel p1 = new JPanel();
@@ -45,8 +45,8 @@ public class ChatApp extends JFrame implements ActionListener {
         pp.setLayout(new BoxLayout(pp, BoxLayout.Y_AXIS));
 
         tfUserID = new JTextField("Blanket", 12);
-        tfDestAddr = new JTextField("14", 12);
-        tfDestPort = new JTextField("5", 12);
+        tfDestAddr = new JTextField(Integer.toString(addr), 12);
+        tfDestPort = new JTextField("4", 12);
         tfSrcPort = new JTextField("4", 21);
 
         tfChatMssg = new JTextField("Michael Zjakson!!!", 12);

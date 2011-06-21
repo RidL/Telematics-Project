@@ -23,6 +23,7 @@ public class Trans extends Thread {
         if (ref == null) {
             ref = new Trans(addr);
             ref.start();
+            System.out.println("Setting new address as: " + addr);
         }else{
         	System.out.println("Warning: Trans already exists, did not create " +
         			"a new Trans with address: " + addr + " current address still is " + address + "");
@@ -31,7 +32,7 @@ public class Trans extends Thread {
     }
     
     public static Trans getTrans() {
-		if (ref == null ) {
+		if (ref == null) {
             ref = new Trans(0);
             ref.start();
             System.out.println("Warning: trans address wasn't set, picking 0");

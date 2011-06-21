@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
+import tp.app.ChatApp;
 import tp.link.Link;
 import tp.link.Tunnel;
 import tp.trans.Trans;
@@ -40,6 +41,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	private JPanel newPane;
 	private JButton newRoute;
+	private JButton startChat;
 	
 	public ConnectionsUI(){
 		ctrl = new ConnControl();
@@ -69,6 +71,10 @@ public class ConnectionsUI extends JPanel implements Observer{
 		newRoute.setEnabled(false);
 		newRoute.addActionListener(ctrl);
 		newPane.add(newRoute);
+		startChat = new JButton("Chat");
+		startChat.setEnabled(false);
+		startChat.addActionListener(ctrl);
+		newPane.add(startChat);
 		routePanel.add(newPane, BorderLayout.SOUTH);
 		
 		setLayout(new BorderLayout());
@@ -90,8 +96,13 @@ public class ConnectionsUI extends JPanel implements Observer{
 				networkConfirm.setEnabled(false);
 				networkAddress.setEditable(false);
 				newRoute.setEnabled(true);
+				startChat.setEnabled(true);
 			}else if(src==newRoute){
 				new RouteOptionsFrame();
+			}else if(src==startChat){
+				int row = routeData.getSelectedRow();
+				int addr = Integer.parseInt(opts.get(row).getTP());
+				new ChatApp("Chat", addr);
 			}
 		}
 	}
