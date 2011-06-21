@@ -36,6 +36,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	//route UI stuff
 	private JPanel routePanel;
 	private JScrollPane tablePanel;
+	ArrayList<RouteOptions> opts;
 	private JTable routeData;
 	
 	private JPanel newPane;
@@ -43,6 +44,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	public ConnectionsUI(){
 		ctrl = new ConnControl();
+		opts = new ArrayList<RouteOptions>();
 		
 		TitledBorder networkBorder;
 		networkBorder = BorderFactory.createTitledBorder("Local");
@@ -56,7 +58,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		TitledBorder routeTitle;
 		routeTitle = BorderFactory.createTitledBorder("Tunnels");
-		routeData = new JTable(new MyTableModel(new ArrayList<RouteOptions>()));
+		routeData = new JTable(new MyTableModel());
 		tablePanel = new JScrollPane(routeData);
 		routePanel = new JPanel();
 		routePanel.setLayout(new BorderLayout());
@@ -97,9 +99,8 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		System.out.println("update");
 		Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
-		ArrayList<RouteOptions> opts = new ArrayList<RouteOptions>();
+		opts.clear();
 		for(Map.Entry<Integer, Link> e: routes){
 			RouteOptions ro = new RouteOptions();
 			ro.setTP(Integer.toString(e.getKey()));
@@ -116,20 +117,14 @@ public class ConnectionsUI extends JPanel implements Observer{
 			}
 			opts.add(ro);
 		}
-		System.out.println(opts.size());
-		routeData = new JTable(new MyTableModel(opts));
+		routeData.setModel(new MyTableModel());
 	}
 	
 	private class MyTableModel extends AbstractTableModel{
 		private static final long serialVersionUID = 1L;
-		ArrayList<RouteOptions> routes;
 		
 		private final String[] COLUMN_NAMES = 
-			{"name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
-		
-		public MyTableModel(ArrayList<RouteOptions> opts){
-			routes = opts;
-		}
+			{"Name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
 		
 		@Override
 		public String getColumnName(int col){
@@ -143,24 +138,24 @@ public class ConnectionsUI extends JPanel implements Observer{
 
 		@Override
 		public int getRowCount() {
-			return routes.size();
+			return opts.size();
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Object ret = null;
 			if(columnIndex==0){
-				ret = routes.get(rowIndex).getName();
+				ret = opts.get(rowIndex).getName();
 			}else if(columnIndex==1){
-				ret = routes.get(rowIndex).getTP();
+				ret = opts.get(rowIndex).getTP();
 			}else if(columnIndex==2){
-				ret = routes.get(rowIndex).getIP();
+				ret = opts.get(rowIndex).getIP();
 			}else if(columnIndex==3){
-				ret = routes.get(rowIndex).getPort();
+				ret = opts.get(rowIndex).getPort();
 			}else if(columnIndex==4){
-				ret = routes.get(rowIndex).isListen();
+				ret = opts.get(rowIndex).isListen();
 			}else if(columnIndex==5){
-				ret = routes.get(rowIndex).isConnected();
+				ret = opts.get(rowIndex).isConnected();
 			}
 			return ret;
 		}
