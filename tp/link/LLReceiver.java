@@ -34,6 +34,7 @@ public class LLReceiver {
         offset = 0;
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
+        Log.writeLog(" LLR", "Out: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         tmp = lpt.readLPT();
         Log.writeLog(" LLR", Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
@@ -44,8 +45,10 @@ public class LLReceiver {
         f = null;
         frameReceived = false;
         timeoutCount = System.currentTimeMillis();
+        int tmp2 = lpt.readLPT();
         while (!frameReceived) {
-            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
+        	tmp2 = lpt.readLPT();
+            if (tmp2 != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
             	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
             		hlr.resetTimer();
             		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
@@ -53,8 +56,10 @@ public class LLReceiver {
             	timeoutCount = System.currentTimeMillis();
             	microSleep();
                 tmp = lpt.readLPT();
-                Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-                if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
+                if(tmp2 == tmp){
+                	Log.writeLog(" LLR", "INC:     :" + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+                }
+                  if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
                     hlr.resetTimer();
