@@ -84,16 +84,12 @@ public class ConnectionsUI extends JPanel implements Observer{
 		this.add(routePanel, BorderLayout.CENTER);
 	}
 	
-	private ConnectionsUI getOuter(){
-		return this;
-	}
-	
 	private class ConnControl implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			JButton src = (JButton)ae.getSource();
 			if(src==networkConfirm){
-				Trans t = Trans.getTrans(Integer.parseInt(networkAddress.getText()));
+				Trans.getTrans(Integer.parseInt(networkAddress.getText()));
 				tui.addObservers();
 				networkConfirm.setEnabled(false);
 				networkAddress.setEditable(false);

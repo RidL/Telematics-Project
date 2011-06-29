@@ -13,7 +13,6 @@ import javax.swing.JTextField;
 
 import tp.link.HLReceiver;
 import tp.link.HLSender;
-import tp.link.Link;
 import tp.link.Tunnel;
 import tp.link.TunnelTimeoutException;
 import tp.trans.Trans;
@@ -31,23 +30,6 @@ public class RouteOptionsFrame extends JFrame{
 	public RouteOptionsFrame(){
 		buildUI();
 	}
-	
-//	public RouteOptionsFrame(ConnectionsUI parent, RouteOptions opt){
-//		this.parent = parent;
-//		
-//		buildUI();
-//		texts[0].setText(opt.getName());
-//		texts[1].setText(opt.getTP());
-//		texts[2].setText(opt.getIP());
-//		texts[3].setText(opt.getPort());
-//		listeningCheck.setSelected(opt.isListen());
-//		if(opt.isConnected()){
-//			for(JTextField t: texts)
-//				t.setEditable(false);
-//			listeningCheck.setEnabled(false);
-//			confirm.setEnabled(false);
-//		}
-//	}
 	
 	public void buildUI(){
 		setTitle("Route Options");
@@ -90,14 +72,13 @@ public class RouteOptionsFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Link l = null;
 			if(texts[3].getText().equalsIgnoreCase("LPT")){
 				HLSender snd;
 				HLReceiver rcv;
 				rcv = new HLReceiver();
 				snd = new HLSender(rcv);
 				rcv.setSender(snd);
-				l = snd;
+				Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), snd);
 			}else{
 				try {
 					Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
