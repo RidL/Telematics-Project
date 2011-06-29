@@ -19,6 +19,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
 import tp.app.ChatApp;
+import tp.app.FileTransferGUI;
 import tp.link.Link;
 import tp.link.Tunnel;
 import tp.trans.Trans;
@@ -43,6 +44,8 @@ public class ConnectionsUI extends JPanel implements Observer{
 	private JPanel newPane;
 	private JButton newRoute;
 	private JButton startChat;
+	private JButton startFileTrans;
+	private JButton newRef;
 	
 	public ConnectionsUI(TransUI tui){
 		ctrl = new ConnControl();
@@ -77,6 +80,14 @@ public class ConnectionsUI extends JPanel implements Observer{
 		startChat.setEnabled(false);
 		startChat.addActionListener(ctrl);
 		newPane.add(startChat);
+		startFileTrans = new JButton("File");
+		startFileTrans.setEnabled(false);
+		startFileTrans.addActionListener(ctrl);
+		newPane.add(startFileTrans);
+		newRef = new JButton("Tun");
+		newRef.setEnabled(false);
+		newRef.addActionListener(ctrl);
+		newPane.add(newRef);
 		routePanel.add(newPane, BorderLayout.SOUTH);
 		
 		setLayout(new BorderLayout());
@@ -95,12 +106,24 @@ public class ConnectionsUI extends JPanel implements Observer{
 				networkAddress.setEditable(false);
 				newRoute.setEnabled(true);
 				startChat.setEnabled(true);
+				startFileTrans.setEnabled(true);
+				newRef.setEnabled(true);
 			}else if(src==newRoute){
 				new RouteOptionsFrame();
 			}else if(src==startChat){
 				int row = routeData.getSelectedRow();
-				int addr = Integer.parseInt(opts.get(row).getTP());
-				new ChatApp("Chat", addr);
+				if(row>=0){
+					int addr = Integer.parseInt(opts.get(row).getTP());
+					new ChatApp("Chat", addr);
+				}
+			}else if(src==startFileTrans){
+				int row = routeData.getSelectedRow();
+				if(row>=0){
+					int addr = Integer.parseInt(opts.get(row).getTP());
+					new FileTransferGUI("File Transfer", addr);
+				}
+			}else if(src==newRef){
+				new RouteOptionsFrame(true);
 			}
 		}
 	}

@@ -39,7 +39,6 @@ public class Route extends Observable implements Runnable{
             	for(Iterator<Segment> it = _routableSegs.iterator(); it.hasNext();) {
                     s = it.next();
                     int addr = s.getDestinationAddress();
-                    System.out.println("Should be addr: " + addr);
                     Link destLink = routingTable.get(addr);
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
@@ -67,6 +66,18 @@ public class Route extends Observable implements Runnable{
 	
 	public Set<Map.Entry<Integer, Link>> getRoutes(){
 		return routingTable.entrySet();
+	}
+	
+	public void addRoute(int addr, int ref){
+		Link l = routingTable.get(addr);
+		if(l!=null){
+			routingTable.put(ref, l);
+			System.out.println("Tunnel added - " + routingTable.size());
+			setChanged();
+			notifyObservers();
+		}else{
+			System.out.println("Could not find address to tunnel over");
+		}
 	}
 	
 	public void addRoute(int addr, Link l){

@@ -43,9 +43,9 @@ public class Segment {
 //        System.out.println("before len: " + Frame.toBinaryString(bytes[5]));
 //        System.out.println("before a/s: " + Frame.toBinaryString(bytes[6]));
         calculateHash();
-//        System.out.println("after opt: " + Frame.toBinaryString(bytes[4]));
-//        System.out.println("after len: " + Frame.toBinaryString(bytes[5]));
-//        System.out.println("after a/s: " + Frame.toBinaryString(bytes[6]));
+        System.out.println("after opt: " + Frame.toBinaryString(bytes[2]));
+        System.out.println("after len: " + Frame.toBinaryString(bytes[3]));
+        System.out.println("after a/s: " + Frame.toBinaryString(bytes[4]));
     }
 
     public Segment(byte[] bytes) {
@@ -146,6 +146,14 @@ public class Segment {
         }
     	return ret;
     }
+
+    public String blaat() {
+                String s = "";
+        for (int i = 0; i < this.getBytes().length; i++) {
+            s += Frame.toBinaryString(this.getBytes()[i]) + "\n";
+        }
+        return s;
+    }
     
     public String toString(){
     	String retString = "SRC: ";
@@ -159,5 +167,6 @@ public class Segment {
     	retString += "\nSEQ: ";
     	retString += new String(Integer.toString(this.getSEQ()));
     	return retString;
+
     }
 }

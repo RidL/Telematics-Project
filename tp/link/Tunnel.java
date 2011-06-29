@@ -1,9 +1,8 @@
 package tp.link;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,13 +14,14 @@ import tp.trans.Trans;
 
 public class Tunnel extends Thread implements Link {
 	public static final long CONNECTION_TIMEOUT = 120000;//2min
-    private BufferedReader read;
+
     private boolean isConnected;
     private boolean listening;
     private InetAddress addr;
     private int port;
     private Route route = Trans.getTrans().getRoute();
-    OutputStream os;
+    private DataOutputStream os;
+    private DataInputStream is;
 
     public Tunnel(String addr, int port, boolean listen) throws TunnelTimeoutException {
         Socket sock = null;
@@ -40,6 +40,7 @@ public class Tunnel extends Thread implements Link {
 				String servAddr;
 				do{
 	    			sock = serv.accept();
+	    			serv.close();
 	    			servAddr = sock.getRemoteSocketAddress().toString().split(":")[0].substring(1);
 	    			System.out.println(addr.toString());
 	    			System.out.println(servAddr);
@@ -68,8 +69,8 @@ public class Tunnel extends Thread implements Link {
     			throw new TunnelTimeoutException("Timeout while trying to connect to: " + addr + " " + port);
     	}
     	try {
-			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			os = sock.getOutputStream();
+			os = new DataOutputStream(sock.getOutputStream());
+			is = new DataInputStream(sock.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -79,16 +80,16 @@ public class Tunnel extends Thread implements Link {
     public void run() {
         while (true) {
             byte[] data = new byte[103];
-            int in;
+            byte in;
             try {
-                in = read.read();
-                for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
+                in = is.readByte();
+                for (int i = 0; (i < 5); in = is.readByte(), i++) {
                     data[i] = (byte) in;
                 }
-                data[5] = (byte)in;
-                data[6] = (byte) read.read();
+                data[5] = in;
+                data[6] = is.readByte();
                 for (int i = 0; i < in; i++) {
-                    data[7 + i] = (byte) read.read();
+                    data[7 + i] = is.readByte();
                 }
 
             } catch (IOException e) {
@@ -96,8 +97,7 @@ public class Tunnel extends Thread implements Link {
                 e.printStackTrace();
                 break;
             }
-            Segment seg = new Segment(data);
-            route.rcvSegment(seg);
+            route.rcvSegment(new Segment(data));
         }
     }
     

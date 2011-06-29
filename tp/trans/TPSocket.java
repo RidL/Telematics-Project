@@ -6,8 +6,6 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -27,9 +25,7 @@ public class TPSocket {
     private byte[] outBuffer;
     private final Object OUTLOCK = new Object();
     private final Object INLOCK = new Object();
-    
     //--------------------
-    
     private ArrayList<Segment> sndBuffer;
     private ArrayList<Segment> rcvBuffer;
     private int sndWindowPtr;
@@ -42,28 +38,34 @@ public class TPSocket {
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
-        
+
         //-----------------
-        
+
         sndBuffer = new ArrayList<Segment>(WINDOW_SIZE);
         rcvBuffer = new ArrayList<Segment>(WINDOW_SIZE);
+
+        for (int i = 0; i < WINDOW_SIZE; i++) {
+            rcvBuffer.add(null);
+        }
+
         sndWindowPtr = 0;
         rcvWindowPtr = 0;
     }
 
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
-    	byte[] temp = null;
+        byte[] temp = null;
+        System.out.println("HANG");
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
-                    System.out.println("WAITING FOR INLOCK");
+                       System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
-             System.out.println("INLOCK ACQUIRED");
+            System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();
@@ -78,35 +80,31 @@ public class TPSocket {
      */
     // door app aangeroepen om data aan trans te geven
     public boolean writeOut(byte[] bytes) {
-    	synchronized (OUTLOCK) {
+        synchronized (OUTLOCK) {
             if (isOutDirty()) {
                 try {
                     OUTLOCK.wait();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
             if (bytes.length <= 96) {
                 outBuffer = bytes;
-                seq_nr++;
-                if(seq_nr == SEQ_NR_LIMIT) {
-                    seq_nr = 0;
-                }
             }
             OUTLOCK.notify();
         }
-    	return true;
+        return true;
     }
 
     // door trans aangeroepen voor data van app
     public byte[] readOut() {
-    	byte[] temp = null;
+        byte[] temp = null;
         synchronized (OUTLOCK) {
             if (!isOutDirty()) {
                 try {
                     OUTLOCK.wait();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
             temp = outBuffer;
@@ -118,24 +116,24 @@ public class TPSocket {
 
     // aangeroepen door trans voor data naar app
     public boolean writeIn(byte[] bytes) {
-    	synchronized (INLOCK) {
+        synchronized (INLOCK) {
             if (isInDirty()) {
                 try {
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(TPSocket.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
             if (bytes.length <= 96) {
                 inBuffer = bytes;
                 ack_nr++;
-                if(ack_nr == SEQ_NR_LIMIT) {
+                if (ack_nr == SEQ_NR_LIMIT) {
                     ack_nr = 0;
                 }
             }
             INLOCK.notify();
         }
-    	return true;
+        return true;
     }
 
     /**
@@ -157,7 +155,9 @@ public class TPSocket {
     }
 
     public int getCurrentSeq() {
-        return seq_nr;
+    	synchronized (OUTLOCK) {
+    		return seq_nr;
+		}
     }
 
     public int getCurrentAck() {
@@ -168,14 +168,14 @@ public class TPSocket {
      * @return the outDirty
      */
     public boolean isOutDirty() {
-        return outBuffer!=null;
+        return outBuffer != null;
     }
 
     /**
      * @return the inDirty
      */
     public boolean isInDirty() {
-        return inBuffer!=null;
+        return inBuffer != null;
     }
 
     /**
@@ -194,64 +194,103 @@ public class TPSocket {
 
     public void incrLastAcked() {
         lastAcked++;
-        if(lastAcked == SEQ_NR_LIMIT) {
-        	lastAcked = 0;
+        if (lastAcked == SEQ_NR_LIMIT) {
+            lastAcked = 0;
+        }
+    }
+    
+    public void incrSeq() {
+        seq_nr++;
+        if (seq_nr == SEQ_NR_LIMIT) {
+            seq_nr = 0;
         }
     }
 
     public int getLastAcked() {
         return lastAcked;
     }
-    
+
     //--------------------------
-    
-    public void addSegmentToSNDBuffer(Segment s){
-    	sndBuffer.add(s);
+    public void addSegmentToSNDBuffer(Segment s) {
+        sndBuffer.add(s);
+    }
+
+    public void updateBuffer(int seq_nr) {
+        //sndBuffer.set((seq_nr-lastAcked)-1, null);
+
+        for (int i = 0; i < sndBuffer.size(); i++) {
+            if (sndBuffer.get(i).getSEQ() == seq_nr) {
+                sndBuffer.set(i, null);
+                break;
+            }
+        }
+
+        Iterator<Segment> it = sndBuffer.listIterator();
+        while (it.hasNext()) {
+            if (it.next() == null) {
+                it.remove();
+                incrLastAcked();
+            } else {
+                break;
+            }
+        }
     }
     
-    public void updateBuffer(int seq_nr){
-    	sndBuffer.set((seq_nr-lastAcked)-1, null);
-    	Iterator<Segment> it = sndBuffer.listIterator();
-    	while(it.hasNext()) {
-    		if(it.next() == null) {
-    			it.remove();
-    			incrLastAcked();
-    		}
-    		else {
-    			break;
-    		}
-    	}
-    	//TODO: zet acked frame in buffer op null
-    	//TODO: doorloop de buffer om te kijken of er vanaf sendBase null's zijn
- 
+    public boolean isSNDBufferFull() {
+    	return sndBuffer.size() == 128;
     }
-    
+
     public Segment getSegmentFromSNDBuffer() {
-    	return sndBuffer.get(0);
+        if (sndBuffer.size() > 0) {
+            return sndBuffer.get(0);
+        } else {
+            return null;
+        }
     }
 
-	public void fillrcvBuffer(Segment seg, int seq) {
-		rcvBuffer.add((seq-rcvWindowPtr), seg);
-		Iterator<Segment> it = rcvBuffer.listIterator();
-    	while(it.hasNext()) {
-    		if(it.next() == null) {
-    			it.remove();
-    			rcvWindowPtr++;
-    		}
-    		else {
-    			break;
-    		}
+    public Segment getSegmentFromRCVBuffer() {
+        if (rcvBuffer.get(0) != null) {
+            Segment temp = rcvBuffer.get(0);
+            rcvBuffer.remove(0);
+            rcvBuffer.add(null);
+            rcvWindowPtr = (rcvWindowPtr + 1) % 256;
+            return temp;
+        } else {
+            return null;
+        }
+    }
+    
+    public String printRCVB() {
+    	String s = "";
+    	for (int i = 0; i < rcvBuffer.size(); i++) {
+    		s += rcvBuffer.get(i) + "\n";
     	}
-	}
+    	return s;
+    }
+
+    public void fillrcvBuffer(Segment seg, int seq) {
+        //rcvBuffer.set((seq-rcvWindowPtr), seg);
+        if (seq >= rcvWindowPtr) {
+        	  rcvBuffer.set((seq % WINDOW_SIZE) - (rcvWindowPtr % WINDOW_SIZE), seg);
+        } else if(seq < rcvWindowPtr - WINDOW_SIZE){
+        	  rcvBuffer.set(256 - rcvWindowPtr + seq - 1, seg);
+        }else {
+            System.out.println("seg already rcvd");
+        }
+//        Iterator<Segment> it = rcvBuffer.listIterator();
+//        while (it.hasNext()) {
+//            if (it.next() == null) {
+//                it.remove();
+//                rcvWindowPtr++;
+//                if (rcvWindowPtr == 128) {
+//                    rcvWindowPtr = 0;
+//                }
+//            } else {
+//                break;
+//            }
+//        }
+    }
 }
-
-
-
-
-
-
-
-
 //TPSocket sock;
 //for (int i = 0; i < sockList.size(); i++) {
 //	sock = sockList.get(i);                System.out.println("Kom ik hierrr?");
@@ -284,52 +323,4 @@ public class TPSocket {
 //    //TODO: else: wait for retransmit
 //    }
 //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

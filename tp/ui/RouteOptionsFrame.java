@@ -27,9 +27,34 @@ public class RouteOptionsFrame extends JFrame{
 	private JCheckBox listeningCheck;
 	private JButton confirm;
 	
+	private boolean tun;
+	
 	public RouteOptionsFrame(){
+		tun = false;
 		buildUI();
 	}
+	
+	public RouteOptionsFrame(boolean tun){
+		this();
+		this.tun = tun;
+	}
+	
+//	public RouteOptionsFrame(ConnectionsUI parent, RouteOptions opt){
+//		this.parent = parent;
+//		
+//		buildUI();
+//		texts[0].setText(opt.getName());
+//		texts[1].setText(opt.getTP());
+//		texts[2].setText(opt.getIP());
+//		texts[3].setText(opt.getPort());
+//		listeningCheck.setSelected(opt.isListen());
+//		if(opt.isConnected()){
+//			for(JTextField t: texts)
+//				t.setEditable(false);
+//			listeningCheck.setEnabled(false);
+//			confirm.setEnabled(false);
+//		}
+//	}
 	
 	public void buildUI(){
 		setTitle("Route Options");
@@ -80,14 +105,18 @@ public class RouteOptionsFrame extends JFrame{
 				rcv.setSender(snd);
 				Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), snd);
 			}else{
-				try {
-					Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
-					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), t);
-					t.start();
-				} catch (NumberFormatException nfe) {
-					nfe.printStackTrace();
-				} catch (TunnelTimeoutException tte) {
-					System.err.println("Timeout while connecting to " + texts[2].getText());
+				if(tun){
+					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), Integer.parseInt(texts[2].getText()));
+				}else{
+					try {
+						Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
+						Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), t);
+						t.start();
+					} catch (NumberFormatException nfe) {
+						nfe.printStackTrace();
+					} catch (TunnelTimeoutException tte) {
+						System.err.println("Timeout while connecting to " + texts[2].getText());
+					}
 				}
 			}
 			dispose();

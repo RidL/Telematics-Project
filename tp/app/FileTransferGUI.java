@@ -28,32 +28,32 @@ public class FileTransferGUI extends JFrame {
     private ButtonHandler bHandler;
     private JTextField addressField,  sourcePortField,  destPortField,  fileField;
 
-    public FileTransferGUI(String title) {
+    public FileTransferGUI(String title, int addr) {
         super(title);
         bHandler = new ButtonHandler();
-        buildGUI();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        buildGUI(addr);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 400);
         setVisible(true);
         pack();
         new ButtonHandler();
     }
 
-    private void buildGUI() {
+    private void buildGUI(int addr) {
         Container c = getContentPane();
         JPanel rootPanel = new JPanel();
         JLabel addressLabel = new JLabel("Address");
         addressField = new JTextField();
         addressField.setColumns(10);
-        addressField.setText("1");
+        addressField.setText(Integer.toString(addr));
         JLabel sourcePortLabel = new JLabel("Source port");
         sourcePortField = new JTextField();
         sourcePortField.setColumns(10);
-        sourcePortField.setText("4");
+        sourcePortField.setText("1");
         JLabel destPortLabel = new JLabel("Destination port");
         destPortField = new JTextField();
         destPortField.setColumns(10);
-        destPortField.setText("4");
+        destPortField.setText("1");
 
         JLabel fileLabel = new JLabel("File");
         JButton fileButton = new JButton("Browse");
@@ -147,6 +147,6 @@ public class FileTransferGUI extends JFrame {
 
     public static void main(String[] args) {
         Log.getInstance("FileTransfer");
-        new FileTransferGUI("File Transfer");
+        new FileTransferGUI("File Transfer", 1);
     }
 }

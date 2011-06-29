@@ -46,8 +46,8 @@ public class ChatApp extends JFrame implements ActionListener {
 
         tfUserID = new JTextField("Blanket", 12);
         tfDestAddr = new JTextField(Integer.toString(addr), 12);
-        tfDestPort = new JTextField("4", 12);
-        tfSrcPort = new JTextField("4", 21);
+        tfDestPort = new JTextField("0", 12);
+        tfSrcPort = new JTextField("0", 21);
 
         tfChatMssg = new JTextField("Michael Zjakson!!!", 12);
 
@@ -108,7 +108,7 @@ public class ChatApp extends JFrame implements ActionListener {
         this.pack();
         this.setSize(500, 500);
         //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
         initActionListeners();
     }
