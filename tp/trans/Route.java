@@ -73,8 +73,11 @@ public class Route extends Observable implements Runnable{
 		Link l = routingTable.get(addr);
 		if(l!=null){
 			routingTable.put(ref, l);
+			System.out.println("Tunnel added - " + routingTable.size());
+			setChanged();
+			notifyObservers();
 		}else{
-			System.out.println("Could not find referer!");
+			System.out.println("Could not find address to tunnel over");
 		}
 	}
 	

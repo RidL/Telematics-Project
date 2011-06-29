@@ -46,8 +46,8 @@ public class ChatApp extends JFrame implements ActionListener {
 
         tfUserID = new JTextField("Blanket", 12);
         tfDestAddr = new JTextField(Integer.toString(addr), 12);
-        tfDestPort = new JTextField("4", 12);
-        tfSrcPort = new JTextField("4", 21);
+        tfDestPort = new JTextField("0", 12);
+        tfSrcPort = new JTextField("0", 21);
 
         tfChatMssg = new JTextField("Michael Zjakson!!!", 12);
 

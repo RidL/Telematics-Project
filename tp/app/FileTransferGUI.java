@@ -49,11 +49,11 @@ public class FileTransferGUI extends JFrame {
         JLabel sourcePortLabel = new JLabel("Source port");
         sourcePortField = new JTextField();
         sourcePortField.setColumns(10);
-        sourcePortField.setText("5");
+        sourcePortField.setText("1");
         JLabel destPortLabel = new JLabel("Destination port");
         destPortField = new JTextField();
         destPortField.setColumns(10);
-        destPortField.setText("5");
+        destPortField.setText("1");
 
         JLabel fileLabel = new JLabel("File");
         JButton fileButton = new JButton("Browse");
