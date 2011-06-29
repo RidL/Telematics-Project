@@ -106,13 +106,13 @@ public class ConnectionsUI extends JPanel implements Observer{
 				new RouteOptionsFrame();
 			}else if(src==startChat){
 				int row = routeData.getSelectedRow();
-				if(row>0){
+				if(row>=0){
 					int addr = Integer.parseInt(opts.get(row).getTP());
 					new ChatApp("Chat", addr);
 				}
 			}else if(src==startFileTrans){
 				int row = routeData.getSelectedRow();
-				if(row>0){
+				if(row>=0){
 					int addr = Integer.parseInt(opts.get(row).getTP());
 					new FileTransferGUI("File Transfer", addr);
 				}
