@@ -196,30 +196,4 @@ public class FileTransfer {
 
         return result;
     }
-    public static void main(String[] args) {
-        FileTransfer f = null;
-
-        if(args.length == 5) {
-            try{
-                f = new FileTransfer(Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-                    Integer.parseInt(args[3]));
-            }
-            catch(NumberFormatException nfe) {
-                System.out.println("ERROR: Wrong arguments");
-            }
-            if(args[0].equals("-s")) {
-                f.send(args[4]);
-            }
-            else if(args[0].equals("-r")) {
-                f.receive();
-            }
-        }
-        else {
-            System.out.println("ERROR: Wrong arguments");
-        }
-        long test = (long)87367243;
-
-        System.out.println(Long.toBinaryString(test) + " werthers original");
-        System.out.println(f.bytesToLong(f.longToBytes(test)));
-    }
 }
