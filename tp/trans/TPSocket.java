@@ -159,7 +159,9 @@ public class TPSocket {
     }
 
     public int getCurrentSeq() {
-        return seq_nr;
+    	synchronized (OUTLOCK) {
+    		return seq_nr;
+		}
     }
 
     public int getCurrentAck() {
@@ -253,6 +255,14 @@ public class TPSocket {
         } else {
             return null;
         }
+    }
+    
+    public String printRCVB() {
+    	String s = "";
+    	for (int i = 0; i < rcvBuffer.size(); i++) {
+    		s += rcvBuffer.get(i) + "\n";
+    	}
+    	return s;
     }
 
     public void fillrcvBuffer(Segment seg, int seq) {

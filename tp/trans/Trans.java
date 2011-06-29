@@ -175,12 +175,14 @@ public class Trans extends Thread {
                     // System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
 
                     sock.fillrcvBuffer(seg, seg.getSEQ());
+                    System.out.println(sock.printRCVB());
                     Segment s;
                     while ((s = sock.getSegmentFromRCVBuffer()) != null) {
                         System.out.println("A segment was written to the application " + (sock.writeIn(s.getData())));
                     }
                     // send ACK
                     System.out.println("Sending ack for data with seq: " + seg.getSEQ());
+                    
                     Segment ack = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, /*sock.getCurrentAck() - 1*/ seg.getSEQ());
                     route.pushSegment(ack);
                 }
