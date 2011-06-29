@@ -19,6 +19,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
 import tp.app.ChatApp;
+import tp.app.FileTransferGUI;
 import tp.link.Link;
 import tp.link.Tunnel;
 import tp.trans.Trans;
@@ -43,6 +44,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	private JPanel newPane;
 	private JButton newRoute;
 	private JButton startChat;
+	private JButton startFileTrans;
 	
 	public ConnectionsUI(TransUI tui){
 		ctrl = new ConnControl();
@@ -77,6 +79,9 @@ public class ConnectionsUI extends JPanel implements Observer{
 		startChat.setEnabled(false);
 		startChat.addActionListener(ctrl);
 		newPane.add(startChat);
+		startFileTrans = new JButton("File");
+		startFileTrans.setEnabled(false);
+		startFileTrans.addActionListener(ctrl);
 		routePanel.add(newPane, BorderLayout.SOUTH);
 		
 		setLayout(new BorderLayout());
@@ -84,16 +89,12 @@ public class ConnectionsUI extends JPanel implements Observer{
 		this.add(routePanel, BorderLayout.CENTER);
 	}
 	
-	private ConnectionsUI getOuter(){
-		return this;
-	}
-	
 	private class ConnControl implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			JButton src = (JButton)ae.getSource();
 			if(src==networkConfirm){
-				Trans t = Trans.getTrans(Integer.parseInt(networkAddress.getText()));
+				Trans.getTrans(Integer.parseInt(networkAddress.getText()));
 				tui.addObservers();
 				networkConfirm.setEnabled(false);
 				networkAddress.setEditable(false);
@@ -103,8 +104,16 @@ public class ConnectionsUI extends JPanel implements Observer{
 				new RouteOptionsFrame();
 			}else if(src==startChat){
 				int row = routeData.getSelectedRow();
-				int addr = Integer.parseInt(opts.get(row).getTP());
-				new ChatApp("Chat", addr);
+				if(row>0){
+					int addr = Integer.parseInt(opts.get(row).getTP());
+					new ChatApp("Chat", addr);
+				}
+			}else if(src==startFileTrans){
+				int row = routeData.getSelectedRow();
+				if(row>0){
+					int addr = Integer.parseInt(opts.get(row).getTP());
+					new FileTransferGUI("File Transfer", addr);
+				}
 			}
 		}
 	}
