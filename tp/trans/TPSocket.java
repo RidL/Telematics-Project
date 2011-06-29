@@ -271,8 +271,10 @@ public class TPSocket {
     public void fillrcvBuffer(Segment seg, int seq) {
         //rcvBuffer.set((seq-rcvWindowPtr), seg);
         if (seq >= rcvWindowPtr) {
-            rcvBuffer.set((seq % WINDOW_SIZE) - (rcvWindowPtr % WINDOW_SIZE), seg);
-        } else {
+        	  rcvBuffer.set((seq % WINDOW_SIZE) - (rcvWindowPtr % WINDOW_SIZE), seg);
+        } else if(seq < rcvWindowPtr - WINDOW_SIZE){
+        	  rcvBuffer.set(256 - rcvWindowPtr + seq - 1, seg);
+        }else {
             System.out.println("seg already rcvd");
         }
 //        Iterator<Segment> it = rcvBuffer.listIterator();

@@ -2,11 +2,12 @@ package tp.link;
 
 import tp.util.Log;
 import lpt.Lpt;
+import lpt.ErrorLpt;
 
 public class LLReceiver {
     private static final int INITIAL_VALUE = 10;
     private static final int LL_SLEEP_TIME = 200;
-    private Lpt lpt;
+    private ErrorLpt lpt;
     private HLReceiver hlr;
     private boolean alt;
     private boolean frameReceived;
@@ -23,7 +24,7 @@ public class LLReceiver {
     private boolean sysoutLog = false;
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
-        lpt = new Lpt();
+        lpt = new ErrorLpt();
         alt = true;
         f = null;
         frameReceived = false;
