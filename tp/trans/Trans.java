@@ -65,7 +65,15 @@ public class Trans extends Thread {
 
                         System.out.println("TP-SENDING DATA: " + s.getSEQ());
                         System.out.println(s.blaat());
-                        sock.addSegmentToSNDBuffer(s);
+                        while (sock.isSNDBufferFull()) {
+                        	try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						}
+                        sock.addSegmentToSNDBuffer(s); 
                         route.pushSegment(s);
                         if (timer == null) {
                             timer = new Timer(true);

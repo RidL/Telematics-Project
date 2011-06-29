@@ -55,16 +55,17 @@ public class TPSocket {
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
         byte[] temp = null;
+        System.out.println("HANG");
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
-                    //   System.out.println("WAITING FOR INLOCK");
+                       System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
             }
-            // System.out.println("INLOCK ACQUIRED");
+            System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();
@@ -228,6 +229,10 @@ public class TPSocket {
                 break;
             }
         }
+    }
+    
+    public boolean isSNDBufferFull() {
+    	return sndBuffer.size() == 128;
     }
 
     public Segment getSegmentFromSNDBuffer() {

@@ -93,21 +93,24 @@ public class FileReceiver extends Thread {
         for (j = 0; i < MAX_SEGMENT_DATA; i++, j++) {
             firstData[j] = bytesIn[i];
         }
-
+        System.out.println("File gemaakt, rest van de data in file zette------------------------------------------------------------");
         file = new File(new String(fileName));
         fos = new FileOutputStream(file);
         fos.write(firstData);
-
+        
         // keep reading data from tpSocket
         int dataPtr = firstData.length;
         byte[] read = null;
         long length = bytesToLong(fileLength);
         while (dataPtr < length) {
+        	System.out.println(dataPtr +" = datapointer");
             read = tpSocket.readIn();
             fos.write(read);
             dataPtr += read.length;
         }
+        fos.flush();
         fos.close();
+        System.out.println("File is binnen!------------------------------------------------------------");
     }
 
     public static byte[] longToBytes(long in) {
