@@ -151,6 +151,7 @@ public class Trans extends Thread {
 //                            }
 //                        }
                     } else if (sock.getLastAcked() >= seg.getSEQ()) {
+                    	System.out.println("HAHAHAHAHAHAHHAHAHAHAHAHHAHAHA---------------------------------------");
                         return;
                     }
 
