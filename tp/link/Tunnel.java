@@ -97,12 +97,7 @@ public class Tunnel extends Thread implements Link {
                 e.printStackTrace();
                 break;
             }
-            Segment seg = new Segment(data);
-//            System.out.println("Seg == ack" + seg.isACK());
-//            for(Byte b: data){
-//            	System.out.println(Frame.toBinaryString(b));
-//            }
-            route.rcvSegment(seg);
+            route.rcvSegment(new Segment(data));
         }
     }
     

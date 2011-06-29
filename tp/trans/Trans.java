@@ -61,11 +61,20 @@ public class Trans extends Thread {
                     if ((sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE)
                             || (sock.getCurrentSeq() + WINDOW_SIZE) - sock.getLastAcked() < WINDOW_SIZE) {
                         data = sock.readOut();
+                        sock.incrSeq();
                         Segment s = createSegment(data, sock, false);
 
                         System.out.println("TP-SENDING DATA: " + s.getSEQ());
                         System.out.println(s.blaat());
-                        sock.addSegmentToSNDBuffer(s);
+                        while (sock.isSNDBufferFull()) {
+                        	try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						}
+                        sock.addSegmentToSNDBuffer(s); 
                         route.pushSegment(s);
                         if (timer == null) {
                             timer = new Timer(true);
@@ -167,12 +176,14 @@ public class Trans extends Thread {
                     // System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
 
                     sock.fillrcvBuffer(seg, seg.getSEQ());
+                    System.out.println(sock.printRCVB());
                     Segment s;
                     while ((s = sock.getSegmentFromRCVBuffer()) != null) {
                         System.out.println("A segment was written to the application " + (sock.writeIn(s.getData())));
                     }
                     // send ACK
                     System.out.println("Sending ack for data with seq: " + seg.getSEQ());
+                    
                     Segment ack = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, /*sock.getCurrentAck() - 1*/ seg.getSEQ());
                     route.pushSegment(ack);
                 }

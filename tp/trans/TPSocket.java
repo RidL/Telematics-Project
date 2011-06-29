@@ -55,16 +55,17 @@ public class TPSocket {
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
         byte[] temp = null;
+        System.out.println("HANG");
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
-                    //   System.out.println("WAITING FOR INLOCK");
+                       System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
             }
-            // System.out.println("INLOCK ACQUIRED");
+            System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();
@@ -89,10 +90,6 @@ public class TPSocket {
             }
             if (bytes.length <= 96) {
                 outBuffer = bytes;
-                seq_nr++;
-                if (seq_nr == SEQ_NR_LIMIT) {
-                    seq_nr = 0;
-                }
             }
             OUTLOCK.notify();
         }
@@ -158,7 +155,9 @@ public class TPSocket {
     }
 
     public int getCurrentSeq() {
-        return seq_nr;
+    	synchronized (OUTLOCK) {
+    		return seq_nr;
+		}
     }
 
     public int getCurrentAck() {
@@ -199,6 +198,13 @@ public class TPSocket {
             lastAcked = 0;
         }
     }
+    
+    public void incrSeq() {
+        seq_nr++;
+        if (seq_nr == SEQ_NR_LIMIT) {
+            seq_nr = 0;
+        }
+    }
 
     public int getLastAcked() {
         return lastAcked;
@@ -229,6 +235,10 @@ public class TPSocket {
             }
         }
     }
+    
+    public boolean isSNDBufferFull() {
+    	return sndBuffer.size() == 128;
+    }
 
     public Segment getSegmentFromSNDBuffer() {
         if (sndBuffer.size() > 0) {
@@ -248,6 +258,14 @@ public class TPSocket {
         } else {
             return null;
         }
+    }
+    
+    public String printRCVB() {
+    	String s = "";
+    	for (int i = 0; i < rcvBuffer.size(); i++) {
+    		s += rcvBuffer.get(i) + "\n";
+    	}
+    	return s;
     }
 
     public void fillrcvBuffer(Segment seg, int seq) {
