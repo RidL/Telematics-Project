@@ -2,6 +2,7 @@ package tp.link;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -21,7 +22,8 @@ public class Tunnel extends Thread implements Link {
     private InetAddress addr;
     private int port;
     private Route route = Trans.getTrans().getRoute();
-    OutputStream os;
+    private OutputStream os;
+    private InputStream is;
 
     public Tunnel(String addr, int port, boolean listen) throws TunnelTimeoutException {
         Socket sock = null;
@@ -71,6 +73,7 @@ public class Tunnel extends Thread implements Link {
     	try {
 			read = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			os = sock.getOutputStream();
+			is = sock.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -82,14 +85,14 @@ public class Tunnel extends Thread implements Link {
             byte[] data = new byte[103];
             int in;
             try {
-                in = read.read();
-                for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
+                in = is.read();
+                for (int i = 0; (in != -1) && (i < 5); in = is.read(), i++) {
                     data[i] = (byte) in;
                 }
                 data[5] = (byte)in;
-                data[6] = (byte) read.read();
+                data[6] = (byte) is.read();
                 for (int i = 0; i < in; i++) {
-                    data[7 + i] = (byte) read.read();
+                    data[7 + i] = (byte) is.read();
                 }
 
             } catch (IOException e) {
