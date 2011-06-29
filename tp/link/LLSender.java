@@ -2,6 +2,7 @@ package tp.link;
 
 import tp.util.Log;
 import lpt.Lpt;
+import lpt.ErrorLpt;
 
 /**
  * This class represents the low-level link layer sender component.
