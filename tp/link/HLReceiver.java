@@ -77,14 +77,17 @@ public class HLReceiver extends Thread {
                 }
             	sendAck();
             	recPtr = recPtr-(recPtr%WINDOW_SIZE);
+            	errCount = 0;
             	frameBroken = false;
             }else{
-            	Log.writeLog(" HLR", "frame read", sysoutLog);
+            	
                 // !senderActive == receiving || cable_free
                 if (!senderActive) {
+                	Log.writeLog(" HLR", "Interpreting frame", sysoutLog);
                     interpretFrame(tempFrame);
                 } else {
                 	// if senderActive
+                	Log.writeLog(" HLR", "Interpreting ack", sysoutLog);
                     ackReceived(tempFrame);
                 }
             }
@@ -115,11 +118,12 @@ public class HLReceiver extends Thread {
     	int[] ackScore = new int[5];
     	int	bestAck = 0;
     	for(int i = 0;i<5;i++){
-    		for(int y = 0;i<5;i++){
+    		for(int y = 0;y<5;y++){
     			if(ack[y]==ack[i]){
     				ackScore[i] += 1;
     			}
     		}
+    		
     		if(ackScore[i]>ackScore[bestAck]){
     			bestAck = i;
     		}
@@ -219,8 +223,10 @@ public class HLReceiver extends Thread {
     		errCount--;
             
     	}else{
+    		Log.writeLog(" HLR", "Frame added to buffer", sysoutLog);
     		frameBuffer[recPtr] = tempFrame;
         	recPtr++;
+        	Log.writeLog(" HLR", "recPtr update: "+recPtr, sysoutLog);
     	}
     	// Moet er een ack worden gestuurd?
         if((tempFrame != null && tempFrame.isFin()) || (recPtr%WINDOW_SIZE == 0)&&(errCount==0)) {
@@ -230,13 +236,16 @@ public class HLReceiver extends Thread {
         }
         // Is dit het laatste frame van segment en geen retransmits meer?
         //TEMP CODE, TEMPFRAME ZOU NIET FIN MOGEN ZIJN NA TIMEOUT
-        if(frameBuffer[recPtr] != null && frameBuffer[recPtr].isFin() && errCount==0) {
+        Log.writeLog(" HLR", "recPtr is: "+recPtr, sysoutLog);
+        if(frameBuffer[recPtr-1] != null && frameBuffer[recPtr-1].isFin() && errCount==0) {
+        	 Log.writeLog(" HLR", "Final frame encountered, empty'ing bufferz", sysoutLog);
             recPtr = 0;
             windowPtr = 0;
-            Log.writeLog(" HLR", "fin detected", sysoutLog);
+           
             for(int i=0; i<frameBuffer.length; i++){
             	frameBuffer[i] = null;
             }
+            System.out.println("Segment received");
         }
     }
 
