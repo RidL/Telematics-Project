@@ -28,8 +28,15 @@ public class RouteOptionsFrame extends JFrame{
 	private JCheckBox listeningCheck;
 	private JButton confirm;
 	
+	private boolean tun;
+	
 	public RouteOptionsFrame(){
+		tun = false;
 		buildUI();
+	}
+	
+	public RouteOptionsFrame(boolean tun){
+		this.tun = tun;
 	}
 	
 //	public RouteOptionsFrame(ConnectionsUI parent, RouteOptions opt){
@@ -99,14 +106,18 @@ public class RouteOptionsFrame extends JFrame{
 				rcv.setSender(snd);
 				l = snd;
 			}else{
-				try {
-					Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
-					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), t);
-					t.start();
-				} catch (NumberFormatException nfe) {
-					nfe.printStackTrace();
-				} catch (TunnelTimeoutException tte) {
-					System.err.println("Timeout while connecting to " + texts[2].getText());
+				if(tun){
+					Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), Integer.parseInt(texts[2].getText()));
+				}else{
+					try {
+						Tunnel t = new Tunnel(texts[2].getText(), Integer.parseInt(texts[3].getText()), listeningCheck.isSelected());
+						Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), t);
+						t.start();
+					} catch (NumberFormatException nfe) {
+						nfe.printStackTrace();
+					} catch (TunnelTimeoutException tte) {
+						System.err.println("Timeout while connecting to " + texts[2].getText());
+					}
 				}
 			}
 			dispose();

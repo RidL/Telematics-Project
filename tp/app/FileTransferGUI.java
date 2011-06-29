@@ -32,7 +32,7 @@ public class FileTransferGUI extends JFrame {
         super(title);
         bHandler = new ButtonHandler();
         buildGUI(addr);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 400);
         setVisible(true);
         pack();

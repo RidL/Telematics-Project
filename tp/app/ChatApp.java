@@ -108,7 +108,7 @@ public class ChatApp extends JFrame implements ActionListener {
         this.pack();
         this.setSize(500, 500);
         //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
         initActionListeners();
     }
