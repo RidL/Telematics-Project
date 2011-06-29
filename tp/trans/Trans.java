@@ -14,7 +14,7 @@ public class Trans extends Thread {
     private List<TPSocket> sockList;
     private Timer timer;
     private TimeoutHandler tHandler;
-    private long time_out = 500;
+    private long time_out = 5000;
 
     private Trans(int address) {
         route = new Route(this);
@@ -76,11 +76,11 @@ public class Trans extends Thread {
 						}
                         sock.addSegmentToSNDBuffer(s); 
                         route.pushSegment(s);
-                        if (timer == null) {
-                            timer = new Timer(true);
-                            tHandler = new TimeoutHandler(sock);
-                            timer.schedule(tHandler, time_out);
-                        }
+//                        if (timer == null) {
+//                            timer = new Timer(true);
+//                            tHandler = new TimeoutHandler(sock);
+//                            timer.schedule(tHandler, time_out);
+//                        }
                     }
                 }
             }
@@ -140,33 +140,34 @@ public class Trans extends Thread {
                         System.out.println("ACK is in order");
                         //sock.incrLastAcked();
                         //sendBuffer.get(i).remove(0);
-                        if (timer != null) {
-                            timer.cancel();
-                            timer = null;
-                            tHandler = null;
-                            if (sock.getSegmentFromSNDBuffer() != null) {
-                                timer = new Timer(true);
-                                tHandler = new TimeoutHandler(sock);
-                                timer.schedule(tHandler, time_out);
-                            }
-                        }
+//                        if (timer != null) {
+//                            timer.cancel();
+//                            timer = null;
+//                            tHandler = null;
+//                            if (sock.getSegmentFromSNDBuffer() != null) {
+//                                timer = new Timer(true);
+//                                tHandler = new TimeoutHandler(sock);
+//                                timer.schedule(tHandler, time_out);
+//                            }
+//                        }
                     } else if (sock.getLastAcked() >= seg.getSEQ()) {
+                    	System.out.println("HAHAHAHAHAHAHHAHAHAHAHAHHAHAHA---------------------------------------");
                         return;
                     }
 
                     else {
                         // retransmit
                         route.pushSegment(sock.getSegmentFromSNDBuffer());
-                        if (timer != null) {
-                            timer.cancel();
-                            timer = new Timer(true);
-                            tHandler = new TimeoutHandler(sock);
-                            timer.schedule(tHandler, time_out);
-                        } else {
-                            timer = new Timer(true);
-                            tHandler = new TimeoutHandler(sock);
-                            timer.schedule(tHandler, time_out);
-                        }
+//                        if (timer != null) {
+//                            timer.cancel();
+//                            timer = new Timer(true);
+//                            tHandler = new TimeoutHandler(sock);
+//                            timer.schedule(tHandler, time_out);
+//                        } else {
+//                            timer = new Timer(true);
+//                            tHandler = new TimeoutHandler(sock);
+//                            timer.schedule(tHandler, time_out);
+//                        }
                     }
                     sock.updateBuffer(seg.getSEQ());
 
