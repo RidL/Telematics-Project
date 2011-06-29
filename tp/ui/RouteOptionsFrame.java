@@ -36,6 +36,7 @@ public class RouteOptionsFrame extends JFrame{
 	}
 	
 	public RouteOptionsFrame(boolean tun){
+		this();
 		this.tun = tun;
 	}
 	

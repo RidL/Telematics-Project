@@ -72,7 +72,7 @@ public class Route extends Observable implements Runnable{
 	public void addRoute(int addr, int ref){
 		Link l = routingTable.get(addr);
 		if(l!=null){
-			routingTable.put(addr, l);
+			routingTable.put(ref, l);
 		}else{
 			System.out.println("Could not find referer!");
 		}
