@@ -89,7 +89,7 @@ public class Trans extends Thread {
 
     public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) throws SocketTakenException, UnkownTPHostException {
         for (TPSocket s : sockList) {
-            if (s.getSourcePort() == srcPort) {
+            if ((s.getSourcePort() == srcPort) && (s.getDestinationAddress() == Trans.getTrans().getAddress())) {
                 throw new SocketTakenException("Port: " + srcPort + " is taken, connection to " + dstAddress);
             }
         }
@@ -120,10 +120,8 @@ public class Trans extends Thread {
         TPSocket sock;
         for (int i = 0; i < sockList.size(); i++) {
             sock = sockList.get(i);
-            //System.out.println("Kom ik hierrr?");
-            if (sock.getSourcePort() == seg.getDestinationPort()) {
+            if ((sock.getSourcePort() == seg.getDestinationPort())&&(seg.getDestinationAddress()==address)) {
                 //if (seg.isValidSegment()) {
-
                 if (seg.isACK()) {
                     System.out.println("ACK RCVD!!!!!!");
                     //  System.out.println("lastAck: " + sock.getLastAcked());

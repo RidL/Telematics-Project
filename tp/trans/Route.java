@@ -69,6 +69,15 @@ public class Route extends Observable implements Runnable{
 		return routingTable.entrySet();
 	}
 	
+	public void addRoute(int addr, int ref){
+		Link l = routingTable.get(addr);
+		if(l!=null){
+			routingTable.put(addr, l);
+		}else{
+			System.out.println("Could not find address to tunnel over");
+		}
+	}
+	
 	public void addRoute(int addr, Link l){
 		routingTable.put(addr, l);
 		System.out.println("Route added - " + routingTable.size());
