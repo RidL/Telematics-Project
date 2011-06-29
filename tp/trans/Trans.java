@@ -176,7 +176,7 @@ public class Trans extends Thread {
                     // System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
 
                     sock.fillrcvBuffer(seg, seg.getSEQ());
-                    System.out.println(sock.printRCVB());
+                    //System.out.println(sock.printRCVB());
                     Segment s;
                     while ((s = sock.getSegmentFromRCVBuffer()) != null) {
                         System.out.println("A segment was written to the application " + (sock.writeIn(s.getData())));
