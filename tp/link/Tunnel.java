@@ -40,6 +40,7 @@ public class Tunnel extends Thread implements Link {
 				String servAddr;
 				do{
 	    			sock = serv.accept();
+	    			serv.close();
 	    			servAddr = sock.getRemoteSocketAddress().toString().split(":")[0].substring(1);
 	    			System.out.println(addr.toString());
 	    			System.out.println(servAddr);
@@ -82,6 +83,7 @@ public class Tunnel extends Thread implements Link {
             int in;
             try {
                 in = read.read();
+                System.out.println(Frame.toBinaryString((byte)in));
                 for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
                     data[i] = (byte) in;
                 }
