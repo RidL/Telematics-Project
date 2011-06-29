@@ -82,6 +82,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		startFileTrans = new JButton("File");
 		startFileTrans.setEnabled(false);
 		startFileTrans.addActionListener(ctrl);
+		newPane.add(startFileTrans);
 		routePanel.add(newPane, BorderLayout.SOUTH);
 		
 		setLayout(new BorderLayout());
