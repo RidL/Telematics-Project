@@ -17,6 +17,7 @@ public class TestLinkReceiver extends TestCase{
 	}
 	
 	public void testOneFrameSegment(){
+		System.out.println("TLR <<< TEST TestOneFrameSegment >>>");
 		pushFrame((byte)12,PAYLOAD_8BYTE);
 		getNextRead();
 		System.out.println(changeNr);
@@ -43,6 +44,7 @@ public class TestLinkReceiver extends TestCase{
 	}
 	
 	public void testThreeFrameSegment(){
+		System.out.println("TLR <<< TEST ThreeFrameSegment >>>");
 		for(int i=0;i<2;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	
 		}
@@ -66,7 +68,7 @@ public class TestLinkReceiver extends TestCase{
 		sendResponse();
 		System.out.println("TLR: OUT LOWLVLRESPONSE");
 		System.out.println("Eerste gedeelte ack: "+Frame.toBinaryString((byte)changeNr));
-		assertTrue("Eerste gedeelte ack fout",changeNr==-97);
+		assertEquals("Eerste gedeelte ack fout", -97,changeNr);
 		getNextRead();
 		System.out.println("TLR: IN:"+(((((byte)(changeNr)) >> 3) & 0x1f) ^ 0x10));
 		sendResponse();
@@ -81,6 +83,7 @@ public class TestLinkReceiver extends TestCase{
 		
 	}
 	public void testEigthFrameSegment(){
+		System.out.println("TLR <<< TEST TestEigthFrameSegment >>>");
 		for(int i=0;i<7;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	
 		}
@@ -121,6 +124,7 @@ public class TestLinkReceiver extends TestCase{
 		}
 		
 	}
+	
 	public void testNineFrameSegment(){
 		for(int i=0;i<8;i++){
 			pushFrame((byte)1,PAYLOAD_8BYTE);	

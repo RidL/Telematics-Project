@@ -115,11 +115,12 @@ public class HLReceiver extends Thread {
     	int[] ackScore = new int[5];
     	int	bestAck = 0;
     	for(int i = 0;i<5;i++){
-    		for(int y = 0;i<5;i++){
+    		for(int y = 0;y<5;y++){
     			if(ack[y]==ack[i]){
     				ackScore[i] += 1;
     			}
     		}
+    		
     		if(ackScore[i]>ackScore[bestAck]){
     			bestAck = i;
     		}
