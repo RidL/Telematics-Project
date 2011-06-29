@@ -61,6 +61,7 @@ public class Trans extends Thread {
                     if ((sock.getCurrentSeq() - sock.getLastAcked() < WINDOW_SIZE)
                             || (sock.getCurrentSeq() + WINDOW_SIZE) - sock.getLastAcked() < WINDOW_SIZE) {
                         data = sock.readOut();
+                        sock.incrSeq();
                         Segment s = createSegment(data, sock, false);
 
                         System.out.println("TP-SENDING DATA: " + s.getSEQ());

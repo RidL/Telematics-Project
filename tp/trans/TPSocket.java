@@ -90,10 +90,6 @@ public class TPSocket {
             }
             if (bytes.length <= 96) {
                 outBuffer = bytes;
-                seq_nr++;
-                if (seq_nr == SEQ_NR_LIMIT) {
-                    seq_nr = 0;
-                }
             }
             OUTLOCK.notify();
         }
@@ -200,6 +196,13 @@ public class TPSocket {
         lastAcked++;
         if (lastAcked == SEQ_NR_LIMIT) {
             lastAcked = 0;
+        }
+    }
+    
+    public void incrSeq() {
+        seq_nr++;
+        if (seq_nr == SEQ_NR_LIMIT) {
+            seq_nr = 0;
         }
     }
 
