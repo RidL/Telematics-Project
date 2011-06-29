@@ -78,10 +78,10 @@ public class Trans extends Thread {
     }
 
     public TPSocket createSocket(int dstAddress, int srcPort, int dstPort) throws SocketTakenException, UnkownTPHostException {
-    	for(TPSocket s: sockList){
-    		if(s.getSourcePort()==srcPort)
-    			throw new SocketTakenException("Port: " + srcPort + " is taken, connection to " + dstAddress);
-    	}
+//    	for(TPSocket s: sockList){
+//    		if(s.getSourcePort()==srcPort)
+//    			throw new SocketTakenException("Port: " + srcPort + " is taken, connection to " + dstAddress);
+//    	}
     	if(!route.hasDst(dstAddress)){
     		throw new UnkownTPHostException("Unknown route for " + dstAddress);
     	}
