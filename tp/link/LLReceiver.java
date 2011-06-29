@@ -68,7 +68,7 @@ public class LLReceiver {
             	break;
             }
         }
-        Log.writeLog(" LLR", "frame received", sysoutLog);
+        Log.writeLog(" LLR", "frame received or timeout ", sysoutLog);
         return f;
     }
 
