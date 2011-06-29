@@ -83,7 +83,6 @@ public class Tunnel extends Thread implements Link {
             int in;
             try {
                 in = read.read();
-                System.out.println(Frame.toBinaryString((byte)in));
                 for (int i = 0; (in != -1) && (i < 5); in = read.read(), i++) {
                     data[i] = (byte) in;
                 }
@@ -99,6 +98,10 @@ public class Tunnel extends Thread implements Link {
                 break;
             }
             Segment seg = new Segment(data);
+            System.out.println("Seg == ack" + seg.isACK());
+            for(Byte b: data){
+            	System.out.println(Frame.toBinaryString(b));
+            }
             route.rcvSegment(seg);
         }
     }
