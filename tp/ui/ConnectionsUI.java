@@ -101,6 +101,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 				networkAddress.setEditable(false);
 				newRoute.setEnabled(true);
 				startChat.setEnabled(true);
+				startFileTrans.setEnabled(true);
 			}else if(src==newRoute){
 				new RouteOptionsFrame();
 			}else if(src==startChat){
