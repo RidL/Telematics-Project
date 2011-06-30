@@ -2,19 +2,14 @@ package tp.trans;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Trans extends Thread {
-
-    private static final int WINDOW_SIZE = 128;
     private static Trans ref;
     private static Route route;
     private static int address;
     private List<TPSocket> sockList;
 //    private Timer timer;
 //    private TimeoutHandler tHandler;
-    private long time_out = 5000;
 
     private Trans(int address) {
         route = new Route(this);
@@ -68,10 +63,10 @@ public class Trans extends Thread {
                 	if(sock.isValidSeq(sock.getCurrentSeq()+1)){
                 		 System.out.println("new data read");
                 		 data = sock.readOut();
-	                     sock.incrSeq();
 	                     Segment s = createSegment(data, sock, false);
 	                     sock.addSegmentToSNDBuffer(s);
 	                     route.pushSegment(s);
+	                     sock.incrSeq();
                 	}
                 }
             }
@@ -126,24 +121,10 @@ public class Trans extends Thread {
                 	if(sock.isValidSeq(seq)){// not before window base!
                 		sock.processAck(seg.getSEQ());
                 	}else{
-                		System.out.println("ERROR, rcv'd ack out of window");
+                		System.out.println("ERROR: rcv'd ack out of window");
                 	}
                     
-//                    if (sock.getLastAcked() == seg.getSEQ() - 1
-//                            || sock.getLastAcked() == (seg.getSEQ() + WINDOW_SIZE) - 1) {
-//                        System.out.println("ACK is in order");
-//                    } else if (sock.getLastAcked() >= seg.getSEQ()) {
-//                        return;
-//                    }
-//                    else {
-//                        // retransmit
-//                        route.pushSegment(sock.getSegmentFromSNDBuffer());
-//                    }
-                    
                 } else {
-                    System.out.println("TP-DATA RECEIVED, seqnr = " + seg.getSEQ());
-                    // System.out.println("seg bytes length" + seg.getBytes().length);
-                    // System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
                     if(sock.isValidAck(seg.getSEQ())){
                     	sock.fillrcvBuffer(seg);
                     	//send ack
@@ -172,25 +153,4 @@ public class Trans extends Thread {
         }
         return new Segment(data, srcAddr, scrPort, destAddr, destPort, isAck, ackseq);
     }
-
-//    class TimeoutHandler extends TimerTask {
-//
-//        private TPSocket sock;
-//
-//        public TimeoutHandler(TPSocket sock) {
-//            this.sock = sock;
-//        }
-//
-//        @Override
-//        public void run() {
-//            
-//            if (sock.getSegmentFromSNDBuffer() != null) {
-//                System.out.println("Timer started for seq." + sock.getCurrentSeq());
-//                route.pushSegment(sock.getSegmentFromSNDBuffer());
-//                timer.cancel();
-//                timer = new Timer(true);
-//                timer.schedule(new TimeoutHandler(sock), time_out);
-//            }
-//        }
-//    }
 }

@@ -4,6 +4,8 @@
  */
 package tp.trans;
 
+import tp.util.Log;
+
 /**
  *
  * @author STUDENT\s1012886
@@ -249,7 +251,9 @@ public class TPSocket {
     		if(sndBuffer[i%WINDOW_SIZE]!=null)
     			break;
     	}
+    	
     	sndWindowBase = i%SEQ_NR_LIMIT;
+    	Log.writeLog("TPS", "Processing ACK " + seqNr + "settubg sndwBase to " + sndWindowBase, true);
     }
     
     public int getSndWindowBase(){
@@ -257,7 +261,7 @@ public class TPSocket {
     }
     
     public Segment getSegmentFromSNDBuffer() {
-        return sndBuffer[sndWindowBase];
+        return sndBuffer[sndWindowBase%WINDOW_SIZE];
     }
 
 //    public Segment getSegmentFromRCVBuffer() {
