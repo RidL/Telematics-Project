@@ -7,7 +7,7 @@ import lpt.ErrorLpt;
 public class LLReceiver {
     private static final int INITIAL_VALUE = 10;
     private static final int LL_SLEEP_TIME = 200;
-    private ErrorLpt lpt;
+    private Lpt lpt;
     private HLReceiver hlr;
     private boolean alt;
     private boolean frameReceived;
@@ -24,7 +24,7 @@ public class LLReceiver {
     private boolean sysoutLog = false;
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
-        lpt = new ErrorLpt();
+        lpt = new Lpt();
         alt = true;
         f = null;
         frameReceived = false;
@@ -34,9 +34,9 @@ public class LLReceiver {
         offset = 0;
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
-        Log.writeLog(" LLR", "Out: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial Out: "+Integer.toString(((INITIAL_VALUE >> 3) & 0x1f) ^ 0x10), sysoutLog);
         tmp = lpt.readLPT();
-        Log.writeLog(" LLR", Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial In: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
     }
 
@@ -45,10 +45,8 @@ public class LLReceiver {
         f = null;
         frameReceived = false;
         timeoutCount = System.currentTimeMillis();
-        int tmp2 = lpt.readLPT();
         while (!frameReceived) {
-        	tmp2 = lpt.readLPT();
-            if (tmp2 != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
+            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
             	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
             		hlr.resetTimer();
             		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
@@ -56,9 +54,9 @@ public class LLReceiver {
             	timeoutCount = System.currentTimeMillis();
             	microSleep();
                 tmp = lpt.readLPT();
-                if(tmp2 == tmp){
-                	Log.writeLog(" LLR", "INC:     :" + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-                }
+                
+                	Log.writeLog(" LLR", "INC :: : " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+               
                   if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
