@@ -107,13 +107,11 @@ public class Trans extends Thread {
         }
         TPSocket sock = new TPSocket(dstAddress, srcPort, dstPort);
         sockList.add(sock);
-        //sendBuffer.add(new ArrayList<Segment>(WINDOW_SIZE));
         return sock;
     }
 
     public void closeSocket(TPSocket sock) {
         sockList.remove(sock);
-        //sendBuffer.remove(index);
     }
 
     public Route getRoute() {
@@ -151,7 +149,6 @@ public class Trans extends Thread {
 //                            }
 //                        }
                     } else if (sock.getLastAcked() >= seg.getSEQ()) {
-                    	System.out.println("HAHAHAHAHAHAHHAHAHAHAHAHHAHAHA---------------------------------------");
                         return;
                     }
 

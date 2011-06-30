@@ -14,7 +14,11 @@ public class ChatReceiver implements Runnable {
     public ChatReceiver(Chat chat) {
         socket = chat.getSocket();
     }
-
+    
+    public TPSocket getSock(){
+    	return socket;
+    }
+    
     @Override
     public void run() {
         while (true) {

@@ -9,6 +9,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
@@ -20,11 +23,13 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
 
+import tp.trans.Trans;
+
 /**
  *
  * @author STUDENT\s1027492
  */
-public class ChatApp extends JFrame implements ActionListener {
+public class ChatApp extends JFrame implements ActionListener, WindowListener{
 
     private JTextField tfUserID, tfDestAddr, tfDestPort, tfSrcPort, tfChatMssg;
     private JTextArea mssgArea;
@@ -108,7 +113,7 @@ public class ChatApp extends JFrame implements ActionListener {
         this.pack();
         this.setSize(500, 500);
         //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addWindowListener(this);
         this.setVisible(true);
         initActionListeners();
     }
@@ -144,5 +149,29 @@ public class ChatApp extends JFrame implements ActionListener {
          bConnect.addActionListener(this);
          NOTIFY.addActionListener(this);
     }
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		Trans.getTrans().closeSocket(chatReceiver.getSock());
+		dispose();
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {}
 
 }
