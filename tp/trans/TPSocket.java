@@ -33,14 +33,14 @@ public class TPSocket {
     private long timeCount;
     
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
-        seqNr = -1;
+        seqNr = 0;
         ackNr = 0;
         lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
 
-        timeCount = 999999999;
+        timeCount = Long.MAX_VALUE-500;
 
         sndBuffer = new Segment[WINDOW_SIZE];
         rcvBuffer = new Segment[WINDOW_SIZE];

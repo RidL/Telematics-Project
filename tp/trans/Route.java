@@ -46,8 +46,6 @@ public class Route extends Observable implements Runnable{
                     }
                 }
             	routableSegs.remove(s);
-//            	setChanged();
-//        		notifyObservers();
             }
 		}
 	}
@@ -93,8 +91,6 @@ public class Route extends Observable implements Runnable{
         synchronized(LOCK){
             routableSegs.add(s);
             stats.addOut(s);
-//            setChanged();
-//    		notifyObservers();
             LOCK.notifyAll();
         }
 	}
@@ -113,8 +109,6 @@ public class Route extends Observable implements Runnable{
                 LOCK.notifyAll();
             }
 		}
-//		setChanged();
-//		notifyObservers();
 	}
 
 	public void changed() {

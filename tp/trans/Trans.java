@@ -53,10 +53,10 @@ public class Trans extends Thread {
         byte[] data;
         TPSocket sock = null;
         while (true) {
-            //	synchronized (sockList) {
             for (int i = 0; i < sockList.size(); i++) {
                 sock = sockList.get(i);
                 if(sock.timeout()){
+                	System.out.println("timeout");
                 	Segment s = sock.getSegmentFromSNDBuffer();
                 	if(s!=null){
                 		route.pushSegment(s);
@@ -66,6 +66,7 @@ public class Trans extends Thread {
                 if (sock.isOutDirty()) {
                 	sock.resetTimer();
                 	if(sock.isValidSeq(sock.getCurrentSeq()+1)){
+                		 System.out.println("new data read");
                 		 data = sock.readOut();
 	                     sock.incrSeq();
 	                     Segment s = createSegment(data, sock, false);
