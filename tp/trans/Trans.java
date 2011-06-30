@@ -12,8 +12,8 @@ public class Trans extends Thread {
     private static Route route;
     private static int address;
     private List<TPSocket> sockList;
-    private Timer timer;
-    private TimeoutHandler tHandler;
+//    private Timer timer;
+//    private TimeoutHandler tHandler;
     private long time_out = 5000;
 
     private Trans(int address) {
@@ -68,11 +68,11 @@ public class Trans extends Thread {
                         System.out.println(s.blaat());
                         while (sock.isSNDBufferFull()) {
                         	try {
-							Thread.sleep(5);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+                        		Thread.sleep(5);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
                         sock.addSegmentToSNDBuffer(s); 
                         route.pushSegment(s);
@@ -208,24 +208,24 @@ public class Trans extends Thread {
         return new Segment(data, srcAddr, scrPort, destAddr, destPort, isAck, ackseq);
     }
 
-    class TimeoutHandler extends TimerTask {
-
-        private TPSocket sock;
-
-        public TimeoutHandler(TPSocket sock) {
-            this.sock = sock;
-        }
-
-        @Override
-        public void run() {
-            
-            if (sock.getSegmentFromSNDBuffer() != null) {
-                System.out.println("Timer started for seq." + sock.getCurrentSeq());
-                route.pushSegment(sock.getSegmentFromSNDBuffer());
-                timer.cancel();
-                timer = new Timer(true);
-                timer.schedule(new TimeoutHandler(sock), time_out);
-            }
-        }
-    }
+//    class TimeoutHandler extends TimerTask {
+//
+//        private TPSocket sock;
+//
+//        public TimeoutHandler(TPSocket sock) {
+//            this.sock = sock;
+//        }
+//
+//        @Override
+//        public void run() {
+//            
+//            if (sock.getSegmentFromSNDBuffer() != null) {
+//                System.out.println("Timer started for seq." + sock.getCurrentSeq());
+//                route.pushSegment(sock.getSegmentFromSNDBuffer());
+//                timer.cancel();
+//                timer = new Timer(true);
+//                timer.schedule(new TimeoutHandler(sock), time_out);
+//            }
+//        }
+//    }
 }

@@ -43,6 +43,7 @@ public class Frame {
 	public Frame(byte[] data, byte head){
 		bytes = new byte[8];
         bytes[0] = head;
+        unescape(data, bytes, 1);
 	}
 
     public static int parity(byte[] data, int byteOffset, int max){
