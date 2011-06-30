@@ -111,7 +111,8 @@ public class Route extends Observable implements Runnable{
 		}
 	}
 
-	public void changed() {
+	public synchronized void changed() {
+		System.out.println("CHANGED");
 		setChanged();
 		notifyObservers();
 	}

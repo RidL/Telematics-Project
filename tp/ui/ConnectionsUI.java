@@ -27,8 +27,12 @@ import tp.trans.Trans;
 public class ConnectionsUI extends JPanel implements Observer{
 	private static final long serialVersionUID = 1L;
 	
+	private static final String[] COLUMN_NAMES = 
+		{"Name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
+	
 	private ConnControl ctrl;
 	private TransUI tui;
+	private MyTableModel mtb;
 	
 	//network UI stuff
 	private JPanel networkPanel;
@@ -50,6 +54,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	public ConnectionsUI(TransUI tui){
 		ctrl = new ConnControl();
 		opts = new ArrayList<RouteOptions>();
+		mtb = new MyTableModel(opts);
 		this.tui = tui;
 		
 		TitledBorder networkBorder;
@@ -64,7 +69,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		TitledBorder routeTitle;
 		routeTitle = BorderFactory.createTitledBorder("Tunnels");
-		routeData = new JTable(new MyTableModel(opts));
+		routeData = new JTable(mtb);
 		tablePanel = new JScrollPane(routeData);
 		routePanel = new JPanel();
 		routePanel.setLayout(new BorderLayout());
@@ -130,42 +135,47 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		System.out.println("1");
-		Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
-		System.out.println("2");
-		opts.clear();
-		System.out.println("3");
-		for(Map.Entry<Integer, Link> e: routes){
-			
-			RouteOptions ro = new RouteOptions();
-			ro.setTP(Integer.toString(e.getKey()));
-			Link val = e.getValue();
-			if(val instanceof Tunnel){
-				Tunnel t = (Tunnel)val;
-				ro.setIP(t.getAddress());
-				ro.setPort(t.getPort());
-				ro.setListen( t.isListening());
-				ro.setConnected(t.isConnected());
-			}else{
-				ro.setIP("LPT");
-				ro.setPort("LPT");
+		synchronized(this){
+			System.out.println("1");
+			Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
+			System.out.println("2");
+			opts.clear();
+			System.out.println("3");
+			for(Map.Entry<Integer, Link> e: routes){
+				
+				RouteOptions ro = new RouteOptions();
+				ro.setTP(Integer.toString(e.getKey()));
+				Link val = e.getValue();
+				if(val instanceof Tunnel){
+					Tunnel t = (Tunnel)val;
+					ro.setIP(t.getAddress());
+					ro.setPort(t.getPort());
+					ro.setListen( t.isListening());
+					ro.setConnected(t.isConnected());
+				}else{
+					ro.setIP("LPT");
+					ro.setPort("LPT");
+				}
+				opts.add(ro);
 			}
-			opts.add(ro);
+			System.out.println("4");
+			routeData.setModel(new MyTableModel(opts));
+			System.out.println("5");
 		}
-		System.out.println("4");
-		routeData.setModel(new MyTableModel(opts));
-		System.out.println("5");
+		
 	}
 	
 	private class MyTableModel extends AbstractTableModel{
 		private static final long serialVersionUID = 1L;
-		ArrayList<RouteOptions> opts;
-		private final String[] COLUMN_NAMES = 
-			{"Name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
+		ArrayList<RouteOptions> opziones;
 		
-		public MyTableModel(ArrayList<RouteOptions> opts){
-			super();
-			this.opts = opts;
+		public MyTableModel(ArrayList<RouteOptions> asd){
+			System.out.println("sz: " + opts.size());
+			this.opziones = asd;
+		}
+		
+		public void setOptions(ArrayList<RouteOptions> asd){
+			this.opziones = asd;
 		}
 		
 		@Override
@@ -175,29 +185,29 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		@Override
 		public int getColumnCount() {
-			return COLUMN_NAMES.length;
+			return 6;
 		}
 
 		@Override
 		public int getRowCount() {
-			return opts.size();
+			return opziones.size();
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Object ret = null;
 			if(columnIndex==0){
-				ret = opts.get(rowIndex).getName();
+				ret = opziones.get(rowIndex).getName();
 			}else if(columnIndex==1){
-				ret = opts.get(rowIndex).getTP();
+				ret = opziones.get(rowIndex).getTP();
 			}else if(columnIndex==2){
-				ret = opts.get(rowIndex).getIP();
+				ret = opziones.get(rowIndex).getIP();
 			}else if(columnIndex==3){
-				ret = opts.get(rowIndex).getPort();
+				ret = opziones.get(rowIndex).getPort();
 			}else if(columnIndex==4){
-				ret = opts.get(rowIndex).isListen();
+				ret = opziones.get(rowIndex).isListen();
 			}else if(columnIndex==5){
-				ret = opts.get(rowIndex).isConnected();
+				ret = opziones.get(rowIndex).isConnected();
 			}
 			return ret;
 		}
