@@ -4,19 +4,18 @@
  */
 package tp.trans;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 /**
  *
  * @author STUDENT\s1012886
  */
 public class TPSocket {
 
-    private final static int SEQ_NR_LIMIT = 256;
-    private final static int WINDOW_SIZE = 128;
-    private int seq_nr;
-    private int ack_nr;
+    public final static int SEQ_NR_LIMIT = 256;
+    public final static int WINDOW_SIZE = 128;
+    public final static int ACK_TIMEOUT = 500;
+    
+    private int seqNr;
+    private int ackNr;
     private int lastAcked;
     private int dstAddress;
     private int srcPort;
@@ -26,14 +25,16 @@ public class TPSocket {
     private final Object OUTLOCK = new Object();
     private final Object INLOCK = new Object();
     //--------------------
-    private ArrayList<Segment> sndBuffer;
-    private ArrayList<Segment> rcvBuffer;
-    private int sndWindowPtr;
-    private int rcvWindowPtr;
-
+    private Segment[] sndBuffer;
+    private Segment[] rcvBuffer;
+    private int sndWindowBase;
+    private int rcvWindowBase;
+    
+    private long timeCount;
+    
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
-        seq_nr = -1;
-        ack_nr = 0;
+        seqNr = -1;
+        ackNr = 0;
         lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
@@ -41,15 +42,8 @@ public class TPSocket {
 
         //-----------------
 
-        sndBuffer = new ArrayList<Segment>(WINDOW_SIZE);
-        rcvBuffer = new ArrayList<Segment>(WINDOW_SIZE);
-
-        for (int i = 0; i < WINDOW_SIZE; i++) {
-            rcvBuffer.add(null);
-        }
-
-        sndWindowPtr = 0;
-        rcvWindowPtr = 0;
+        sndBuffer = new Segment[WINDOW_SIZE];
+        rcvBuffer = new Segment[WINDOW_SIZE];
     }
 
     // aangeroepen door app voor data van trans
@@ -126,9 +120,9 @@ public class TPSocket {
             }
             if (bytes.length <= 96) {
                 inBuffer = bytes;
-                ack_nr++;
-                if (ack_nr == SEQ_NR_LIMIT) {
-                    ack_nr = 0;
+                ackNr++;
+                if (ackNr == SEQ_NR_LIMIT) {
+                    ackNr = 0;
                 }
             }
             INLOCK.notify();
@@ -156,12 +150,12 @@ public class TPSocket {
 
     public int getCurrentSeq() {
     	synchronized (OUTLOCK) {
-    		return seq_nr;
+    		return seqNr;
 		}
     }
 
     public int getCurrentAck() {
-        return ack_nr;
+        return ackNr;
     }
 
     /**
@@ -200,127 +194,107 @@ public class TPSocket {
     }
     
     public void incrSeq() {
-        seq_nr++;
-        if (seq_nr == SEQ_NR_LIMIT) {
-            seq_nr = 0;
+        seqNr++;
+        if (seqNr == SEQ_NR_LIMIT) {
+            seqNr = 0;
         }
     }
 
     public int getLastAcked() {
         return lastAcked;
     }
-
+    
+    public void resetTimer(){
+    	timeCount = System.currentTimeMillis();
+    }
+    
+    public boolean timeout(){
+    	return (timeCount+TPSocket.ACK_TIMEOUT)<System.currentTimeMillis();
+    }
+    
     //--------------------------
     public void addSegmentToSNDBuffer(Segment s) {
-        sndBuffer.add(s);
-    }
-
-    public void updateBuffer(int seq_nr) {
-        //sndBuffer.set((seq_nr-lastAcked)-1, null);
-
-        for (int i = 0; i < sndBuffer.size(); i++) {
-            if (sndBuffer.get(i).getSEQ() == seq_nr) {
-                sndBuffer.set(i, null);
-                break;
-            }
-        }
-
-        Iterator<Segment> it = sndBuffer.listIterator();
-        while (it.hasNext()) {
-            if (it.next() == null) {
-                it.remove();
-                incrLastAcked();
-            } else {
-                break;
-            }
-        }
+        sndBuffer[s.getSEQ()%(WINDOW_SIZE)] = s;
     }
     
-    public boolean isSNDBufferFull() {
-    	return sndBuffer.size() == 128;
-    }
-
-    public Segment getSegmentFromSNDBuffer() {
-        if (sndBuffer.size() > 0) {
-            return sndBuffer.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    public Segment getSegmentFromRCVBuffer() {
-        if (rcvBuffer.get(0) != null) {
-            Segment temp = rcvBuffer.get(0);
-            rcvBuffer.remove(0);
-            rcvBuffer.add(null);
-            rcvWindowPtr = (rcvWindowPtr + 1) % 256;
-            return temp;
-        } else {
-            return null;
-        }
-    }
-    
-    public String printRCVB() {
-    	String s = "";
-    	for (int i = 0; i < rcvBuffer.size(); i++) {
-    		s += rcvBuffer.get(i) + "\n";
+    public boolean isValidSeq(int seq){
+    	boolean ret;
+    	if(sndWindowBase<128){
+    		ret = (seq>sndWindowBase)&&(seq<(sndWindowBase+TPSocket.WINDOW_SIZE));
+    	}else{
+    		ret = (seq<((sndWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (seq>sndWindowBase);
     	}
-    	return s;
+    	return ret;
     }
-
-    public void fillrcvBuffer(Segment seg, int seq) {
-        //rcvBuffer.set((seq-rcvWindowPtr), seg);
-        if (seq >= rcvWindowPtr) {
-        	  rcvBuffer.set((seq % WINDOW_SIZE) - (rcvWindowPtr % WINDOW_SIZE), seg);
-        } else if(seq < rcvWindowPtr - WINDOW_SIZE){
-        	  rcvBuffer.set(256 - rcvWindowPtr + seq - 1, seg);
-        }else {
-            System.out.println("seg already rcvd");
-        }
-//        Iterator<Segment> it = rcvBuffer.listIterator();
+    
+    public void processAck(int seqNr) {
+//        for (int i = 0; i < sndBuffer.size(); i++) {
+//            if (sndBuffer.get(i).getSEQ() == seq_nr) {
+//                sndBuffer.set(i, null);
+//                break;
+//            }
+//        }
+//        Iterator<Segment> it = sndBuffer.listIterator();
 //        while (it.hasNext()) {
 //            if (it.next() == null) {
 //                it.remove();
-//                rcvWindowPtr++;
-//                if (rcvWindowPtr == 128) {
-//                    rcvWindowPtr = 0;
-//                }
+//                incrLastAcked();
 //            } else {
 //                break;
 //            }
 //        }
+    	sndBuffer[seqNr%WINDOW_SIZE] = null;
+    	int i;
+    	for(i=sndWindowBase; i<(sndWindowBase+WINDOW_SIZE); i++){
+    		if(sndBuffer[i%WINDOW_SIZE]!=null)
+    			break;
+    	}
+    	sndWindowBase = i%SEQ_NR_LIMIT;
     }
-}
-//TPSocket sock;
-//for (int i = 0; i < sockList.size(); i++) {
-//	sock = sockList.get(i);                System.out.println("Kom ik hierrr?");
-//    if (sock.getSourcePort() == seg.getDestinationPort()) {
-//        //if (seg.isValidSegment()) {
-//
-//            if(seg.isACK()) {
-//                System.out.println("lastAck" + sock.getLastAcked());
-//                System.out.println("currSeq" + seg.getSEQ());
-//                if(sock.getLastAcked() == seg.getSEQ()-1 ||
-//                    (sock.getLastAcked() + WINDOW_SIZE) == seg.getSEQ()-1 ) {
-//                    System.out.println("TP-ACK RECEIVED: " +  seg.getSEQ());
-//                    sock.incrLastAcked();
-//                    //sendBuffer.get(i).remove(0);
-//                }
-//                else {
-//                    // retransmit
-//                    route.pushSegment(sendBuffer.get(i).get(sock.getCurrentSeq()-sock.getLastAcked()));
-//                }
-//            }
-//            else {
-//                System.out.println("TP-DATA RECEIVED: " + seg.getSEQ());
-//                System.out.println("write succeeded " + (sock.writeIn(seg.getData())));
-//                
-//                // send ACK
-//                Segment s = new Segment(new byte[0], getAddress(), sock.getSourcePort(), sock.getDestinationAddress(), sock.getDesintationPort(), true, sock.getCurrentAck());
-//                route.pushSegment(s);
-//            }
-//        //}
-//    //TODO: else: wait for retransmit
+    
+    public int getSndWindowBase(){
+    	return sndWindowBase;
+    }
+    
+    public Segment getSegmentFromSNDBuffer() {
+        return sndBuffer[sndWindowBase];
+    }
+
+//    public Segment getSegmentFromRCVBuffer() {
+//        if (rcvBuffer.get(0) != null) {
+//            Segment temp = rcvBuffer.get(0);
+//            rcvBuffer.remove(0);
+//            rcvBuffer.add(null);
+//            rcvWindowPtr = (rcvWindowPtr + 1) % 256;
+//            return temp;
+//        } else {
+//            return null;
+//        }
 //    }
-//}
+//
+    public void fillrcvBuffer(Segment seg) {
+        rcvBuffer[seg.getSEQ()%WINDOW_SIZE] = seg;
+        int i;
+    	for(i=rcvWindowBase; i<(rcvWindowBase+WINDOW_SIZE); i++){
+    		if(rcvBuffer[i%WINDOW_SIZE]!=null){
+    			writeIn(rcvBuffer[i%WINDOW_SIZE].getData());
+    		}else{
+    			break;
+    		}    			
+    	}
+    	rcvWindowBase = i%SEQ_NR_LIMIT;
+    	
+    	
+    }
+
+	public boolean isValidAck(int ack) {
+		boolean ret;
+    	if(rcvWindowBase<128){
+    		ret = (ack>rcvWindowBase)&&(ack<(rcvWindowBase+TPSocket.WINDOW_SIZE));
+    	}else{
+    		ret = (ack<((rcvWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (ack>rcvWindowBase);
+    	}
+    	return ret;
+	}
+}
 

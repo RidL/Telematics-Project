@@ -1,6 +1,8 @@
 package tp.trans;
 
 import tp.link.Frame;
+import tp.util.SHA1Hash;
+
 import java.security.NoSuchAlgorithmException;
 
 public class Segment {
