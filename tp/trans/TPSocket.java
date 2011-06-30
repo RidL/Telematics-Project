@@ -40,7 +40,7 @@ public class TPSocket {
         this.srcPort = srcPort;
         this.dstPort = dstPort;
 
-        //-----------------
+        timeCount = 999999999;
 
         sndBuffer = new Segment[WINDOW_SIZE];
         rcvBuffer = new Segment[WINDOW_SIZE];
