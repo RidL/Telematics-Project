@@ -64,7 +64,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		TitledBorder routeTitle;
 		routeTitle = BorderFactory.createTitledBorder("Tunnels");
-		routeData = new JTable(new MyTableModel());
+		routeData = new JTable(new MyTableModel(opts));
 		tablePanel = new JScrollPane(routeData);
 		routePanel = new JPanel();
 		routePanel.setLayout(new BorderLayout());
@@ -130,9 +130,13 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
+		System.out.println("1");
 		Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
+		System.out.println("2");
 		opts.clear();
+		System.out.println("3");
 		for(Map.Entry<Integer, Link> e: routes){
+			
 			RouteOptions ro = new RouteOptions();
 			ro.setTP(Integer.toString(e.getKey()));
 			Link val = e.getValue();
@@ -148,14 +152,21 @@ public class ConnectionsUI extends JPanel implements Observer{
 			}
 			opts.add(ro);
 		}
-		routeData.setModel(new MyTableModel());
+		System.out.println("4");
+		routeData.setModel(new MyTableModel(opts));
+		System.out.println("5");
 	}
 	
 	private class MyTableModel extends AbstractTableModel{
 		private static final long serialVersionUID = 1L;
-		
+		ArrayList<RouteOptions> opts;
 		private final String[] COLUMN_NAMES = 
 			{"Name", "TP Addr", "IP Addr", "Port", "Listen", "Connected"};
+		
+		public MyTableModel(ArrayList<RouteOptions> opts){
+			super();
+			this.opts = opts;
+		}
 		
 		@Override
 		public String getColumnName(int col){
