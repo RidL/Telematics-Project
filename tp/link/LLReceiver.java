@@ -56,7 +56,7 @@ public class LLReceiver {
                 tmp = lpt.readLPT();
                 
                 	Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-               
+
                   if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
