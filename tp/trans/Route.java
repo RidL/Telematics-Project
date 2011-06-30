@@ -116,4 +116,9 @@ public class Route extends Observable implements Runnable{
 //		setChanged();
 //		notifyObservers();
 	}
+
+	public void changed() {
+		setChanged();
+		notifyObservers();
+	}
 }

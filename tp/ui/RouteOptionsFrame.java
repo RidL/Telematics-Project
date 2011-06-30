@@ -14,7 +14,6 @@ import javax.swing.JTextField;
 import tp.link.HLReceiver;
 import tp.link.HLSender;
 import tp.link.Tunnel;
-import tp.link.TunnelTimeoutException;
 import tp.trans.Trans;
 
 public class RouteOptionsFrame extends JFrame{
@@ -114,8 +113,6 @@ public class RouteOptionsFrame extends JFrame{
 						t.start();
 					} catch (NumberFormatException nfe) {
 						nfe.printStackTrace();
-					} catch (TunnelTimeoutException tte) {
-						System.err.println("Timeout while connecting to " + texts[2].getText());
 					}
 				}
 			}
