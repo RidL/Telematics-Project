@@ -4,7 +4,7 @@ import tp.util.Log;
 
 public class HLReceiver extends Thread {
     private static final int WINDOW_SIZE = 8;
-    private static final int BUFFER_SIZE = 21;
+    private static final int BUFFER_SIZE = 24;
     private static final int HL_SLEEP_TIME = 1000;
 
     private LLReceiver llr;
@@ -223,6 +223,13 @@ public class HLReceiver extends Thread {
     		errCount--;
             
     	}else{
+    		if(recPtr>=24){
+    			Log.writeLog(" HLR", "Buffer overvlow encounterd, setting rcvPtr 8 back", sysoutLog);
+    			for(int i = 16; i<24;i++){
+    				frameBuffer[i] = null;
+    			}
+    			recPtr = 16;
+    		}
     		Log.writeLog(" HLR", "Frame added to buffer", sysoutLog);
     		frameBuffer[recPtr] = tempFrame;
         	recPtr++;
@@ -246,6 +253,13 @@ public class HLReceiver extends Thread {
             	frameBuffer[i] = null;
             }
             System.out.println("Segment received");
+            
+            /**
+             * Hier moet nog code komen op stuff naar boven te pushe
+             * 
+             * Ook moet hier iets komen dat niet volledige buffer (24 size) kan worden gepushed, max 21
+             * 
+             */
         }
     }
 

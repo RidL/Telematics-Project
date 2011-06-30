@@ -34,9 +34,9 @@ public class LLReceiver {
         offset = 0;
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
-        Log.writeLog(" LLR", "Out: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial Out: "+INITIAL_VALUE, sysoutLog);
         tmp = lpt.readLPT();
-        Log.writeLog(" LLR", Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial In: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
     }
 
@@ -45,10 +45,8 @@ public class LLReceiver {
         f = null;
         frameReceived = false;
         timeoutCount = System.currentTimeMillis();
-        int tmp2 = lpt.readLPT();
         while (!frameReceived) {
-        	tmp2 = lpt.readLPT();
-            if (tmp2 != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
+            if (lpt.readLPT() != tmp || (hlr.expectingAck()&&tmp==Frame.ONES&&!rcvedAck) || (((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&readingFrame)) {
             	if((((timeoutCount+LL_SLEEP_TIME)<System.currentTimeMillis())&&validFrame)){
             		hlr.resetTimer();
             		Log.writeLog(" LLR", "LL TIMEOUT", sysoutLog);
@@ -56,9 +54,9 @@ public class LLReceiver {
             	timeoutCount = System.currentTimeMillis();
             	microSleep();
                 tmp = lpt.readLPT();
-                if(tmp2 == tmp){
-                	Log.writeLog(" LLR", "INC:     :" + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
-                }
+                
+                	Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+
                   if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;
@@ -72,6 +70,11 @@ public class LLReceiver {
             if(hlr.timeOut()&&validFrame){
             	Log.writeLog(" LLR", "Timeout while waiting", sysoutLog);
             	break;
+            }
+            try{
+            	Thread.sleep(1);
+            }catch(InterruptedException e){
+            	
             }
         }
         Log.writeLog(" LLR", "frame received or timeout ", sysoutLog);
@@ -95,6 +98,11 @@ public class LLReceiver {
             	if(checkParity()){
             		Log.writeLog(" LLR", "new frame, offset: " + offset, sysoutLog);
             		f = new Frame(data, header);
+            		Log.writeLog(" LLR", "Data: " + Frame.toBinaryString(data), sysoutLog);
+            		byte[] llr = f.getBytes();
+            		for(int a = 0;a<llr.length;a++){
+            			Log.writeLog(" LLR", "Data in frame@["+a+"]: " + Frame.toBinaryString(llr[a]), sysoutLog);
+            		}
             		data[5] = 0;
             		data[6] = 0;
             	}else{
