@@ -219,7 +219,7 @@ public class TPSocket {
         sndBuffer[s.getSEQ()%(WINDOW_SIZE)] = s;
     }
     
-    public boolean isValidSeq(int seq){
+    public boolean isValidACK(int seq){
     	boolean ret;
     	if(sndWindowBase<128){
     		ret = (seq>sndWindowBase)&&(seq<(sndWindowBase+TPSocket.WINDOW_SIZE));
@@ -291,12 +291,12 @@ public class TPSocket {
     	
     }
 
-	public boolean isValidAck(int ack) {
+	public boolean isValidSEQ(int ack) {
 		boolean ret;
     	if(rcvWindowBase<128){
-    		ret = (ack>rcvWindowBase)&&(ack<(rcvWindowBase+TPSocket.WINDOW_SIZE));
+    		ret = (ack>=rcvWindowBase)&&(ack<(rcvWindowBase+TPSocket.WINDOW_SIZE));
     	}else{
-    		ret = (ack<((rcvWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (ack>rcvWindowBase);
+    		ret = (ack<((rcvWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (ack>=rcvWindowBase);
     	}
     	return ret;
 	}

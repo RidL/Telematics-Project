@@ -101,11 +101,9 @@ public class Route extends Observable implements Runnable{
 		
 		if(s.getDestinationAddress()==trans.getAddress()){
 			trans.rcvSeg(s);
-			stats.addIn(s);
 		}else{
             synchronized(LOCK) {
                 routableSegs.add(s);
-                stats.addRouted(s);
                 LOCK.notifyAll();
             }
 		}

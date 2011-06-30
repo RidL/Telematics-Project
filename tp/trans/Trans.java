@@ -60,7 +60,7 @@ public class Trans extends Thread {
                 }
                 if (sock.isOutDirty()) {
                 	sock.resetTimer();
-                	if(sock.isValidSeq(sock.getCurrentSeq()+1)){
+                	if(sock.isValidACK(sock.getCurrentSeq()+1)){
                 		 System.out.println("new data read");
                 		 data = sock.readOut();
 	                     Segment s = createSegment(data, sock, false);
@@ -109,7 +109,6 @@ public class Trans extends Thread {
      * @param seg
      */
     public void rcvSeg(Segment seg) {
-        // rcvBuff.add(seg);
         TPSocket sock;
         for (int i = 0; i < sockList.size(); i++) {
             sock = sockList.get(i);
@@ -118,24 +117,25 @@ public class Trans extends Thread {
                 if (seg.isACK()) {
                 	int seq = seg.getSEQ();
                 	System.out.println("ACK RCV: " + seq + "");
-                	if(sock.isValidSeq(seq)){// not before window base!
+                	if(sock.isValidACK(seq)){// not before window base!
                 		sock.processAck(seg.getSEQ());
                 	}else{
                 		System.out.println("ERROR: rcv'd ack out of window");
                 	}
                     
                 } else {
-                    if(sock.isValidAck(seg.getSEQ())){
+                    if(sock.isValidSEQ(seg.getSEQ())){
                     	sock.fillrcvBuffer(seg);
                     	//send ack
                     	route.pushSegment(new Segment(new byte[0], getAddress(), 
                     			sock.getSourcePort(), sock.getDestinationAddress(), 
                     			sock.getDesintationPort(), true, seg.getSEQ()));
+                    }else{
+                    	System.out.println("ERROR: rcv'd seq out of window");
                     }
                     
                 }
                 //}
-                //TODO: else: wait for retransmit
             }
         }
     }
