@@ -34,9 +34,9 @@ public class LLReceiver {
         offset = 0;
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
-        Log.writeLog(" LLR", "Out: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial Out: "+Integer.toString(((INITIAL_VALUE >> 3) & 0x1f) ^ 0x10), sysoutLog);
         tmp = lpt.readLPT();
-        Log.writeLog(" LLR", Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial In: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
     }
 
@@ -55,6 +55,7 @@ public class LLReceiver {
             	microSleep();
                 tmp = lpt.readLPT();
                 Log.writeLog(" LLR", "INC:     :" + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+
                   if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
                     rcvedAck = true;

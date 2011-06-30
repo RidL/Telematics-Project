@@ -35,24 +35,24 @@ public class LinkInitializer {
         hls.start();
 
         while (true) {
-//        	
-//                if (hls.readyToPushSegment()) {
-//                	System.out.println("LI: "+hls.readyToPushSegment());
-//                	Log.writeLog("LLI" , "readyToPushNewSegment", true);
-//                    hls.pushSegment(bytes);
-//                    System.out.println("LI: DONE WITH SENDING");
-//                }
-//             
-//            
-//           
-//       
-//            try {
-//				Thread.sleep(1);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//        
+        	
+                if (hls.readyToPushSegment()) {
+                	System.out.println("LI: "+hls.readyToPushSegment());
+                	Log.writeLog("LLI" , "readyToPushNewSegment", true);
+                    hls.pushSegment(bytes);
+                    System.out.println("LI: DONE WITH SENDING");
+                }
+             
+            
+           
+       
+            try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        
         }
     }
 }
