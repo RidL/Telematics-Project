@@ -7,7 +7,7 @@ import lpt.ErrorLpt;
 public class LLReceiver {
     private static final int INITIAL_VALUE = 10;
     private static final int LL_SLEEP_TIME = 200;
-    private Lpt lpt;
+    private ErrorLpt lpt;
     private HLReceiver hlr;
     private boolean alt;
     private boolean frameReceived;
@@ -24,7 +24,7 @@ public class LLReceiver {
     private boolean sysoutLog = false;
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
-        lpt = new Lpt();
+        lpt = new ErrorLpt();
         alt = true;
         f = null;
         frameReceived = false;
@@ -34,7 +34,7 @@ public class LLReceiver {
         offset = 0;
         header = 0;
         lpt.writeLPT(INITIAL_VALUE);
-        Log.writeLog(" LLR", "Initial Out: "+Integer.toString(((INITIAL_VALUE >> 3) & 0x1f) ^ 0x10), sysoutLog);
+        Log.writeLog(" LLR", "Initial Out: "+INITIAL_VALUE, sysoutLog);
         tmp = lpt.readLPT();
         Log.writeLog(" LLR", "Initial In: "+Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
         rcvedAck = false;
@@ -55,7 +55,7 @@ public class LLReceiver {
             	microSleep();
                 tmp = lpt.readLPT();
                 
-                	Log.writeLog(" LLR", "INC :: : " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
+                	Log.writeLog(" LLR", "INC: " + Integer.toString(((tmp >> 3) & 0x1f) ^ 0x10), sysoutLog);
                
                   if ((tmp == Frame.ONES) && !validFrame && readThisFrame()) {
                     validFrame = true;
@@ -70,6 +70,11 @@ public class LLReceiver {
             if(hlr.timeOut()&&validFrame){
             	Log.writeLog(" LLR", "Timeout while waiting", sysoutLog);
             	break;
+            }
+            try{
+            	Thread.sleep(1);
+            }catch(InterruptedException e){
+            	
             }
         }
         Log.writeLog(" LLR", "frame received or timeout ", sysoutLog);
@@ -93,6 +98,11 @@ public class LLReceiver {
             	if(checkParity()){
             		Log.writeLog(" LLR", "new frame, offset: " + offset, sysoutLog);
             		f = new Frame(data, header);
+            		Log.writeLog(" LLR", "Data: " + Frame.toBinaryString(data), sysoutLog);
+            		byte[] llr = f.getBytes();
+            		for(int a = 0;a<llr.length;a++){
+            			Log.writeLog(" LLR", "Data in frame@["+a+"]: " + Frame.toBinaryString(llr[a]), sysoutLog);
+            		}
             		data[5] = 0;
             		data[6] = 0;
             	}else{

@@ -410,6 +410,7 @@ public class HLSender extends Thread implements Link{
          */
     	Log.writeLog(" HLS", "sending ack", sysoutLog);
         byte[] ackData = {ack,ack,ack,ack,ack};
+        Log.writeLog(" HLS", "Data of ack: "+Frame.toBinaryString(ackData), sysoutLog);
         Frame ackFrame = new Frame(ackData, true, false);
         boolean succ = lls.pushFirstFrame(ackFrame);
         if(!succ) {
@@ -417,6 +418,7 @@ public class HLSender extends Thread implements Link{
         	hlr.resetSegment();
             return;
         }
+        Log.writeLog(" HLS", "Ack send", sysoutLog);
         ackToSend = false;
     }
 
