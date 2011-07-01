@@ -119,7 +119,7 @@ public class HLReceiver extends Thread {
     	}
     	int[] ackScore = new int[5];
     	int	bestAck = 0;
-    	for(int i = 0;i<5;i++){
+    	for(int i = 1;i<6;i++){
     		for(int y = 0;y<5;y++){
     			if(ack[y]==ack[i]){
     				ackScore[i] += 1;
@@ -265,7 +265,9 @@ public class HLReceiver extends Thread {
             byte[] buff = new byte[21*8];
             for(int i=0; i<21; i++){
             	for(int k=0; k<8; k++){
-            		buff[(i*8)+k] = frameBuffer[i].getBytes()[k];
+            		if(frameBuffer[i]!=null){
+            			buff[(i*8)+k] = frameBuffer[i].getBytes()[k];
+            		}
             	}
             }
             Trans.getTrans().getRoute().rcvSegment(new Segment(buff));
