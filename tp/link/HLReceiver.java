@@ -265,6 +265,7 @@ public class HLReceiver extends Thread {
             		}
             	}
             }
+            System.out.println(Frame.toBinaryString(buff));
             Trans.getTrans().getRoute().rcvSegment(new Segment(buff, true));
             
             resetSegment();

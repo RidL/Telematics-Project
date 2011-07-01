@@ -66,6 +66,8 @@ public class Segment {
     	for(int i=0; i<data.length; i++){
     		this.data[i] = bytes[i+7];
     	}
+    	System.out.println(Frame.toBinaryString(bytes));
+    	System.out.println(Frame.toBinaryString(data));
     }
     
     public int getSourcePort() {
