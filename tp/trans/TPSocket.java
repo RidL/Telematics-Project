@@ -233,10 +233,9 @@ public class TPSocket {
     				}
     			}else{
     				if(i<sndWindowBase){
-    					if(i>=this.nextSeq)
+    					if(i>=this.nextSeq){
     						break;
-    				}else{
-    					Log.writeLog("TPS", "seq(" + nextSeq + ") voor sndWindowBase(" + sndWindowBase + ") en i(" + i +") na seq ABORT", true);
+    					}
     				}
     			}
     		}
