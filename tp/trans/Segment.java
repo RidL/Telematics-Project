@@ -44,6 +44,7 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
+    	System.out.println(Frame.toBinaryString(bytes[5]));
         byte[] tmp = new byte[(bytes[5]+7)];
         byte[] dat = new byte[(bytes[5])];
         
