@@ -150,11 +150,6 @@ public class FileTransferGUI extends JFrame implements WindowListener{
         }
     }
 
-    public static void main(String[] args) {
-        Log.getInstance("FileTransfer");
-        new FileTransferGUI("File Transfer", 1);
-    }
-
 	@Override
 	public void windowActivated(WindowEvent arg0) {
 		// TODO Auto-generated method stub
@@ -169,7 +164,7 @@ public class FileTransferGUI extends JFrame implements WindowListener{
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		TPSocket s = fs.getSocket();
+		TPSocket s = null;
 		if(s==null)
 			s = this.fr.getSocket();
 		Trans.getTrans().closeSocket(s);

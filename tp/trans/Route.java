@@ -110,6 +110,11 @@ public class Route extends Observable implements Runnable{
 	}
 
 	public synchronized void changed() {
+		try {
+			Thread.sleep(20);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		System.out.println("CHANGED");
 		setChanged();
 		notifyObservers();
