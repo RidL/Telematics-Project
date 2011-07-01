@@ -133,6 +133,10 @@ public class Trans extends Thread {
                     			sock.getSourcePort(), sock.getDestinationAddress(), 
                     			sock.getDesintationPort(), true, seg.getSEQ()));
                     }else{
+                    	route.pushSegment(new Segment(new byte[0], getAddress(), 
+                    			sock.getSourcePort(), sock.getDestinationAddress(), 
+                    			sock.getDesintationPort(), true, seg.getSEQ()));
+                    	
                     	Log.writeLog("TRA", "ERROR: rcv'd seq out of window", true);
                     }
                     

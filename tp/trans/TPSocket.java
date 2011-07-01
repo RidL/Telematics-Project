@@ -270,19 +270,7 @@ public class TPSocket {
     public Segment getSegmentFromSNDBuffer() {
         return sndBuffer[sndWindowBase%WINDOW_SIZE];
     }
-
-//    public Segment getSegmentFromRCVBuffer() {
-//        if (rcvBuffer.get(0) != null) {
-//            Segment temp = rcvBuffer.get(0);
-//            rcvBuffer.remove(0);
-//            rcvBuffer.add(null);
-//            rcvWindowPtr = (rcvWindowPtr + 1) % 256;
-//            return temp;
-//        } else {
-//            return null;
-//        }
-//    }
-//
+    
     public void fillrcvBuffer(Segment seg) {
         rcvBuffer[seg.getSEQ()%WINDOW_SIZE] = seg;
         int i;
