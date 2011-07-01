@@ -64,7 +64,7 @@ public class Segment {
     	this.bytes = bytes;
     	this.data = new byte[bytes[5]+7];
     	for(int i=0; i<data.length; i++){
-    		this.data[i] = bytes[i];
+    		this.data[i+7] = bytes[i];
     	}
     }
     

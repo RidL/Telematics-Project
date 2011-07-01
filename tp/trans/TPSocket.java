@@ -14,7 +14,7 @@ public class TPSocket {
 
     public final static int SEQ_NR_LIMIT = 256;
     public final static int WINDOW_SIZE = 128;
-    public final static int ACK_TIMEOUT = 500;
+    public final static int ACK_TIMEOUT = 5000;
     
     private int nextSeq;
     private int ackNr;
