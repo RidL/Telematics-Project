@@ -114,7 +114,7 @@ public class Trans extends Thread {
         for (int i = 0; i < sockList.size(); i++) {
             sock = sockList.get(i);
             if ((sock.getSourcePort() == seg.getDestinationPort())&&(seg.getDestinationAddress()==address)) {
-                if (seg.isValidSegment()) {
+              //  if (seg.isValidSegment()) {
 	                if (seg.isACK()) {
 	                	int seq = seg.getSEQ();
 	                	System.out.println("ACK RCV: " + seq + "");
@@ -140,9 +140,10 @@ public class Trans extends Thread {
 	                    }
 	                    
 	                }
-                }else{
-                	Log.writeLog("TRA", "Received invalid segment", true);
-                }
+//                }else{
+//                	Log.writeLog("TRA", "Hash is: "+seg.hashCode(), true);
+//                	Log.writeLog("TRA", "Received invalid segment", true);
+//                }
             }
         }
     }
