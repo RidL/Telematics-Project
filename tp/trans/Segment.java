@@ -40,13 +40,7 @@ public class Segment {
         }
 
         this.data = data;
-//        System.out.println("before opt: " + Frame.toBinaryString(bytes[4]));
-//        System.out.println("before len: " + Frame.toBinaryString(bytes[5]));
-//        System.out.println("before a/s: " + Frame.toBinaryString(bytes[6]));
         calculateHash();
-        System.out.println("after opt: " + Frame.toBinaryString(bytes[2]));
-        System.out.println("after len: " + Frame.toBinaryString(bytes[3]));
-        System.out.println("after a/s: " + Frame.toBinaryString(bytes[4]));
     }
 
     public Segment(byte[] bytes) {

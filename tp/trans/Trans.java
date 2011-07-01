@@ -114,33 +114,35 @@ public class Trans extends Thread {
         for (int i = 0; i < sockList.size(); i++) {
             sock = sockList.get(i);
             if ((sock.getSourcePort() == seg.getDestinationPort())&&(seg.getDestinationAddress()==address)) {
-                //if (seg.isValidSegment()) {
-                if (seg.isACK()) {
-                	int seq = seg.getSEQ();
-                	System.out.println("ACK RCV: " + seq + "");
-                	if(sock.isValidACK(seq)){// not before window base!
-                		sock.processAck(seg.getSEQ());
-                	}else{
-                		Log.writeLog("TRA", "ERROR: rcv'd ack out of window", true);
-                	}
-                    
-                } else {
-                    if(sock.isValidSEQ(seg.getSEQ())){
-                    	sock.fillrcvBuffer(seg);
-                    	//send ack
-                    	route.pushSegment(new Segment(new byte[0], getAddress(), 
-                    			sock.getSourcePort(), sock.getDestinationAddress(), 
-                    			sock.getDesintationPort(), true, seg.getSEQ()));
-                    }else{
-                    	route.pushSegment(new Segment(new byte[0], getAddress(), 
-                    			sock.getSourcePort(), sock.getDestinationAddress(), 
-                    			sock.getDesintationPort(), true, seg.getSEQ()));
-                    	
-                    	Log.writeLog("TRA", "ERROR: rcv'd seq out of window", true);
-                    }
-                    
+                if (seg.isValidSegment()) {
+	                if (seg.isACK()) {
+	                	int seq = seg.getSEQ();
+	                	System.out.println("ACK RCV: " + seq + "");
+	                	if(sock.isValidACK(seq)){// not before window base!
+	                		sock.processAck(seg.getSEQ());
+	                	}else{
+	                		Log.writeLog("TRA", "ERROR: rcv'd ack out of window", true);
+	                	}
+	                    
+	                } else {
+	                    if(sock.isValidSEQ(seg.getSEQ())){
+	                    	sock.fillrcvBuffer(seg);
+	                    	//send ack
+	                    	route.pushSegment(new Segment(new byte[0], getAddress(), 
+	                    			sock.getSourcePort(), sock.getDestinationAddress(), 
+	                    			sock.getDesintationPort(), true, seg.getSEQ()));
+	                    }else{
+	                    	route.pushSegment(new Segment(new byte[0], getAddress(), 
+	                    			sock.getSourcePort(), sock.getDestinationAddress(), 
+	                    			sock.getDesintationPort(), true, seg.getSEQ()));
+	                    	
+	                    	Log.writeLog("TRA", "ERROR: rcv'd seq out of window", true);
+	                    }
+	                    
+	                }
+                }else{
+                	Log.writeLog("TRA", "Received invalid segment", true);
                 }
-                //}
             }
         }
     }

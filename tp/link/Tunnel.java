@@ -115,7 +115,6 @@ public class Tunnel extends Thread implements Link {
     
     @Override
     public void pushSegment(Segment s) {
-    	System.out.println("pushage");
     	try {
 			os.write(s.getBytes());
 		} catch (IOException e) {

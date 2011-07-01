@@ -93,7 +93,6 @@ public class FileReceiver extends Thread {
         byte[] read = null;
         long length = bytesToLong(fileLength);
         while (dataPtr < length) {
-        	System.out.println(dataPtr +" = datapointer");
             read = tpSocket.readIn();
             fos.write(read);
             dataPtr += read.length;
