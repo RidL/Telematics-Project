@@ -49,17 +49,14 @@ public class TPSocket {
     // aangeroepen door app voor data van trans
     public byte[] readIn() {
         byte[] temp = null;
-        System.out.println("HANG");
         synchronized (INLOCK) {
             if (!isInDirty()) {
                 try {
-                       System.out.println("WAITING FOR INLOCK");
                     INLOCK.wait();
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
             }
-            System.out.println("INLOCK ACQUIRED");
             temp = inBuffer;
             inBuffer = null;
             INLOCK.notify();
@@ -227,19 +224,19 @@ public class TPSocket {
     			if(i>=seqNr)
     				break;
     		}else{
-    			if(this.seqNr>=sndWindowBase){
+    			if(this.seqNr>=sndWindowBase){ //offbyone >= / >?
     				if(i>=sndWindowBase){
     					if(i>=this.seqNr)
     						break;
     				}else{
-    					System.out.println("AAAAAAAAAAAAHHHHHH++++++");
+    					Log.writeLog("TPS", "seq na sndWindowBase en i ook ABORT", true);
     				}
     			}else{
     				if(i<sndWindowBase){
     					if(i>=this.seqNr)
     						break;
     				}else{
-    					System.out.println("AAAAAAAAAAAAHHHHHH++++++");
+    					Log.writeLog("TPS", "seq voor sndWindowBase en i na seq ABORT", true);
     				}
     			}
     		}
