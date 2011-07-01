@@ -7,7 +7,7 @@ import lpt.ErrorLpt;
 public class LLReceiver {
     private static final int INITIAL_VALUE = 10;
     private static final int LL_SLEEP_TIME = 200;
-    private ErrorLpt lpt;
+    private Lpt lpt;
     private HLReceiver hlr;
     private boolean alt;
     private boolean frameReceived;
@@ -24,7 +24,7 @@ public class LLReceiver {
     private boolean sysoutLog = false;
     public LLReceiver(HLReceiver hlr) {
         this.hlr = hlr;
-        lpt = new ErrorLpt();
+        lpt = new Lpt();
         alt = true;
         f = null;
         frameReceived = false;
