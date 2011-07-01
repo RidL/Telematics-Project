@@ -42,14 +42,13 @@ public class Tunnel extends Thread implements Link {
                 for (int i = 0; i < in; i++) {
                     data[7 + i] = is.readByte();
                 }
-
+                Trans.getTrans().getRoute().rcvSegment(new Segment(data));
             } catch (IOException e) {
                 System.out.println("Connection closed @ " + addr);
                 isConnected = false;
                 Trans.getTrans().getRoute().changed();
                 connect();
             }
-            Trans.getTrans().getRoute().rcvSegment(new Segment(data));
         }
     }
     

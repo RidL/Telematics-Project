@@ -45,8 +45,6 @@ public class TransUI extends JFrame{
 	            UIManager.getSystemLookAndFeelClassName());
 	    } 
 	    catch (Exception e) {}
-		try{
-			new TransUI();
-		}catch(Exception e){System.err.println("Uncaught Exception");}
+		new TransUI();
 	}
 }
