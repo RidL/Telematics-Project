@@ -62,7 +62,7 @@ public class Segment {
     
     public Segment(byte[] bytes, boolean doh){
     	this.bytes = bytes;
-    	this.data = new byte[bytes[5]+7];
+    	this.data = new byte[bytes[5]];
     	for(int i=0; i<data.length; i++){
     		this.data[i] = bytes[i+7];
     	}
