@@ -102,6 +102,8 @@ public class RouteOptionsFrame extends JFrame{
 				rcv = new HLReceiver();
 				snd = new HLSender(rcv);
 				rcv.setSender(snd);
+				rcv.start();
+				snd.start();
 				Trans.getTrans().getRoute().addRoute(Integer.parseInt(texts[1].getText()), snd);
 			}else{
 				if(tun){

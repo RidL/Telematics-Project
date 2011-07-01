@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
 
+import tp.link.HLSender;
 import tp.link.Link;
 import tp.util.Log;
 
@@ -40,6 +41,10 @@ public class Route extends Observable implements Runnable{
                     s = it.next();
                     int addr = s.getDestinationAddress();
                     Link destLink = routingTable.get(addr);
+                    
+                    if(destLink instanceof HLSender)
+                    	Log.writeLog("ROUT", "I WAS RIGHT< TWAS A HLSender", true);
+                    
                     if(destLink.readyToPushSegment()) {
                         destLink.pushSegment(s);
                         break;
@@ -90,7 +95,6 @@ public class Route extends Observable implements Runnable{
 		Log.writeLog("ROUT", s.toString(), true);
         synchronized(LOCK){
             routableSegs.add(s);
-            stats.addOut(s);
             LOCK.notifyAll();
         }
 	}
