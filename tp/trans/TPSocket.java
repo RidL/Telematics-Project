@@ -222,9 +222,9 @@ public class TPSocket {
     public boolean isValidACK(int seq){
     	boolean ret;
     	if(sndWindowBase<128){
-    		ret = (seq>sndWindowBase)&&(seq<(sndWindowBase+TPSocket.WINDOW_SIZE));
+    		ret = (seq>=sndWindowBase)&&(seq<(sndWindowBase+TPSocket.WINDOW_SIZE));
     	}else{
-    		ret = (seq<((sndWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (seq>sndWindowBase);
+    		ret = (seq<((sndWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (seq>=sndWindowBase);
     	}
     	return ret;
     }

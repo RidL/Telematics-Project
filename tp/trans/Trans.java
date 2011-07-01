@@ -3,6 +3,8 @@ package tp.trans;
 import java.util.ArrayList;
 import java.util.List;
 
+import tp.util.Log;
+
 public class Trans extends Thread {
     private static Trans ref;
     private static Route route;
@@ -120,7 +122,7 @@ public class Trans extends Thread {
                 	if(sock.isValidACK(seq)){// not before window base!
                 		sock.processAck(seg.getSEQ());
                 	}else{
-                		System.out.println("ERROR: rcv'd ack out of window");
+                		Log.writeLog("TRA", "ERROR: rcv'd ack out of window", true);
                 	}
                     
                 } else {
@@ -131,7 +133,7 @@ public class Trans extends Thread {
                     			sock.getSourcePort(), sock.getDestinationAddress(), 
                     			sock.getDesintationPort(), true, seg.getSEQ()));
                     }else{
-                    	System.out.println("ERROR: rcv'd seq out of window");
+                    	Log.writeLog("TRA", "ERROR: rcv'd seq out of window", true);
                     }
                     
                 }
