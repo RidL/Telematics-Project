@@ -142,7 +142,7 @@ public class FileReceiver extends Thread {
     @Override
     public void run() {
         try {
-        	while(true)
+        	//while(true)
         		receive();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
