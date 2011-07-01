@@ -135,7 +135,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		synchronized(this){
+		try{
 			Set<Map.Entry<Integer,Link>> routes = Trans.getTrans().getRoute().getRoutes();
 			opts.clear();
 			for(Map.Entry<Integer, Link> e: routes){
@@ -156,7 +156,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 				opts.add(ro);
 			}
 			routeData.setModel(new MyTableModel(opts));
-		}
+		}catch(Exception e){}
 		
 	}
 	

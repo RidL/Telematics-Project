@@ -18,7 +18,6 @@ public class TPSocket {
     
     private int seqNr;
     private int ackNr;
-    private int lastAcked;
     private int dstAddress;
     private int srcPort;
     private int dstPort;
@@ -37,7 +36,6 @@ public class TPSocket {
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
         seqNr = 0;
         ackNr = 0;
-        lastAcked = -1;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
@@ -187,23 +185,12 @@ public class TPSocket {
     public Object getINLOCK() {
         return INLOCK;
     }
-
-    public void incrLastAcked() {
-        lastAcked++;
-        if (lastAcked == SEQ_NR_LIMIT) {
-            lastAcked = 0;
-        }
-    }
     
     public void incrSeq() {
         seqNr++;
         if (seqNr == SEQ_NR_LIMIT) {
             seqNr = 0;
         }
-    }
-
-    public int getLastAcked() {
-        return lastAcked;
     }
     
     public void resetTimer(){
@@ -296,6 +283,20 @@ public class TPSocket {
     		ret = (ack<((rcvWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (ack>=rcvWindowBase);
     	}
     	return ret;
+	}
+
+	public void reset() {
+		seqNr = 0;
+		ackNr = 0;
+		sndWindowBase = 0;
+		rcvWindowBase = 0;
+		for(int i=0; i<WINDOW_SIZE; i++){
+			sndBuffer[i] = null;
+			rcvBuffer[i] = null;
+			inBuffer = null;
+			outBuffer = null;
+		}
+		
 	}
 }
 

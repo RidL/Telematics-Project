@@ -94,7 +94,6 @@ public class Tunnel extends Thread implements Link {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
     	Trans.getTrans().getRoute().changed();
     }
     

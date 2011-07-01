@@ -100,6 +100,7 @@ public class Trans extends Thread {
 
     public void closeSocket(TPSocket sock) {
         sockList.remove(sock);
+        sock.reset();
     }
 
     public Route getRoute() {
