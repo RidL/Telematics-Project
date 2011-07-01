@@ -230,30 +230,37 @@ public class TPSocket {
     }
     
     public void processAck(int seqNr) {
-//        for (int i = 0; i < sndBuffer.size(); i++) {
-//            if (sndBuffer.get(i).getSEQ() == seq_nr) {
-//                sndBuffer.set(i, null);
-//                break;
-//            }
-//        }
-//        Iterator<Segment> it = sndBuffer.listIterator();
-//        while (it.hasNext()) {
-//            if (it.next() == null) {
-//                it.remove();
-//                incrLastAcked();
-//            } else {
-//                break;
-//            }
-//        }
     	sndBuffer[seqNr%WINDOW_SIZE] = null;
     	int i;
-    	for(i=sndWindowBase; i<(sndWindowBase+WINDOW_SIZE); i++){
+    	for(i=sndWindowBase; (i<(sndWindowBase+WINDOW_SIZE)); i=(i+1)%SEQ_NR_LIMIT){
     		if(sndBuffer[i%WINDOW_SIZE]!=null)
     			break;
+    		
+    		if(sndWindowBase<128){
+    			if(i>=seqNr)
+    				break;
+    		}else{
+    			if(this.seqNr>=sndWindowBase){
+    				if(i>=sndWindowBase){
+    					if(i>=this.seqNr)
+    						break;
+    				}else{
+    					System.out.println("AAAAAAAAAAAAHHHHHH++++++");
+    				}
+    			}else{
+    				if(i<sndWindowBase){
+    					if(i>=this.seqNr)
+    						break;
+    				}else{
+    					System.out.println("AAAAAAAAAAAAHHHHHH++++++");
+    				}
+    			}
+    		}
+    		
     	}
     	
     	sndWindowBase = i%SEQ_NR_LIMIT;
-    	Log.writeLog("TPS", "Processing ACK " + seqNr + "settubg sndwBase to " + sndWindowBase, true);
+    	Log.writeLog("TPS", "Processing ACK " + seqNr + " setting sndwBase to " + sndWindowBase, true);
     }
     
     public int getSndWindowBase(){
