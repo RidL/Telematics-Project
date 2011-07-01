@@ -43,7 +43,10 @@ public class Frame {
 	public Frame(byte[] data, byte head){
 		bytes = new byte[8];
         bytes[0] = head;
-        unescape(data, bytes, 1);
+        byte[] tmp = unescape(data);
+        for(int i=1; i<8; i++){
+        	bytes[i] = tmp[i-1];
+        }
         Log.writeLog("FRAM", Frame.toBinaryString(data), true);
         Log.writeLog("FRAM", Frame.toBinaryString(bytes), true);
 	}

@@ -257,15 +257,15 @@ public class HLReceiver extends Thread {
              * Ook moet hier iets komen dat niet volledige buffer (24 size) kan worden gepushed, max 21
              * 
              */
-            byte[] buff = new byte[21*8];
+            byte[] buff = new byte[21*5];
             for(int i=0; i<21; i++){
-            	for(int k=0; k<8; k++){
+            	for(int k=0; k<5; k++){
             		if(frameBuffer[i]!=null){
-            			buff[(i*8)+k] = frameBuffer[i].getBytes()[k];
+            			buff[(i*5)+k] = frameBuffer[i].getBytes()[k+1];
             		}
             	}
             }
-            Trans.getTrans().getRoute().rcvSegment(new Segment(buff));
+            Trans.getTrans().getRoute().rcvSegment(new Segment(buff, true));
             
             resetSegment();
             System.out.println("Segment received");

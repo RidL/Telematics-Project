@@ -44,7 +44,7 @@ public class Segment {
     }
 
     public Segment(byte[] bytes) {
-    	System.out.println(Frame.toBinaryString(bytes[5]));
+    	System.out.println(bytes[5]+" "+Frame.toBinaryString(bytes[5]));
         byte[] tmp = new byte[(bytes[5]+7)];
         byte[] dat = new byte[(bytes[5])];
         
@@ -57,7 +57,15 @@ public class Segment {
         this.bytes = tmp;
         this.data = dat;
     }
-
+    
+    public Segment(byte[] bytes, boolean doh){
+    	this.bytes = bytes;
+    	this.data = new byte[bytes.length-7];
+    	for(int i=0; i<bytes.length-7; i++){
+    		this.data[i] = bytes[7+i];
+    	}
+    }
+    
     public int getSourcePort() {
         return (int) (bytes[0] & 0x0f);
     }
