@@ -1,19 +1,16 @@
 package tp.app;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tp.link.Frame;
 import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 import tp.trans.UnkownTPHostException;
-import tp.util.Log;
 
 /**
  * Responsible for reading data from the socket
@@ -22,9 +19,7 @@ import tp.util.Log;
 public class FileReceiver extends Thread {
 
     private static final int MAX_SEGMENT_DATA = 96;
-    private Trans trans;
     private TPSocket tpSocket;
-    //private FakeSocket tpSocket;
     private File file;
     private FileOutputStream fos;
 
@@ -35,10 +30,8 @@ public class FileReceiver extends Thread {
      * @param dstPort the destination port
      */
     public FileReceiver(int address, int srcPort, int dstPort) {
-        trans = Trans.getTrans();
-        //trans.start();
         try {
-			tpSocket = trans.createSocket(address, srcPort, dstPort);
+			tpSocket = Trans.getTrans().createSocket(address, srcPort, dstPort);
 		} catch (SocketTakenException e) {
 			e.printStackTrace();
 		} catch (UnkownTPHostException e) {
@@ -47,8 +40,6 @@ public class FileReceiver extends Thread {
     }
 
     public FileReceiver(int address, int srcPort, int dstPort, FileSender sender) {
-        trans = Trans.getTrans();
-        //trans.start();
         //tpSocket = trans.createSocket(address, srcPort, dstPort);
         //tpSocket = new FakeSocket(false);
 
@@ -60,10 +51,9 @@ public class FileReceiver extends Thread {
      */
     public void receive() throws FileNotFoundException, IOException, InterruptedException {
         byte[] bytesIn = null;
-        System.out.println("poepje");
+        System.out.println("Started Waiting for File");
         bytesIn = tpSocket.readIn();
         System.out.println("bytesIN: " + bytesIn);
-        Log log = Log.getInstance("dd");
 
         int fileNameLength = (int) bytesIn[0];
         byte[] fileName = new byte[fileNameLength];
@@ -152,9 +142,8 @@ public class FileReceiver extends Thread {
     @Override
     public void run() {
         try {
-            //  while(true) {
-            receive();
-            // }
+        	while(true)
+        		receive();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -163,23 +152,5 @@ public class FileReceiver extends Thread {
             Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
         // }
-    }
-
-    public static void main(String[] args) {
-        Log.getInstance("FileReceiver");
-        FileReceiver f = null;
-
-        if (args.length == 4) {
-            try {
-                f = new FileReceiver(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
-                        Integer.parseInt(args[23]));
-            } catch (NumberFormatException nfe) {
-                System.out.println("ERROR: Wrong arguments");
-                System.out.println("Number format exception");
-            }
-            //f.receive();
-        } else {
-            System.out.println("ERROR: Wrong arguments");
-        }
     }
 }

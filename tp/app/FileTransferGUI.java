@@ -112,8 +112,6 @@ public class FileTransferGUI extends JFrame implements WindowListener{
                 address = Integer.parseInt(addressField.getText());
                 sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
-                // fs = new FileSender(address, sourcePort, destPort);
-                // fr = new FileReceiver(address, sourcePort, destPort);
                 init = true;
             }
 
@@ -130,7 +128,8 @@ public class FileTransferGUI extends JFrame implements WindowListener{
                 sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
                 try {
-                    fs = new FileSender(address, sourcePort, destPort);
+                	if(fs == null)
+                		fs = new FileSender(address, sourcePort, destPort);
                     fs.send(file.getAbsolutePath());
                 } catch (FileNotFoundException ex) {
                     System.out.println("ERROR: File not found ( " + file.getAbsolutePath() + ")");
@@ -144,56 +143,34 @@ public class FileTransferGUI extends JFrame implements WindowListener{
                 address = Integer.parseInt(addressField.getText());
                 sourcePort = Integer.parseInt(sourcePortField.getText());
                 destPort = Integer.parseInt(destPortField.getText());
-                fr = new FileReceiver(address, sourcePort, destPort);
-                fr.start();
+                if(fr==null){
+                	fr = new FileReceiver(address, sourcePort, destPort);
+                    fr.start();
+                }
             }
         }
     }
 
 	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowActivated(WindowEvent arg0) {}
 
 	@Override
-	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowClosed(WindowEvent arg0) {}
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		TPSocket s = null;
-		if(fr==null)
-			s = fs.getSocket();
-		else
-			s = fr.getSocket();
-		Trans.getTrans().closeSocket(s);
-		dispose();
+		Trans.getTrans().closeSocket(fr.getSocket());
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowDeactivated(WindowEvent arg0) {}
 
 	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowDeiconified(WindowEvent arg0) {}
 
 	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowIconified(WindowEvent arg0) {}
 
 	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowOpened(WindowEvent arg0) {}
 }
