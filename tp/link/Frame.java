@@ -44,8 +44,8 @@ public class Frame {
 		bytes = new byte[8];
         bytes[0] = head;
         unescape(data, bytes, 1);
-        Frame.toBinaryString(data);
-        Frame.toBinaryString(bytes);
+        Log.writeLog("FRAM", Frame.toBinaryString(data), true);
+        Log.writeLog("FRAM", Frame.toBinaryString(bytes), true);
 	}
 
     public static int parity(byte[] data, int byteOffset, int max){
