@@ -97,6 +97,7 @@ public class Route extends Observable implements Runnable{
 	
 	public void rcvSegment(Segment s){
 		Log.writeLog("ROUT", "===== Received =====", true);
+		System.out.println(Thread.currentThread().toString());
 		Log.writeLog("ROUT", s.toString(), true);
 		
 		if(s.getDestinationAddress()==trans.getAddress()){

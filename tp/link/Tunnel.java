@@ -20,6 +20,7 @@ public class Tunnel extends Thread implements Link {
     private DataInputStream is;
 
     public Tunnel(String addr, int port, boolean listen){
+    	setName("TUNNEL @ " + addr);
         this.port = port;
         this.listening = listen;
         this.addr = addr;

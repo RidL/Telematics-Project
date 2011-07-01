@@ -12,10 +12,11 @@ public class Trans extends Thread {
     private List<TPSocket> sockList;
 
     private Trans(int address) {
+    	setName("Trans");
         route = new Route(this);
         Trans.address = address;
         sockList = new ArrayList<TPSocket>();
-        new Thread(route).start();
+        new Thread(route, "Route").start();
     }
 
     public static Trans getTrans(int addr) {
