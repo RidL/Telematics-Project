@@ -39,6 +39,8 @@ public class Segment {
             bytes[d+7] = data[d];
         }
 
+        System.out.println("Segment length: "+length);
+        
         this.data = data;
         calculateHash();
     }

@@ -114,20 +114,20 @@ public class HLReceiver extends Thread {
     
     public void ackReceived(Frame tempFrame) {
     	byte[] ack = new byte[5];
-    	for(int i = 0; i<5;i++){
-    		ack[i] =  tempFrame.getBytes()[i];
+    	for(int i = 1; i<6;i++){
+    		ack[i-1] =  tempFrame.getBytes()[i];
     	}
     	int[] ackScore = new int[5];
     	int	bestAck = 0;
-    	for(int i = 1;i<6;i++){
-    		for(int y = 1;y<6;y++){
+    	for(int i = 0;i<5;i++){
+    		for(int y = 0;y<5;y++){
     			if(ack[y]==ack[i]){
-    				ackScore[i-1] += 1;
+    				ackScore[i] += 1;
     			}
     		}
     		
-    		if(ackScore[i-1]>ackScore[bestAck]){
-    			bestAck = i-1;
+    		if(ackScore[i]>ackScore[bestAck]){
+    			bestAck = i;
     		}
     	}
 
