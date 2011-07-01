@@ -289,6 +289,7 @@ public class TPSocket {
     	for(i=rcvWindowBase; i<(rcvWindowBase+WINDOW_SIZE); i++){
     		if(rcvBuffer[i%WINDOW_SIZE]!=null){
     			writeIn(rcvBuffer[i%WINDOW_SIZE].getData());
+    			rcvBuffer[i%WINDOW_SIZE] = null;
     		}else{
     			break;
     		}    			
