@@ -229,14 +229,14 @@ public class TPSocket {
     					if(i>=this.seqNr)
     						break;
     				}else{
-    					Log.writeLog("TPS", "seq na sndWindowBase en i ook ABORT", true);
+    					Log.writeLog("TPS", "seq na sndWindowBase(" + sndWindowBase + ") en i(" + i +") ook ABORT", true);
     				}
     			}else{
     				if(i<sndWindowBase){
     					if(i>=this.seqNr)
     						break;
     				}else{
-    					Log.writeLog("TPS", "seq voor sndWindowBase en i na seq ABORT", true);
+    					Log.writeLog("TPS", "seq voor sndWindowBase(" + sndWindowBase + ") en i(" + i +") na seq ABORT", true);
     				}
     			}
     		}
