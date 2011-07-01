@@ -16,7 +16,7 @@ public class TPSocket {
     public final static int WINDOW_SIZE = 128;
     public final static int ACK_TIMEOUT = 500;
     
-    private int seqNr;
+    private int nextSeq;
     private int ackNr;
     private int dstAddress;
     private int srcPort;
@@ -34,7 +34,7 @@ public class TPSocket {
     private long timeCount;
     
     public TPSocket(int dstAddress, int srcPort, int dstPort) {
-        seqNr = 0;
+        nextSeq = 0;
         ackNr = 0;
         this.dstAddress = dstAddress;
         this.srcPort = srcPort;
@@ -147,7 +147,7 @@ public class TPSocket {
 
     public int getCurrentSeq() {
     	synchronized (OUTLOCK) {
-    		return seqNr;
+    		return nextSeq;
 		}
     }
 
@@ -184,9 +184,9 @@ public class TPSocket {
     }
     
     public void incrSeq() {
-        seqNr++;
-        if (seqNr == SEQ_NR_LIMIT) {
-            seqNr = 0;
+        nextSeq++;
+        if (nextSeq == SEQ_NR_LIMIT) {
+            nextSeq = 0;
         }
     }
     
@@ -221,19 +221,19 @@ public class TPSocket {
     			break;
     		
     		if(sndWindowBase<128){
-    			if(i>=seqNr)
+    			if(i>=this.nextSeq)
     				break;
     		}else{
-    			if(this.seqNr>=sndWindowBase){ //offbyone >= / >?
+    			if(this.nextSeq>=sndWindowBase){ //offbyone >= vs. >?
     				if(i>=sndWindowBase){
-    					if(i>=this.seqNr)
+    					if(i>=this.nextSeq)
     						break;
     				}else{
     					Log.writeLog("TPS", "seq na sndWindowBase(" + sndWindowBase + ") en i(" + i +") ook ABORT", true);
     				}
     			}else{
     				if(i<sndWindowBase){
-    					if(i>=this.seqNr)
+    					if(i>=this.nextSeq)
     						break;
     				}else{
     					Log.writeLog("TPS", "seq voor sndWindowBase(" + sndWindowBase + ") en i(" + i +") na seq ABORT", true);
@@ -283,7 +283,7 @@ public class TPSocket {
 	}
 
 	public void reset() {
-		seqNr = 0;
+		nextSeq = 0;
 		ackNr = 0;
 		sndWindowBase = 0;
 		rcvWindowBase = 0;
