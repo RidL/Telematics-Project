@@ -262,9 +262,13 @@ public class HLReceiver extends Thread {
             	for(int k=0; k<5; k++){
             		if(frameBuffer[i]!=null){
             			buff[(i*5)+k] = frameBuffer[i].getBytes()[k+1];
+            			
             		}
             	}
             }
+            
+            System.out.println(Frame.toBinaryString(buff));
+            
             Trans.getTrans().getRoute().rcvSegment(new Segment(buff, true));
             
             resetSegment();
