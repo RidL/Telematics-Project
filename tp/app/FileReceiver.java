@@ -65,6 +65,7 @@ public class FileReceiver extends Thread {
             fileName[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
                 bytesIn = tpSocket.readIn();
+                i=-1;
             }
         }
 
@@ -74,6 +75,7 @@ public class FileReceiver extends Thread {
             fileLength[j] = bytesIn[i];
             if (i == MAX_SEGMENT_DATA - 1) {
                 bytesIn = tpSocket.readIn();
+                i=-1;
             }
         }
         System.out.println("Filelength received: " + bytesToLong(fileLength));
