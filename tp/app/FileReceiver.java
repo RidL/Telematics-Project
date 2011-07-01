@@ -145,6 +145,10 @@ public class FileReceiver extends Thread {
         return result;
     }
 
+    public TPSocket getSocket(){
+    	return this.tpSocket;
+    }
+    
     @Override
     public void run() {
         try {

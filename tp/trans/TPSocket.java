@@ -303,6 +303,7 @@ public class TPSocket {
     	if(rcvWindowBase<128){
     		ret = (ack>=rcvWindowBase)&&(ack<(rcvWindowBase+TPSocket.WINDOW_SIZE));
     	}else{
+    		System.out.println("ACK: " + ack + " RCVWINDOWBASE: " + rcvWindowBase + "");
     		ret = (ack<((rcvWindowBase+TPSocket.WINDOW_SIZE)%TPSocket.SEQ_NR_LIMIT)) || (ack>=rcvWindowBase);
     	}
     	return ret;

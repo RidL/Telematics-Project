@@ -3,6 +3,8 @@ package tp.app;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,13 +15,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import tp.trans.TPSocket;
+import tp.trans.Trans;
 import tp.util.Log;
 
 /**
  *
  * @author jesse
  */
-public class FileTransferGUI extends JFrame {
+public class FileTransferGUI extends JFrame implements WindowListener{
 
     private File file;
     private FileSender fs;
@@ -32,7 +37,7 @@ public class FileTransferGUI extends JFrame {
         super(title);
         bHandler = new ButtonHandler();
         buildGUI(addr);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addWindowListener(this);
         setSize(400, 400);
         setVisible(true);
         pack();
@@ -149,4 +154,49 @@ public class FileTransferGUI extends JFrame {
         Log.getInstance("FileTransfer");
         new FileTransferGUI("File Transfer", 1);
     }
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		TPSocket s = fs.getSocket();
+		if(s==null)
+			s = this.fr.getSocket();
+		Trans.getTrans().closeSocket(s);
+		dispose();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }
