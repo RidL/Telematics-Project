@@ -154,13 +154,13 @@ public class ChatApp extends JFrame implements ActionListener, WindowListener{
 	public void windowActivated(WindowEvent arg0) {}
 
 	@Override
-	public void windowClosed(WindowEvent arg0) {
+	public void windowClosed(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
 		Trans.getTrans().closeSocket(chatReceiver.getSock());
 		dispose();
 	}
-
-	@Override
-	public void windowClosing(WindowEvent arg0) {}
 
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {}

@@ -99,6 +99,7 @@ public class Trans extends Thread {
     }
 
     public void closeSocket(TPSocket sock) {
+    	System.out.println("Removing socket to " + sock.getSourcePort() + "");
         sockList.remove(sock);
         sock.reset();
     }

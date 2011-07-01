@@ -168,10 +168,6 @@ public class ConnectionsUI extends JPanel implements Observer{
 			this.opziones = asd;
 		}
 		
-		public void setOptions(ArrayList<RouteOptions> asd){
-			this.opziones = asd;
-		}
-		
 		@Override
 		public String getColumnName(int col){
 			return COLUMN_NAMES[col];
