@@ -248,13 +248,8 @@ public class HLReceiver extends Thread {
         Log.writeLog(" HLR", "recPtr is: "+recPtr, sysoutLog);
         if(frameBuffer[recPtr-1] != null && frameBuffer[recPtr-1].isFin() && errCount==0) {
         	 Log.writeLog(" HLR", "Final frame encountered, empty'ing bufferz", sysoutLog);
-            recPtr = 0;
-            windowPtr = 0;
            
-            for(int i=0; i<frameBuffer.length; i++){
-            	frameBuffer[i] = null;
-            }
-            System.out.println("Segment received");
+            
             
             /**
              * Hier moet nog code komen op stuff naar boven te pushe
@@ -271,6 +266,9 @@ public class HLReceiver extends Thread {
             	}
             }
             Trans.getTrans().getRoute().rcvSegment(new Segment(buff));
+            
+            resetSegment();
+            System.out.println("Segment received");
         }
     }
 
