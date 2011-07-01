@@ -224,7 +224,7 @@ public class TPSocket {
     			if(i>=this.nextSeq)
     				break;
     		}else{
-    			if(this.nextSeq>=sndWindowBase){ //offbyone >= vs. >?
+    			if(this.nextSeq>sndWindowBase){ //offbyone >= vs. >?
     				if(i>=sndWindowBase){
     					if(i>=this.nextSeq)
     						break;
