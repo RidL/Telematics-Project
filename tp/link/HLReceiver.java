@@ -1,5 +1,7 @@
 package tp.link;
 
+import tp.trans.Segment;
+import tp.trans.Trans;
 import tp.util.Log;
 
 public class HLReceiver extends Thread {
@@ -260,6 +262,13 @@ public class HLReceiver extends Thread {
              * Ook moet hier iets komen dat niet volledige buffer (24 size) kan worden gepushed, max 21
              * 
              */
+            byte[] buff = new byte[21*8];
+            for(int i=0; i<21; i++){
+            	for(int k=0; k<8; k++){
+            		buff[(i*8)+k] = frameBuffer[i].getBytes()[k];
+            	}
+            }
+            Trans.getTrans().getRoute().rcvSegment(new Segment(buff));
         }
     }
 
