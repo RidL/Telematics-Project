@@ -224,12 +224,12 @@ public class TPSocket {
     			if(i>=this.nextSeq)
     				break;
     		}else{
-    			if(this.nextSeq>sndWindowBase){ //offbyone >= vs. >?
+    			if(this.nextSeq>sndWindowBase){
     				if(i>=sndWindowBase){
     					if(i>=this.nextSeq)
     						break;
     				}else{
-    					Log.writeLog("TPS", "seq na sndWindowBase(" + sndWindowBase + ") en i(" + i +") ook ABORT", true);
+    					Log.writeLog("TPS", "seq(" + nextSeq + ") na sndWindowBase(" + sndWindowBase + ") en i(" + i +") ook ABORT", true);
     				}
     			}else{
     				if(i<sndWindowBase){
