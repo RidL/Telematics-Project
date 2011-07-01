@@ -10,8 +10,6 @@ public class Trans extends Thread {
     private static Route route;
     private static int address;
     private List<TPSocket> sockList;
-//    private Timer timer;
-//    private TimeoutHandler tHandler;
 
     private Trans(int address) {
         route = new Route(this);
@@ -63,7 +61,6 @@ public class Trans extends Thread {
                 if (sock.isOutDirty()) {
                 	sock.resetTimer();
                 	if(sock.isValidACK(sock.getCurrentSeq()+1)){
-                		 System.out.println("new data read");
                 		 data = sock.readOut();
 	                     Segment s = createSegment(data, sock, false);
 	                     sock.addSegmentToSNDBuffer(s);
@@ -99,7 +96,6 @@ public class Trans extends Thread {
     }
 
     public void closeSocket(TPSocket sock) {
-    	System.out.println("Removing socket to " + sock.getSourcePort() + "");
         sockList.remove(sock);
         sock.reset();
     }

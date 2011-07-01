@@ -14,7 +14,6 @@ public class Segment {
     public Segment(byte[] data, int scrAddr, int scrPort, int destAddr, int destPort, boolean isAck, int ackSeq) {
         byte length = (byte) data.length;
         bytes = new byte[data.length + HEADER_LENGTH];
-        byte[] header = new byte[HEADER_LENGTH];
 
         byte scrAddrPort = (byte) ((scrAddr << 4) | scrPort);
         byte destAddrPort = (byte) ((destAddr << 4) | destPort);
@@ -147,14 +146,6 @@ public class Segment {
     		ret = bytes[6];
         }
     	return ret;
-    }
-
-    public String blaat() {
-                String s = "";
-        for (int i = 0; i < this.getBytes().length; i++) {
-            s += Frame.toBinaryString(this.getBytes()[i]) + "\n";
-        }
-        return s;
     }
     
     public String toString(){

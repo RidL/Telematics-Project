@@ -43,7 +43,7 @@ public class Tunnel extends Thread implements Link {
                 }
 
             } catch (IOException e) {
-                System.err.println("Connection closed @ " + addr);
+                System.out.println("Connection closed @ " + addr);
                 isConnected = false;
                 Trans.getTrans().getRoute().changed();
                 connect();
@@ -115,6 +115,7 @@ public class Tunnel extends Thread implements Link {
     
     @Override
     public void pushSegment(Segment s) {
+    	System.out.println("pushage");
     	try {
 			os.write(s.getBytes());
 		} catch (IOException e) {

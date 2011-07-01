@@ -165,8 +165,10 @@ public class FileTransferGUI extends JFrame implements WindowListener{
 	@Override
 	public void windowClosing(WindowEvent arg0) {
 		TPSocket s = null;
-		if(s==null)
-			s = this.fr.getSocket();
+		if(fr==null)
+			s = fs.getSocket();
+		else
+			s = fr.getSocket();
 		Trans.getTrans().closeSocket(s);
 		dispose();
 	}

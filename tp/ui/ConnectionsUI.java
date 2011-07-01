@@ -175,7 +175,7 @@ public class ConnectionsUI extends JPanel implements Observer{
 		
 		@Override
 		public int getColumnCount() {
-			return 6;
+			return COLUMN_NAMES.length;
 		}
 
 		@Override
