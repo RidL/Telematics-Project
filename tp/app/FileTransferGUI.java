@@ -160,6 +160,7 @@ public class FileTransferGUI extends JFrame implements WindowListener{
 	@Override
 	public void windowClosing(WindowEvent arg0) {
 		Trans.getTrans().closeSocket(fr.getSocket());
+		dispose();
 	}
 
 	@Override
