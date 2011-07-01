@@ -11,6 +11,7 @@ import tp.trans.SocketTakenException;
 import tp.trans.TPSocket;
 import tp.trans.Trans;
 import tp.trans.UnkownTPHostException;
+import tp.util.Log;
 
 /**
  * Responsible for reading data from the socket
@@ -53,17 +54,17 @@ public class FileReceiver extends Thread {
         byte[] bytesIn = null;
         System.out.println("Started Waiting for File");
         bytesIn = tpSocket.readIn();
-        System.out.println("bytesIN: " + bytesIn);
+        Log.writeLog("FRCV","bytesIN: " + bytesIn.length, true);
 
         int fileNameLength = (int) bytesIn[0];
         byte[] fileName = new byte[fileNameLength];
-
+        Log.writeLog("FRCV","FileNameLen " + fileNameLength, true);
         // read fileName from tpSocket
         // fileName might be longer than 1 tl-segment
         int i, j;
         for (i = 1, j = 0; j < fileNameLength; i++, j++) {
             fileName[j] = bytesIn[i];
-            if (i == MAX_SEGMENT_DATA - 1) {
+            if (i == bytesIn.length - 1) {
                 bytesIn = tpSocket.readIn();
                 i=-1;
             }
@@ -73,16 +74,18 @@ public class FileReceiver extends Thread {
         byte[] fileLength = new byte[8];
         for (j = 0; j < 8; i++, j++) {
             fileLength[j] = bytesIn[i];
-            if (i == MAX_SEGMENT_DATA - 1) {
+            if (i == bytesIn.length - 1) {
                 bytesIn = tpSocket.readIn();
                 i=-1;
             }
         }
-        System.out.println("Filelength received: " + bytesToLong(fileLength));
+        Log.writeLog("FRCV","Filelength received: " + bytesToLong(fileLength), true);
 
         // read (first) data that is left from the segment containing header info
-        byte[] firstData = new byte[MAX_SEGMENT_DATA - i];
-        for (j = 0; i < MAX_SEGMENT_DATA; i++, j++) {
+        byte[] firstData = new byte[bytesIn.length - i];
+        Log.writeLog("FRCV","Starting array with " + (bytesIn.length-i) + " bytes",true);
+        for (j = 0; i < bytesIn.length; i++, j++) {
+        	Log.writeLog("FRCV","i: " + i + " j: " + j,true);
             firstData[j] = bytesIn[i];
         }
         System.out.println("File gemaakt, rest van de data in file zette------------------------------------------------------------");
