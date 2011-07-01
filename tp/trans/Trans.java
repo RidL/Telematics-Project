@@ -53,9 +53,9 @@ public class Trans extends Thread {
             for (int i = 0; i < sockList.size(); i++) {
                 sock = sockList.get(i);
                 if(sock.timeout()){
-                	System.out.println("timeout");
                 	Segment s = sock.getSegmentFromSNDBuffer();
                 	if(s!=null){
+                		Log.writeLog("TRA", "timeout", true);
                 		route.pushSegment(s);
                 		sock.resetTimer();
                 	}
